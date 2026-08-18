@@ -1,56 +1,47 @@
 import React, { useState } from 'react';
 import { 
-  Save, 
-  RefreshCw, 
-  Upload, 
-  Image as ImageIcon, 
-  User, 
   Building, 
-  MapPin, 
-  Phone, 
-  Mail, 
+  Layout, 
+  Palette, 
+  Type, 
+  Save, 
   CheckCircle2, 
-  X, 
-  Sparkles,
+  Upload, 
+  RefreshCw, 
+  Sparkles, 
+  Sun, 
+  Moon, 
+  Maximize2, 
+  Sliders, 
+  ShieldCheck,
+  Eye,
   Layers,
-  Camera,
-  Plus,
-  Trash2,
-  Edit,
-  Search,
-  Filter
+  Image as ImageIcon
 } from 'lucide-react';
-import { StorageService } from '../services/storageService';
+import { defaultThemeSettings } from '../services/initialData';
 
 export default function AdminSettings({ profile, onUpdateProfile }) {
-  const [formData, setFormData] = useState({ ...profile });
-  const [activeSettingsTab, setActiveSettingsTab] = useState('branding'); // branding, general, vision, apparatus, contact
-  const [savedNotice, setSavedNotice] = useState(false);
-
-  // Apparatus Filter & Search
-  const [appCategoryFilter, setAppCategoryFilter] = useState('Semua');
-  const [appSearch, setAppSearch] = useState('');
-
-  // Modal Tambah / Edit Aparatur
-  const [apparatusModal, setApparatusModal] = useState(false);
-  const [editingAppIndex, setEditingAppIndex] = useState(null);
-  const [appForm, setAppForm] = useState({
-    category: 'Pemerintah Desa',
-    name: '',
-    position: '',
-    nip: '',
-    phone: '',
-    photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
-    area: ''
+  const [activeTab, setActiveTab] = useState('general'); // 'general', 'layout', 'styling', 'typography'
+  
+  const [formData, setFormData] = useState(() => {
+    return {
+      ...profile,
+      theme: {
+        ...defaultThemeSettings,
+        ...(profile?.theme || {})
+      }
+    };
   });
 
-  // File Upload Handlers (converts local image files to base64 DataURL for instant local preview and persistence)
+  const [savedNotice, setSavedNotice] = useState(false);
+
+  // File Upload Handlers (Logo, Photo, Banner, Office)
   const handleImageFileChange = (e, fieldPath) => {
     const file = e.target.files[0];
     if (!file) return;
 
     if (file.size > 3.5 * 1024 * 1024) {
-      alert('Ukuran file terlalu besar! Silakan gunakan gambar berukuran di bawah 3.5 MB.');
+      alert('Ukuran file maksimal 3.5 MB!');
       return;
     }
 
@@ -73,619 +64,263 @@ export default function AdminSettings({ profile, onUpdateProfile }) {
     reader.readAsDataURL(file);
   };
 
-  const handleAppModalPhotoChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      setAppForm(prev => ({ ...prev, photo: event.target.result }));
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleOpenAddApparatus = () => {
-    setEditingAppIndex(null);
-    setAppForm({
-      category: appCategoryFilter !== 'Semua' ? appCategoryFilter : 'Pemerintah Desa',
-      name: '',
-      position: '',
-      nip: '',
-      phone: '',
-      photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
-      area: ''
-    });
-    setApparatusModal(true);
-  };
-
-  const handleOpenEditApparatus = (app, originalIndex) => {
-    setEditingAppIndex(originalIndex);
-    setAppForm({
-      category: app.category || 'Pemerintah Desa',
-      name: app.name || '',
-      position: app.position || '',
-      nip: app.nip || '',
-      phone: app.phone || '',
-      photo: app.photo || '',
-      area: app.area || ''
-    });
-    setApparatusModal(true);
-  };
-
-  const handleSaveApparatus = (e) => {
-    e.preventDefault();
-    if (!appForm.name || !appForm.position) {
-      alert('Nama dan Jabatan wajib diisi!');
-      return;
-    }
-
-    const currentList = [...(formData.apparatus || [])];
-    if (editingAppIndex !== null) {
-      currentList[editingAppIndex] = {
-        ...currentList[editingAppIndex],
-        ...appForm
-      };
-    } else {
-      currentList.push({
-        id: `app-${Date.now()}`,
-        ...appForm
-      });
-    }
-
-    const updated = { ...formData, apparatus: currentList };
-    setFormData(updated);
-    onUpdateProfile(updated);
-    setApparatusModal(false);
-    setSavedNotice(true);
-    setTimeout(() => setSavedNotice(false), 3000);
-  };
-
-  const handleDeleteApparatus = (originalIndex, name) => {
-    if (window.confirm(`Apakah Anda yakin ingin menghapus data pengurus/aparatur "${name}"?`)) {
-      const currentList = [...(formData.apparatus || [])];
-      currentList.splice(originalIndex, 1);
-      const updated = { ...formData, apparatus: currentList };
-      setFormData(updated);
-      onUpdateProfile(updated);
-    }
-  };
-
-  const handleSubmit = (e) => {
+  const handleSave = (e) => {
     e.preventDefault();
     onUpdateProfile(formData);
     setSavedNotice(true);
-    setTimeout(() => setSavedNotice(false), 4000);
+    setTimeout(() => setSavedNotice(false), 3500);
   };
 
-  const handleResetDefaults = () => {
-    if (window.confirm('PERINGATAN: Apakah Anda yakin ingin mereset seluruh data website desa ke pengaturan awal pabrik?')) {
-      StorageService.resetToDefaults();
+  const handleResetTheme = () => {
+    if (window.confirm('Kembalikan pengaturan Layout, Styling, dan Tipografi ke setelan default desa?')) {
+      const reset = {
+        ...formData,
+        theme: defaultThemeSettings
+      };
+      setFormData(reset);
+      onUpdateProfile(reset);
+      setSavedNotice(true);
+      setTimeout(() => setSavedNotice(false), 3500);
     }
   };
 
-  // Filtered apparatus list with preserved original indexes
-  const apparatusWithIndex = (formData.apparatus || []).map((app, idx) => ({ ...app, originalIndex: idx }));
-  const filteredApparatus = apparatusWithIndex.filter((app) => {
-    const matchesCategory = appCategoryFilter === 'Semua' || app.category === appCategoryFilter;
-    const matchesSearch = app.name.toLowerCase().includes(appSearch.toLowerCase()) ||
-                          app.position.toLowerCase().includes(appSearch.toLowerCase()) ||
-                          (app.area && app.area.toLowerCase().includes(appSearch.toLowerCase()));
-    return matchesCategory && matchesSearch;
-  });
+  const presetColors = [
+    { label: 'Emerald Hijau (Bawaan)', hex: '#059669' },
+    { label: 'Teal Samudra', hex: '#0d9488' },
+    { label: 'Royal Blue Modern', hex: '#2563eb' },
+    { label: 'Indigo Elegant', hex: '#4f46e5' },
+    { label: 'Forest Deep', hex: '#064e3b' },
+    { label: 'Amber Keemasan', hex: '#d97706' },
+    { label: 'Crimson Merah', hex: '#dc2626' },
+    { label: 'Slate Dark', hex: '#334155' }
+  ];
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      {/* Settings Navigation Tabs */}
+      
+      {/* 1. TOP SUB-NAV TABS (General, Layout, Styling, Typography) */}
       <div style={{
         display: 'flex',
         gap: '0.5rem',
         background: '#ffffff',
-        padding: '0.75rem 1rem',
+        padding: '0.65rem 0.85rem',
         borderRadius: 'var(--radius-lg)',
         border: '1px solid var(--light-border)',
         boxShadow: 'var(--shadow-sm)',
-        overflowX: 'auto',
-        flexWrap: 'wrap'
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        justifyContent: 'space-between'
       }}>
-        <button
-          type="button"
-          className={`btn btn-sm ${activeSettingsTab === 'branding' ? 'btn-primary' : 'btn-secondary'}`}
-          onClick={() => setActiveSettingsTab('branding')}
-        >
-          <Camera size={15} /> Upload Logo & Foto Desa
-        </button>
-        <button
-          type="button"
-          className={`btn btn-sm ${activeSettingsTab === 'apparatus' ? 'btn-primary' : 'btn-secondary'}`}
-          onClick={() => setActiveSettingsTab('apparatus')}
-        >
-          <User size={15} /> Struktur Aparatur, RW & RT ({formData.apparatus?.length || 0})
-        </button>
-        <button
-          type="button"
-          className={`btn btn-sm ${activeSettingsTab === 'general' ? 'btn-primary' : 'btn-secondary'}`}
-          onClick={() => setActiveSettingsTab('general')}
-        >
-          <Building size={15} /> Identitas & Sambutan Kades
-        </button>
-        <button
-          type="button"
-          className={`btn btn-sm ${activeSettingsTab === 'vision' ? 'btn-primary' : 'btn-secondary'}`}
-          onClick={() => setActiveSettingsTab('vision')}
-        >
-          <Sparkles size={15} /> Visi, Misi & Sejarah
-        </button>
-        <button
-          type="button"
-          className={`btn btn-sm ${activeSettingsTab === 'contact' ? 'btn-primary' : 'btn-secondary'}`}
-          onClick={() => setActiveSettingsTab('contact')}
-        >
-          <Phone size={15} /> Kontak & Peta Kantor
-        </button>
+        <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+          <button
+            className={`btn btn-sm ${activeTab === 'general' ? 'btn-primary' : 'btn-secondary'}`}
+            onClick={() => setActiveTab('general')}
+          >
+            <Building size={14} /> General (Umum & Media)
+          </button>
+          <button
+            className={`btn btn-sm ${activeTab === 'layout' ? 'btn-primary' : 'btn-secondary'}`}
+            onClick={() => setActiveTab('layout')}
+          >
+            <Layout size={14} /> Layout (Tata Letak)
+          </button>
+          <button
+            className={`btn btn-sm ${activeTab === 'styling' ? 'btn-primary' : 'btn-secondary'}`}
+            onClick={() => setActiveTab('styling')}
+          >
+            <Palette size={14} /> Styling (Tema & Warna)
+          </button>
+          <button
+            className={`btn btn-sm ${activeTab === 'typography' ? 'btn-primary' : 'btn-secondary'}`}
+            onClick={() => setActiveTab('typography')}
+          >
+            <Type size={14} /> Typography (Tipografi)
+          </button>
+        </div>
+
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <button
+            type="button"
+            className="btn btn-secondary btn-sm"
+            onClick={handleResetTheme}
+            title="Reset ke Default"
+          >
+            <RefreshCw size={13} /> Reset Default
+          </button>
+          <button
+            type="button"
+            className="btn btn-primary btn-sm"
+            onClick={handleSave}
+          >
+            <Save size={13} /> Simpan Pengaturan
+          </button>
+        </div>
       </div>
 
-      {/* Success Alert */}
       {savedNotice && (
         <div style={{
           background: '#dcfce7',
           border: '1px solid #86efac',
           borderRadius: 'var(--radius-md)',
-          padding: '0.85rem 1.25rem',
+          padding: '0.75rem 1rem',
           color: '#166534',
           fontWeight: 700,
+          fontSize: '0.85rem',
           display: 'flex',
           alignItems: 'center',
-          gap: '0.65rem'
+          gap: '0.5rem'
         }}>
-          <CheckCircle2 size={20} color="#16a34a" />
-          Perubahan profil, struktur aparatur, dan media desa berhasil disimpan secara permanen!
+          <CheckCircle2 size={16} color="#16a34a" />
+          Pengaturan berhasil disimpan dan langsung diterapkan ke seluruh portal desa!
         </div>
       )}
 
-      {/* Form Card */}
-      <form onSubmit={handleSubmit} className="table-wrapper" style={{ padding: 'clamp(1.25rem, 3vw, 2rem)' }}>
+      {/* 2. FORM BODY */}
+      <form onSubmit={handleSave} className="table-wrapper" style={{ padding: '1.75rem' }}>
         
-        {/* 1. BRANDING & IMAGE UPLOAD TAB */}
-        {activeSettingsTab === 'branding' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+        {/* ====================================================================
+            TAB 1: GENERAL (Informasi Dasar, Media, Logo & Kontak)
+            ==================================================================== */}
+        {activeTab === 'general' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             <div>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '0.35rem' }}>
-                Pengaturan Logo & Media Visual Desa
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 0.25rem 0' }}>
+                Pengaturan Umum & Identitas Desa
               </h3>
-              <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', margin: 0 }}>
-                Unggah logo resmi dan foto desa. Gambar yang diunggah akan otomatis diperbarui di seluruh portal publik, kop surat resmi, dan panel admin.
-              </p>
+              <span style={{ fontSize: '0.825rem', color: 'var(--text-muted)' }}>
+                Sesuaikan nama desa, logo resmi, foto aparatur, slogan, dan informasi kontak kantor balai desa.
+              </span>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))', gap: '1.75rem' }}>
-              
-              {/* Box 1: LOGO DESA */}
-              <div style={{
-                background: '#f8fafc',
-                border: '1px solid var(--light-border)',
-                borderRadius: 'var(--radius-lg)',
-                padding: '1.5rem',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '1rem'
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <h4 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <ImageIcon size={18} color="#059669" /> Logo Resmi Desa
-                  </h4>
-                  <span className="badge badge-info">PNG / JPG / SVG</span>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-                  <div style={{
-                    width: '90px',
-                    height: '90px',
-                    borderRadius: 'var(--radius-md)',
-                    background: '#ffffff',
-                    border: '2px dashed #059669',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    overflow: 'hidden',
-                    flexShrink: 0,
-                    padding: '4px'
-                  }}>
-                    {formData.logo ? (
-                      <img src={formData.logo} alt="Logo Desa" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                    ) : (
-                      <Building size={32} color="#94a3b8" />
-                    )}
-                  </div>
-
-                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    <label className="btn btn-primary btn-sm" style={{ cursor: 'pointer', alignSelf: 'flex-start' }}>
-                      <Upload size={14} /> Pilih Logo dari Komputer
-                      <input
-                        type="file"
-                        accept="image/*"
-                        style={{ display: 'none' }}
-                        onChange={(e) => handleImageFileChange(e, 'logo')}
-                      />
-                    </label>
-                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Rekomendasi rasio 1:1, latar transparan (PNG).</span>
-                  </div>
-                </div>
-
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label" style={{ fontSize: '0.8rem' }}>Atau Masukkan URL Gambar Logo:</label>
-                  <input
-                    type="url"
-                    placeholder="https://domain.com/logo-desa.png"
-                    className="form-control"
-                    style={{ fontSize: '0.85rem' }}
-                    value={formData.logo || ''}
-                    onChange={(e) => setFormData({ ...formData, logo: e.target.value })}
-                  />
-                </div>
-              </div>
-
-              {/* Box 2: FOTO KEPALA DESA */}
-              <div style={{
-                background: '#f8fafc',
-                border: '1px solid var(--light-border)',
-                borderRadius: 'var(--radius-lg)',
-                padding: '1.5rem',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '1rem'
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <h4 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <User size={18} color="#059669" /> Foto Kepala Desa
-                  </h4>
-                  <span className="badge badge-success">Portret Resmi</span>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-                  <div style={{
-                    width: '90px',
-                    height: '90px',
-                    borderRadius: '50%',
-                    background: '#ffffff',
-                    border: '3px solid #059669',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    overflow: 'hidden',
-                    flexShrink: 0
-                  }}>
-                    <img
-                      src={formData.headOfVillage?.photo}
-                      alt="Kepala Desa"
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    />
-                  </div>
-
-                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    <label className="btn btn-primary btn-sm" style={{ cursor: 'pointer', alignSelf: 'flex-start' }}>
-                      <Upload size={14} /> Ganti Foto Kades
-                      <input
-                        type="file"
-                        accept="image/*"
-                        style={{ display: 'none' }}
-                        onChange={(e) => handleImageFileChange(e, 'headPhoto')}
-                      />
-                    </label>
-                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Foto profil berseragam dinas atau formal.</span>
-                  </div>
-                </div>
-
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label" style={{ fontSize: '0.8rem' }}>Atau Masukkan URL Foto Kades:</label>
-                  <input
-                    type="url"
-                    placeholder="https://..."
-                    className="form-control"
-                    style={{ fontSize: '0.85rem' }}
-                    value={formData.headOfVillage?.photo || ''}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      headOfVillage: { ...formData.headOfVillage, photo: e.target.value }
-                    })}
-                  />
-                </div>
-              </div>
-
-              {/* Box 3: FOTO BANNER HERO DESA */}
-              <div style={{
-                background: '#f8fafc',
-                border: '1px solid var(--light-border)',
-                borderRadius: 'var(--radius-lg)',
-                padding: '1.5rem',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '1rem'
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <h4 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <ImageIcon size={18} color="#059669" /> Banner / Wallpaper Desa
-                  </h4>
-                  <span className="badge badge-neutral">Landscape (16:9)</span>
-                </div>
-
-                <div style={{ height: '110px', borderRadius: 'var(--radius-md)', overflow: 'hidden', background: '#e2e8f0', position: 'relative' }}>
-                  <img
-                    src={formData.bannerImage || formData.officePhoto}
-                    alt="Banner Desa"
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  />
-                </div>
-
-                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-                  <label className="btn btn-primary btn-sm" style={{ cursor: 'pointer' }}>
-                    <Upload size={14} /> Upload Banner Baru
-                    <input
-                      type="file"
-                      accept="image/*"
-                      style={{ display: 'none' }}
-                      onChange={(e) => handleImageFileChange(e, 'bannerImage')}
-                    />
-                  </label>
-                </div>
-              </div>
-
-              {/* Box 4: FOTO KANTOR / BALAI DESA */}
-              <div style={{
-                background: '#f8fafc',
-                border: '1px solid var(--light-border)',
-                borderRadius: 'var(--radius-lg)',
-                padding: '1.5rem',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '1rem'
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <h4 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <Building size={18} color="#059669" /> Foto Gedung Balai Desa
-                  </h4>
-                  <span className="badge badge-neutral">Tampak Depan</span>
-                </div>
-
-                <div style={{ height: '110px', borderRadius: 'var(--radius-md)', overflow: 'hidden', background: '#e2e8f0' }}>
-                  <img
-                    src={formData.officePhoto}
-                    alt="Kantor Desa"
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  />
-                </div>
-
-                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-                  <label className="btn btn-primary btn-sm" style={{ cursor: 'pointer' }}>
-                    <Upload size={14} /> Upload Foto Kantor
-                    <input
-                      type="file"
-                      accept="image/*"
-                      style={{ display: 'none' }}
-                      onChange={(e) => handleImageFileChange(e, 'officePhoto')}
-                    />
-                  </label>
-                </div>
-              </div>
-
-            </div>
-          </div>
-        )}
-
-        {/* 2. APPARATUS STRUCTURE MANAGEMENT TAB (DESA, KADUS, RW, RT) */}
-        {activeSettingsTab === 'apparatus' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-              <div>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
-                  Kelola Struktur Aparatur, Kepala Dusun, RW, & RT
-                </h3>
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: '0.25rem 0 0 0' }}>
-                  Total terdata: {formData.apparatus?.length || 0} Pengurus & Aparatur (Termasuk 10 RW & 20 RT)
-                </p>
-              </div>
-
-              <button
-                type="button"
-                className="btn btn-primary btn-sm"
-                onClick={handleOpenAddApparatus}
-              >
-                <Plus size={15} /> Tambah Pengurus / Aparatur Baru
-              </button>
-            </div>
-
-            {/* Filter Toolbar */}
-            <div style={{
-              background: '#f8fafc',
-              padding: '0.85rem 1rem',
-              borderRadius: 'var(--radius-md)',
-              border: '1px solid var(--light-border)',
-              display: 'flex',
-              gap: '1rem',
-              flexWrap: 'wrap',
-              alignItems: 'center'
-            }}>
-              <div style={{ position: 'relative', flex: '1', minWidth: '220px' }}>
-                <Search size={15} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-                <input
-                  type="text"
-                  placeholder="Cari nama, jabatan (cth: RW 05, RT 12, Sekdes)..."
-                  className="form-control"
-                  style={{ paddingLeft: '2.25rem', height: '36px', fontSize: '0.85rem' }}
-                  value={appSearch}
-                  onChange={(e) => setAppSearch(e.target.value)}
-                />
-              </div>
-
-              <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap' }}>
-                {['Semua', 'Pemerintah Desa', 'Kepala Dusun (Kadus)', 'Rukun Warga (RW)', 'Rukun Tetangga (RT)'].map((cat) => (
-                  <button
-                    key={cat}
-                    type="button"
-                    className={`btn btn-sm ${appCategoryFilter === cat ? 'btn-primary' : 'btn-secondary'}`}
-                    style={{ fontSize: '0.75rem', padding: '0.3rem 0.65rem' }}
-                    onClick={() => setAppCategoryFilter(cat)}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Grid of Apparatus Cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: '1.25rem' }}>
-              {filteredApparatus.map((app) => (
-                <div
-                  key={app.id || app.originalIndex}
-                  style={{
-                    background: '#f8fafc',
-                    border: '1px solid var(--light-border)',
-                    borderRadius: 'var(--radius-md)',
-                    padding: '1.15rem',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    gap: '0.75rem',
-                    boxShadow: 'var(--shadow-sm)'
-                  }}
-                >
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', marginBottom: '0.75rem' }}>
-                      <div style={{ width: '54px', height: '54px', borderRadius: '50%', overflow: 'hidden', background: '#e2e8f0', flexShrink: 0, border: '2px solid #059669' }}>
-                        <img src={app.photo} alt={app.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <span className="badge badge-success" style={{ fontSize: '0.7rem', padding: '0.15rem 0.5rem', marginBottom: '0.2rem' }}>
-                          {app.category}
-                        </span>
-                        <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-main)', margin: '0.15rem 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {app.name}
-                        </h4>
-                        <span style={{ fontSize: '0.8rem', color: '#059669', fontWeight: 700 }}>
-                          {app.position}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div style={{ fontSize: '0.775rem', color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                      {app.nip && <div><strong>SK/NIP:</strong> {app.nip}</div>}
-                      {app.area && <div><strong>Wilayah:</strong> {app.area}</div>}
-                      {app.phone && (
-                        <div>
-                          <strong>WhatsApp:</strong> <a href={`https://wa.me/${app.phone.replace(/[^0-9]/g, '')}`} target="_blank" rel="noreferrer" style={{ color: '#059669', fontWeight: 600 }}>{app.phone}</a>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.4rem', borderTop: '1px solid var(--light-border)', paddingTop: '0.65rem' }}>
-                    <button
-                      type="button"
-                      className="btn btn-sm btn-secondary"
-                      style={{ fontSize: '0.75rem', padding: '0.25rem 0.6rem' }}
-                      onClick={() => handleOpenEditApparatus(app, app.originalIndex)}
-                    >
-                      <Edit size={13} /> Edit / Ganti Foto
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-sm btn-danger"
-                      style={{ fontSize: '0.75rem', padding: '0.25rem 0.5rem' }}
-                      onClick={() => handleDeleteApparatus(app.originalIndex, app.name)}
-                      title="Hapus"
-                    >
-                      <Trash2 size={13} />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* 3. GENERAL & SPEECH TAB */}
-        {activeSettingsTab === 'general' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
-              Identitas Desa & Sambutan Kepala Desa
-            </h3>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Nama Resmi Desa *</label>
-                <input
-                  type="text"
-                  required
-                  className="form-control"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Kode Wilayah Desa</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={formData.code}
-                  onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                />
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Slogan / Tagline Desa *</label>
-              <input
-                type="text"
-                required
-                className="form-control"
-                value={formData.tagline}
-                onChange={(e) => setFormData({ ...formData, tagline: e.target.value })}
-              />
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Kecamatan</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={formData.district}
-                  onChange={(e) => setFormData({ ...formData, district: e.target.value })}
-                />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Kabupaten / Kota</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={formData.regency}
-                  onChange={(e) => setFormData({ ...formData, regency: e.target.value })}
-                />
-              </div>
-            </div>
-
-            <div style={{ borderTop: '1px solid var(--light-border)', paddingTop: '1.25rem' }}>
-              <h4 style={{ fontSize: '1.05rem', fontWeight: 700, marginBottom: '1rem', color: '#059669' }}>
-                Profil & Sambutan Kepala Desa
+            {/* Sub-Section 1: Nama & Slogan */}
+            <div style={{ background: '#f8fafc', padding: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--light-border)' }}>
+              <h4 style={{ fontSize: '0.9rem', fontWeight: 800, color: '#059669', marginBottom: '1rem' }}>
+                1. Informasi Dasar Desa
               </h4>
+
               <div className="form-row">
                 <div className="form-group">
-                  <label className="form-label">Nama Lengkap & Gelar Kades</label>
+                  <label className="form-label">Nama Desa *</label>
+                  <input
+                    type="text"
+                    required
+                    className="form-control"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Kode Resmi Wilayah Kemendagri</label>
                   <input
                     type="text"
                     className="form-control"
-                    value={formData.headOfVillage?.name}
+                    value={formData.code}
+                    onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Kecamatan</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={formData.district}
+                    onChange={(e) => setFormData({ ...formData, district: e.target.value })}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Kabupaten / Kota</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={formData.regency}
+                    onChange={(e) => setFormData({ ...formData, regency: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Slogan / Tagline Desa</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={formData.tagline}
+                  onChange={(e) => setFormData({ ...formData, tagline: e.target.value })}
+                />
+              </div>
+            </div>
+
+            {/* Sub-Section 2: Upload Logo & Media */}
+            <div style={{ background: '#f8fafc', padding: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--light-border)' }}>
+              <h4 style={{ fontSize: '0.9rem', fontWeight: 800, color: '#059669', marginBottom: '1rem' }}>
+                2. Logo & Media Resmi
+              </h4>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))', gap: '1.25rem' }}>
+                {/* Logo Desa */}
+                <div style={{ background: '#ffffff', padding: '1rem', borderRadius: '10px', border: '1px solid var(--light-border)', textAlign: 'center' }}>
+                  <label className="form-label">Logo Desa</label>
+                  <div style={{ height: '70px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '0.75rem' }}>
+                    {formData.logo ? (
+                      <img src={formData.logo} alt="Logo" style={{ maxHeight: '65px', objectFit: 'contain' }} />
+                    ) : (
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Belum ada logo</span>
+                    )}
+                  </div>
+                  <label className="btn btn-secondary btn-sm" style={{ width: '100%', cursor: 'pointer' }}>
+                    <Upload size={13} /> Ganti Logo File
+                    <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handleImageFileChange(e, 'logo')} />
+                  </label>
+                </div>
+
+                {/* Foto Kades */}
+                <div style={{ background: '#ffffff', padding: '1rem', borderRadius: '10px', border: '1px solid var(--light-border)', textAlign: 'center' }}>
+                  <label className="form-label">Foto Kepala Desa</label>
+                  <div style={{ height: '70px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '0.75rem' }}>
+                    {formData.headOfVillage?.photo ? (
+                      <img src={formData.headOfVillage.photo} alt="Kades" style={{ height: '65px', width: '65px', borderRadius: '50%', objectFit: 'cover' }} />
+                    ) : (
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Belum ada foto</span>
+                    )}
+                  </div>
+                  <label className="btn btn-secondary btn-sm" style={{ width: '100%', cursor: 'pointer' }}>
+                    <Upload size={13} /> Ganti Foto Kades
+                    <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handleImageFileChange(e, 'headPhoto')} />
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            {/* Sub-Section 3: Kepala Desa & Kontak */}
+            <div style={{ background: '#f8fafc', padding: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--light-border)' }}>
+              <h4 style={{ fontSize: '0.9rem', fontWeight: 800, color: '#059669', marginBottom: '1rem' }}>
+                3. Kepala Desa & Kontak Kantor
+              </h4>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Nama Kepala Desa</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={formData.headOfVillage?.name || ''}
                     onChange={(e) => setFormData({
                       ...formData,
                       headOfVillage: { ...formData.headOfVillage, name: e.target.value }
                     })}
                   />
                 </div>
+
                 <div className="form-group">
-                  <label className="form-label">Masa Jabatan / Periode</label>
+                  <label className="form-label">Periode Masa Jabatan</label>
                   <input
                     type="text"
                     className="form-control"
-                    value={formData.headOfVillage?.period}
+                    value={formData.headOfVillage?.period || ''}
                     onChange={(e) => setFormData({
                       ...formData,
                       headOfVillage: { ...formData.headOfVillage, period: e.target.value }
@@ -695,284 +330,428 @@ export default function AdminSettings({ profile, onUpdateProfile }) {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Naskah Sambutan Kepala Desa</label>
+                <label className="form-label">Kata Sambutan Kepala Desa</label>
                 <textarea
-                  rows={4}
+                  rows={2}
                   className="form-control"
-                  value={formData.headOfVillage?.welcomeSpeech}
+                  value={formData.headOfVillage?.welcomeSpeech || ''}
                   onChange={(e) => setFormData({
                     ...formData,
                     headOfVillage: { ...formData.headOfVillage, welcomeSpeech: e.target.value }
                   })}
                 />
               </div>
-            </div>
-          </div>
-        )}
 
-        {/* 4. VISION, MISSION, HISTORY TAB */}
-        {activeSettingsTab === 'vision' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
-              Visi, Misi & Sejarah Desa
-            </h3>
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Nomor Telepon Kantor</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={formData.contact?.phone || ''}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      contact: { ...formData.contact, phone: e.target.value }
+                    })}
+                  />
+                </div>
 
-            <div className="form-group">
-              <label className="form-label">Visi Desa Sukamaju</label>
-              <textarea
-                rows={3}
-                className="form-control"
-                value={formData.vision}
-                onChange={(e) => setFormData({ ...formData, vision: e.target.value })}
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Misi Pembangunan Desa (Satu poin per baris)</label>
-              <textarea
-                rows={6}
-                className="form-control"
-                value={formData.missions ? formData.missions.join('\n') : ''}
-                onChange={(e) => setFormData({
-                  ...formData,
-                  missions: e.target.value.split('\n').filter(Boolean)
-                })}
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Ringkasan Sejarah & Asal-usul Desa</label>
-              <textarea
-                rows={5}
-                className="form-control"
-                value={formData.history}
-                onChange={(e) => setFormData({ ...formData, history: e.target.value })}
-              />
-            </div>
-          </div>
-        )}
-
-        {/* 5. CONTACT & EMERGENCY TAB */}
-        {activeSettingsTab === 'contact' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
-              Informasi Kontak & Jam Operasional
-            </h3>
-
-            <div className="form-group">
-              <label className="form-label">Alamat Kantor Desa</label>
-              <input
-                type="text"
-                className="form-control"
-                value={formData.contact?.address}
-                onChange={(e) => setFormData({
-                  ...formData,
-                  contact: { ...formData.contact, address: e.target.value }
-                })}
-              />
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Email Resmi Desa</label>
-                <input
-                  type="email"
-                  className="form-control"
-                  value={formData.contact?.email}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                    contact: { ...formData.contact, email: e.target.value }
-                  })}
-                />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Nomor Telepon Kantor</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={formData.contact?.phone}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                    contact: { ...formData.contact, phone: e.target.value }
-                  })}
-                />
+                <div className="form-group">
+                  <label className="form-label">Email Resmi Desa</label>
+                  <input
+                    type="email"
+                    className="form-control"
+                    value={formData.contact?.email || ''}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      contact: { ...formData.contact, email: e.target.value }
+                    })}
+                  />
+                </div>
               </div>
             </div>
+          </div>
+        )}
 
-            <div className="form-group">
-              <label className="form-label">Jam Pelayanan Kantor</label>
-              <input
-                type="text"
-                className="form-control"
-                value={formData.contact?.openingHours}
-                onChange={(e) => setFormData({
-                  ...formData,
-                  contact: { ...formData.contact, openingHours: e.target.value }
-                })}
-              />
+        {/* ====================================================================
+            TAB 2: LAYOUT (Tata Letak, Kontainer, Header & Spasi)
+            ==================================================================== */}
+        {activeTab === 'layout' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <div>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 0.25rem 0' }}>
+                Pengaturan Layout & Tata Letak
+              </h3>
+              <span style={{ fontSize: '0.825rem', color: 'var(--text-muted)' }}>
+                Atur lebar kontainer layar, perilaku navbar header, tinggi navigasi, dan kepadatan spasi halaman.
+              </span>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '1.25rem' }}>
+              
+              {/* Kontainer Lebar */}
+              <div style={{ background: '#f8fafc', padding: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--light-border)' }}>
+                <label className="form-label" style={{ fontWeight: 800 }}>Lebar Maksimal Kontainer (Grid Width)</label>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.75rem' }}>
+                  Menentukan batas lebar konten utama di layar lebar / desktop monitor.
+                </span>
+
+                <select
+                  className="form-control"
+                  value={formData.theme?.containerWidth || '1200px'}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    theme: { ...formData.theme, containerWidth: e.target.value }
+                  })}
+                >
+                  <option value="1140px">1140px (Compact Boxed)</option>
+                  <option value="1200px">1200px (Standar Proporsional - Bawaan)</option>
+                  <option value="1280px">1280px (Modern Wide)</option>
+                  <option value="1360px">1360px (Extra Wide HD)</option>
+                  <option value="100%">100% (Full Fluid Width)</option>
+                </select>
+              </div>
+
+              {/* Posisi Navbar Header */}
+              <div style={{ background: '#f8fafc', padding: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--light-border)' }}>
+                <label className="form-label" style={{ fontWeight: 800 }}>Posisi Navbar Header</label>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.75rem' }}>
+                  Perilaku bar navigasi saat pengguna menggulir (scroll) halaman.
+                </span>
+
+                <select
+                  className="form-control"
+                  value={formData.theme?.navbarPosition || 'sticky'}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    theme: { ...formData.theme, navbarPosition: e.target.value }
+                  })}
+                >
+                  <option value="sticky">Sticky Glassmorphism (Melekat di Atas Saat Scroll)</option>
+                  <option value="static">Static Normal (Tetap di Puncak Halaman Saja)</option>
+                </select>
+              </div>
+
+              {/* Tinggi Navbar Header */}
+              <div style={{ background: '#f8fafc', padding: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--light-border)' }}>
+                <label className="form-label" style={{ fontWeight: 800 }}>Tinggi Header Navbar</label>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.75rem' }}>
+                  Ketebalan bar navigasi bagian atas.
+                </span>
+
+                <select
+                  className="form-control"
+                  value={formData.theme?.navbarHeight || '60px'}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    theme: { ...formData.theme, navbarHeight: e.target.value }
+                  })}
+                >
+                  <option value="54px">54px (Ultra Sleek & Slim)</option>
+                  <option value="60px">60px (Kompak & Simetris - Bawaan)</option>
+                  <option value="66px">66px (Sedang / Balanced)</option>
+                  <option value="72px">72px (Spacious / Longgar)</option>
+                </select>
+              </div>
+
+              {/* Kepadatan Spasi Kartu */}
+              <div style={{ background: '#f8fafc', padding: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--light-border)' }}>
+                <label className="form-label" style={{ fontWeight: 800 }}>Kepadatan Spasi Konten (Spacing Density)</label>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.75rem' }}>
+                  Jarak padding antar-kotak, tabel, dan section.
+                </span>
+
+                <select
+                  className="form-control"
+                  value={formData.theme?.cardDensity || 'comfortable'}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    theme: { ...formData.theme, cardDensity: e.target.value }
+                  })}
+                >
+                  <option value="compact">Compact (Padat & Ringkas)</option>
+                  <option value="comfortable">Comfortable (Nyaman & Seimbang - Bawaan)</option>
+                  <option value="spacious">Spacious (Lapang & Lega)</option>
+                </select>
+              </div>
+
             </div>
           </div>
         )}
 
-        {/* Bottom Actions Bar */}
-        <div style={{
-          marginTop: '2rem',
-          paddingTop: '1.5rem',
-          borderTop: '1px solid var(--light-border)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '1rem'
-        }}>
+        {/* ====================================================================
+            TAB 3: STYLING (Warna Tema, Sudut Kartu & Bayangan)
+            ==================================================================== */}
+        {activeTab === 'styling' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <div>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 0.25rem 0' }}>
+                Pengaturan Styling, Warna & Sudut
+              </h3>
+              <span style={{ fontSize: '0.825rem', color: 'var(--text-muted)' }}>
+                Kustomisasi warna identitas desa, bentuk sudut rounded, dan intensitas bayangan elemen.
+              </span>
+            </div>
+
+            {/* Preset Color Palettes */}
+            <div style={{ background: '#f8fafc', padding: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--light-border)' }}>
+              <label className="form-label" style={{ fontWeight: 800 }}>Pilih Palet Warna Aksen Utama (Brand Primary)</label>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '1rem' }}>
+                Warna tombol utama, ikon aktif, badge status, dan aksen navbar portal desa.
+              </span>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))', gap: '0.75rem', marginBottom: '1.25rem' }}>
+                {presetColors.map((color) => {
+                  const isSelected = (formData.theme?.primaryColor || '#059669').toLowerCase() === color.hex.toLowerCase();
+                  return (
+                    <div
+                      key={color.hex}
+                      onClick={() => setFormData({
+                        ...formData,
+                        theme: { ...formData.theme, primaryColor: color.hex }
+                      })}
+                      style={{
+                        background: '#ffffff',
+                        border: isSelected ? `2px solid ${color.hex}` : '1px solid var(--light-border)',
+                        borderRadius: '10px',
+                        padding: '0.65rem 0.75rem',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        boxShadow: isSelected ? '0 4px 10px rgba(0,0,0,0.1)' : 'none',
+                        transition: 'var(--transition)'
+                      }}
+                    >
+                      <span style={{ width: '22px', height: '22px', borderRadius: '50%', background: color.hex, flexShrink: 0 }}></span>
+                      <span style={{ fontSize: '0.75rem', fontWeight: isSelected ? 800 : 600, color: 'var(--text-main)' }}>
+                        {color.label.split(' ')[0]}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Custom Color Input */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', background: '#ffffff', padding: '0.75rem 1rem', borderRadius: '8px', border: '1px solid var(--light-border)' }}>
+                <span style={{ fontSize: '0.8rem', fontWeight: 700 }}>Pilih Warna Custom (Hex):</span>
+                <input
+                  type="color"
+                  value={formData.theme?.primaryColor || '#059669'}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    theme: { ...formData.theme, primaryColor: e.target.value }
+                  })}
+                  style={{ width: '40px', height: '32px', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                />
+                <span style={{ fontFamily: 'monospace', fontWeight: 800, fontSize: '0.9rem', color: formData.theme?.primaryColor || '#059669' }}>
+                  {formData.theme?.primaryColor || '#059669'}
+                </span>
+              </div>
+            </div>
+
+            {/* Corner Radius & Shadows */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '1.25rem' }}>
+              
+              {/* Border Radius */}
+              <div style={{ background: '#f8fafc', padding: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--light-border)' }}>
+                <label className="form-label" style={{ fontWeight: 800 }}>Bentuk Kelengkungan Sudut (Border Radius)</label>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.75rem' }}>
+                  Tingkat kebulatan sudut tombol, kartu, dan kotak input.
+                </span>
+
+                <select
+                  className="form-control"
+                  value={formData.theme?.borderRadius || '12px'}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    theme: { ...formData.theme, borderRadius: e.target.value }
+                  })}
+                >
+                  <option value="4px">4px (Sharp / Tegas Kotak)</option>
+                  <option value="8px">8px (Sleek Modern)</option>
+                  <option value="12px">12px (Smooth Rounded - Bawaan)</option>
+                  <option value="18px">18px (Curved Lembut)</option>
+                  <option value="24px">24px (Pill Style Bulat)</option>
+                </select>
+              </div>
+
+              {/* Shadow Intensity */}
+              <div style={{ background: '#f8fafc', padding: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--light-border)' }}>
+                <label className="form-label" style={{ fontWeight: 800 }}>Intensitas Bayangan (Box Shadow)</label>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.75rem' }}>
+                  Efek kedalaman elevasi kartu dan container.
+                </span>
+
+                <select
+                  className="form-control"
+                  value={formData.theme?.shadowIntensity || 'soft'}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    theme: { ...formData.theme, shadowIntensity: e.target.value }
+                  })}
+                >
+                  <option value="none">Flat (Tanpa Bayangan)</option>
+                  <option value="subtle">Subtle (Bayangan Sangat Tipis)</option>
+                  <option value="soft">Soft Modern (Seimbang - Bawaan)</option>
+                  <option value="elevated">Elevated (Bayangan Tebal 3D)</option>
+                </select>
+              </div>
+
+            </div>
+          </div>
+        )}
+
+        {/* ====================================================================
+            TAB 4: TYPOGRAPHY (Jenis Font, Ukuran & Ketebalan Heading)
+            ==================================================================== */}
+        {activeTab === 'typography' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <div>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 0.25rem 0' }}>
+                Pengaturan Tipografi & Huruf
+              </h3>
+              <span style={{ fontSize: '0.825rem', color: 'var(--text-muted)' }}>
+                Pilih jenis font Google Fonts resmi, ukuran teks dasar, dan ketebalan huruf judul.
+              </span>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '1.25rem' }}>
+              
+              {/* Font Family */}
+              <div style={{ background: '#f8fafc', padding: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--light-border)' }}>
+                <label className="form-label" style={{ fontWeight: 800 }}>Jenis Font Utama (Google Fonts)</label>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.75rem' }}>
+                  Karakter huruf untuk seluruh antarmuka portal dan dashboard.
+                </span>
+
+                <select
+                  className="form-control"
+                  value={formData.theme?.fontFamily || "'Plus Jakarta Sans', system-ui, sans-serif"}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    theme: { ...formData.theme, fontFamily: e.target.value }
+                  })}
+                  style={{ fontWeight: 700 }}
+                >
+                  <option value="'Plus Jakarta Sans', system-ui, sans-serif">Plus Jakarta Sans (Modern & Bersih - Bawaan)</option>
+                  <option value="'Inter', system-ui, sans-serif">Inter (Presisi & Profesional UI)</option>
+                  <option value="'Outfit', system-ui, sans-serif">Outfit (Futuristik & Trendy)</option>
+                  <option value="'Poppins', system-ui, sans-serif">Poppins (Geometris & Ramah)</option>
+                  <option value="'Roboto', system-ui, sans-serif">Roboto (Standar Android & Universal)</option>
+                  <option value="'Montserrat', system-ui, sans-serif">Montserrat (Tegas & Elegan)</option>
+                </select>
+              </div>
+
+              {/* Base Font Size */}
+              <div style={{ background: '#f8fafc', padding: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--light-border)' }}>
+                <label className="form-label" style={{ fontWeight: 800 }}>Ukuran Font Dasar (Base Size)</label>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.75rem' }}>
+                  Skala ukuran pembacaan teks paragraf.
+                </span>
+
+                <select
+                  className="form-control"
+                  value={formData.theme?.baseFontSize || '16px'}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    theme: { ...formData.theme, baseFontSize: e.target.value }
+                  })}
+                >
+                  <option value="14px">14px (Kompak / Ringkas)</option>
+                  <option value="15px">15px (Sedang)</option>
+                  <option value="16px">16px (Standar Nyaman - Bawaan)</option>
+                  <option value="17px">17px (Besar & Jelas)</option>
+                </select>
+              </div>
+
+              {/* Heading Weight */}
+              <div style={{ background: '#f8fafc', padding: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--light-border)' }}>
+                <label className="form-label" style={{ fontWeight: 800 }}>Ketebalan Judul (Heading Weight)</label>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.75rem' }}>
+                  Tingkat ketebalan huruf pada judul halaman dan kartu.
+                </span>
+
+                <select
+                  className="form-control"
+                  value={formData.theme?.headingWeight || '800'}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    theme: { ...formData.theme, headingWeight: e.target.value }
+                  })}
+                >
+                  <option value="600">600 (Semi-Bold)</option>
+                  <option value="700">700 (Bold Standar)</option>
+                  <option value="800">800 (Extra-Bold Tegas - Bawaan)</option>
+                  <option value="900">900 (Black Tebal Maksimal)</option>
+                </select>
+              </div>
+
+              {/* Letter Spacing */}
+              <div style={{ background: '#f8fafc', padding: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--light-border)' }}>
+                <label className="form-label" style={{ fontWeight: 800 }}>Kerapatan Huruf (Letter Spacing)</label>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.75rem' }}>
+                  Jarak renggang antar-huruf pada teks.
+                </span>
+
+                <select
+                  className="form-control"
+                  value={formData.theme?.letterSpacing || '-0.01em'}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    theme: { ...formData.theme, letterSpacing: e.target.value }
+                  })}
+                >
+                  <option value="-0.02em">Rapat (-0.02em)</option>
+                  <option value="-0.01em">Proporsional (-0.01em - Bawaan)</option>
+                  <option value="0px">Normal (0px)</option>
+                  <option value="0.02em">Renggang (+0.02em)</option>
+                </select>
+              </div>
+
+            </div>
+
+            {/* Live Typography Preview Box */}
+            <div style={{ background: '#ffffff', padding: '1.5rem', borderRadius: 'var(--radius-md)', border: '2px dashed var(--primary)', marginTop: '0.5rem' }}>
+              <div style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: 800, textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+                Pratinjau Langsung Tipografi ({formData.theme?.fontFamily?.split(',')[0]}):
+              </div>
+              <h2 style={{
+                fontFamily: formData.theme?.fontFamily,
+                fontWeight: formData.theme?.headingWeight,
+                fontSize: '1.5rem',
+                margin: '0 0 0.5rem 0',
+                color: 'var(--text-main)',
+                letterSpacing: formData.theme?.letterSpacing
+              }}>
+                Pemerintah Desa Sukamaju Mandiri
+              </h2>
+              <p style={{
+                fontFamily: formData.theme?.fontFamily,
+                fontSize: formData.theme?.baseFontSize,
+                lineHeight: 1.6,
+                color: 'var(--text-muted)',
+                margin: 0
+              }}>
+                Platform pelayanan publik mandiri 24 jam dengan transparansi anggaran APBDes dan keterbukaan informasi terpadu.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* 3. SUBMIT BUTTON FOOTER */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', borderTop: '1px solid var(--light-border)', paddingTop: '1.5rem', marginTop: '1.5rem' }}>
           <button
-            type="button"
-            className="btn btn-secondary btn-sm"
-            onClick={handleResetDefaults}
-            style={{ color: '#dc2626', borderColor: '#fca5a5' }}
+            type="submit"
+            className="btn btn-primary"
+            style={{ padding: '0.75rem 1.75rem', fontSize: '0.95rem' }}
           >
-            <RefreshCw size={14} /> Reset ke Pengaturan Default
-          </button>
-
-          <button type="submit" className="btn btn-primary">
-            <Save size={16} /> Simpan Seluruh Pengaturan Profil
+            <Save size={16} /> Simpan Seluruh Pengaturan
           </button>
         </div>
 
       </form>
 
-      {/* MODAL TAMBAH / EDIT APARATUR / RW / RT */}
-      {apparatusModal && (
-        <div className="modal-backdrop" onClick={() => setApparatusModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3 className="modal-title" style={{ fontSize: '1.15rem' }}>
-                {editingAppIndex !== null ? 'Edit Pengurus / Aparatur' : 'Tambah Pengurus / Aparatur Baru'}
-              </h3>
-              <button className="modal-close" onClick={() => setApparatusModal(false)}>
-                <X size={20} />
-              </button>
-            </div>
-
-            <form onSubmit={handleSaveApparatus}>
-              <div className="modal-body">
-                {/* Photo Preview & Upload */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', marginBottom: '1.25rem', background: '#f8fafc', padding: '1rem', borderRadius: '12px', border: '1px solid var(--light-border)' }}>
-                  <div style={{ width: '64px', height: '64px', borderRadius: '50%', overflow: 'hidden', background: '#e2e8f0', flexShrink: 0, border: '2px solid #059669' }}>
-                    <img src={appForm.photo} alt="Foto" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  </div>
-                  <div>
-                    <label className="btn btn-primary btn-sm" style={{ cursor: 'pointer', marginBottom: '0.25rem' }}>
-                      <Upload size={13} /> Unggah Foto dari Komputer
-                      <input
-                        type="file"
-                        accept="image/*"
-                        style={{ display: 'none' }}
-                        onChange={handleAppModalPhotoChange}
-                      />
-                    </label>
-                    <span style={{ fontSize: '0.725rem', color: 'var(--text-muted)', display: 'block' }}>Format JPG/PNG portret</span>
-                  </div>
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Tingkatan / Kategori Struktur *</label>
-                  <select
-                    className="form-control"
-                    value={appForm.category}
-                    onChange={(e) => setAppForm({ ...appForm, category: e.target.value })}
-                  >
-                    <option value="Pemerintah Desa">Pemerintah Desa (Kades / Sekdes / Kasi / Kaur)</option>
-                    <option value="Kepala Dusun (Kadus)">Kepala Dusun (Kadus)</option>
-                    <option value="Rukun Warga (RW)">Rukun Warga (Ketua RW)</option>
-                    <option value="Rukun Tetangga (RT)">Rukun Tetangga (Ketua RT)</option>
-                  </select>
-                </div>
-
-                <div className="form-row">
-                  <div className="form-group">
-                    <label className="form-label">Nama Lengkap & Gelar *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Contoh: Bpk. Dadang Kusnadi"
-                      className="form-control"
-                      value={appForm.name}
-                      onChange={(e) => setAppForm({ ...appForm, name: e.target.value })}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Jabatan Struktural *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Contoh: Ketua RT 01 / Ketua RW 02"
-                      className="form-control"
-                      value={appForm.position}
-                      onChange={(e) => setAppForm({ ...appForm, position: e.target.value })}
-                    />
-                  </div>
-                </div>
-
-                <div className="form-row">
-                  <div className="form-group">
-                    <label className="form-label">Nomor SK / NIP</label>
-                    <input
-                      type="text"
-                      placeholder="SK. RT 01/2023 atau NIP"
-                      className="form-control"
-                      value={appForm.nip}
-                      onChange={(e) => setAppForm({ ...appForm, nip: e.target.value })}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Nomor WhatsApp Aktif</label>
-                    <input
-                      type="tel"
-                      placeholder="Contoh: 081234567890"
-                      className="form-control"
-                      value={appForm.phone}
-                      onChange={(e) => setAppForm({ ...appForm, phone: e.target.value })}
-                    />
-                  </div>
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Cakupan Wilayah / Alamat</label>
-                  <input
-                    type="text"
-                    placeholder="Contoh: Dusun Pasirjati (RW 01, RW 02)"
-                    className="form-control"
-                    value={appForm.area}
-                    onChange={(e) => setAppForm({ ...appForm, area: e.target.value })}
-                  />
-                </div>
-
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label" style={{ fontSize: '0.8rem' }}>Atau URL Foto Langsung:</label>
-                  <input
-                    type="url"
-                    placeholder="https://..."
-                    className="form-control"
-                    style={{ fontSize: '0.85rem' }}
-                    value={appForm.photo}
-                    onChange={(e) => setAppForm({ ...appForm, photo: e.target.value })}
-                  />
-                </div>
-              </div>
-
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setApparatusModal(false)}>
-                  Batal
-                </button>
-                <button type="submit" className="btn btn-primary">
-                  {editingAppIndex !== null ? 'Simpan Perubahan' : 'Tambah Pengurus'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

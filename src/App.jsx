@@ -133,6 +133,40 @@ export default function App() {
   const [requestsList, setRequestsList] = useState(() => StorageService.getRequests());
   const [complaintsList, setComplaintsList] = useState(() => StorageService.getComplaints());
 
+  // Dynamic Theme & CSS Variables Application
+  useEffect(() => {
+    const theme = profile?.theme;
+    if (!theme) return;
+
+    const root = document.documentElement;
+
+    // 1. Primary & Theme Colors
+    if (theme.primaryColor) {
+      root.style.setProperty('--primary', theme.primaryColor);
+      root.style.setProperty('--primary-hover', theme.primaryColor);
+      root.style.setProperty('--primary-light', `${theme.primaryColor}18`);
+      root.style.setProperty('--primary-border', `${theme.primaryColor}35`);
+    }
+
+    // 2. Typography
+    if (theme.fontFamily) {
+      root.style.setProperty('--font-main', theme.fontFamily);
+    }
+    if (theme.baseFontSize) {
+      root.style.fontSize = theme.baseFontSize;
+    }
+    if (theme.letterSpacing) {
+      root.style.letterSpacing = theme.letterSpacing;
+    }
+
+    // 3. Layout & Radius
+    if (theme.borderRadius) {
+      root.style.setProperty('--radius-md', theme.borderRadius);
+      root.style.setProperty('--radius-lg', `calc(${theme.borderRadius} * 1.3)`);
+    }
+
+  }, [profile?.theme]);
+
   // Modals
   const [serviceModalOpen, setServiceModalOpen] = useState(false);
   const [selectedLetterType, setSelectedLetterType] = useState('SKU');
@@ -315,7 +349,7 @@ export default function App() {
 
   const handleUpdateProfile = (updatedProfile) => {
     StorageService.saveProfile(updatedProfile);
-    addToast('Pengaturan profil desa berhasil disimpan!');
+    addToast('Pengaturan profil & tema desa berhasil disimpan!');
   };
 
   const pendingRequestsCount = (requestsList || []).filter(

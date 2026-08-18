@@ -1,3 +1,25 @@
+export const defaultThemeSettings = {
+  // Styling & Theme
+  primaryColor: "#059669",
+  secondaryColor: "#0d9488",
+  accentColor: "#f59e0b",
+  colorMode: "light", // 'light', 'dark-slate', 'emerald-twilight'
+  borderRadius: "12px", // '4px', '8px', '12px', '18px', '24px'
+  shadowIntensity: "soft", // 'none', 'subtle', 'soft', 'elevated'
+
+  // Layout
+  containerWidth: "1200px", // '1140px', '1200px', '1280px', '1360px', '100%'
+  navbarPosition: "sticky", // 'sticky', 'fixed', 'static'
+  navbarHeight: "60px", // '54px', '60px', '66px', '72px'
+  cardDensity: "comfortable", // 'compact', 'comfortable', 'spacious'
+
+  // Typography
+  fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", // 'Plus Jakarta Sans', 'Inter', 'Outfit', 'Poppins', 'Roboto', 'Montserrat'
+  baseFontSize: "16px", // '14px', '15px', '16px', '17px'
+  headingWeight: "800", // '600', '700', '800', '900'
+  letterSpacing: "-0.01em" // '0px', '-0.01em', '-0.02em', '0.02em'
+};
+
 export const initialVillageProfile = {
   name: "Desa Sukamaju Mandiri",
   tagline: "Maju Bersama Teknologi, Harmoni Bersama Tradisi Menuju Desa Berdaya & Sejahtera",
@@ -10,6 +32,7 @@ export const initialVillageProfile = {
   logo: "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?auto=format&fit=crop&w=200&q=80",
   bannerImage: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=1200&q=80",
   officePhoto: "https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=800&q=80",
+  theme: defaultThemeSettings,
   headOfVillage: {
     name: "H. Budi Santoso, S.AP",
     title: "Kepala Desa Sukamaju Mandiri",
@@ -91,7 +114,7 @@ export const initialWorkPrograms = [
     fundingSource: "Dana Desa (DDS) T.A. 2026",
     location: "Dusun Sukarame (RW 04 & RW 05)",
     schedule: "Juli - September 2026",
-    status: "SEDANG_BERJALAN", // 'PRIORITAS', 'SEDANG_BERJALAN', 'WAKTU_DEKAT', 'RENCANA_SELANJUTNYA'
+    status: "SEDANG_BERJALAN",
     progress: 75,
     pic: "Endang Supriatna, S.T (Kaur Pembangunan / TPK)",
     description: "Pengecoran jalan usaha tani sepanjang 650 meter dan normalisasi saluran irigasi guna memperlancar distribusi hasil panen padi dan sayuran warga."
@@ -134,32 +157,6 @@ export const initialWorkPrograms = [
     progress: 50,
     pic: "Ahmad Fauzi, S.Kom & Pengurus BUMDes",
     description: "Pemberdayaan petani kopi lokal dengan fasilitas pengolahan pasca panen modern agar nilai jual produk olahan kopi meningkat di pasaran."
-  },
-  {
-    id: "prog-5",
-    title: "Pipanisasi Saluran Air Bersih & Bak Penampungan Mata Air Pegunungan",
-    category: "Sanitasi & Kesehatan Lingkungan",
-    budget: 120000000,
-    fundingSource: "Dana Desa (DDS) Tahap II",
-    location: "Dusun Mekar (RW 09 & RW 10)",
-    schedule: "November 2026 - Januari 2027",
-    status: "WAKTU_DEKAT",
-    progress: 0,
-    pic: "Dewi Lestari, S.Sos (Kasi Kesra)",
-    description: "Penyaluran air bersih bebas kontaminasi sepanjang 2,2 km dari mata air pegunungan menuju 180 rumah keluarga prasejahtera."
-  },
-  {
-    id: "prog-6",
-    title: "Revitalisasi Ekowisata Curug Bening & Fasilitas Camping Ground",
-    category: "Pariwisata & Lingkungan",
-    budget: 95000000,
-    fundingSource: "Rencana APBDes T.A. 2027 (Musrenbangdes)",
-    location: "Kawasan Wisata Curug Bening Dusun Pasirjati",
-    schedule: "Maret - Juni 2027",
-    status: "RENCANA_SELANJUTNYA",
-    progress: 0,
-    pic: "Kaur Perencanaan & Pokdarwis Desa",
-    description: "Penambahan fasilitas jembatan gantung estetik, toilet standar wisata, dan gazebo ramah lingkungan untuk meningkatkan pendapatan desa."
   }
 ];
 
@@ -181,32 +178,7 @@ export const initialFamiliesList = [
     sanitation: "Jamban Sehat Pribadi",
     issueDate: "12 Januari 2020",
     members: [
-      { id: "cit-1", nik: "3204151208850002", name: "Bambang Sudrajat", gender: "Laki-Laki", birthPlace: "Bandung", birthDate: "12-08-1985", religion: "Islam", education: "SMA / Sederajat", occupation: "Wiraswasta / Pemilik Warung", maritalStatus: "Kawin", relation: "Kepala Keluarga", bloodType: "O", fatherName: "Sudrajat", motherName: "Siti Aminah", phone: "081298765412" },
-      { id: "cit-2", nik: "3204154803880003", name: "Nurhasanah", gender: "Perempuan", birthPlace: "Sumedang", birthDate: "08-03-1988", religion: "Islam", education: "Diploma (D3)", occupation: "Ibu Rumah Tangga", maritalStatus: "Kawin", relation: "Istri", bloodType: "A", fatherName: "Kurnia", motherName: "Maryati", phone: "081298765413" },
-      { id: "cit-3", nik: "3204152506140004", name: "Rizky Pratama Sudrajat", gender: "Laki-Laki", birthPlace: "Bandung", birthDate: "25-06-2014", religion: "Islam", education: "SD / Sederajat", occupation: "Pelajar", maritalStatus: "Belum Kawin", relation: "Anak", bloodType: "O", fatherName: "Bambang Sudrajat", motherName: "Nurhasanah", phone: "-" },
-      { id: "cit-4", nik: "3204156009190005", name: "Aisyah Putri Sudrajat", gender: "Perempuan", birthPlace: "Bandung", birthDate: "20-09-2019", religion: "Islam", education: "Belum Sekolah", occupation: "Belum Bekerja", maritalStatus: "Belum Kawin", relation: "Anak", bloodType: "A", fatherName: "Bambang Sudrajat", motherName: "Nurhasanah", phone: "-" }
-    ]
-  },
-  {
-    id: "kk-2",
-    noKk: "3204151504100002",
-    headName: "Ujang Suherman",
-    address: "Dusun Sukarame RT 03 RW 02",
-    rt: "003",
-    rw: "002",
-    dusun: "Dusun Sukarame",
-    postalCode: "40375",
-    economicStatus: "Mampu (Sejahtera)",
-    bpjsStatus: "Aktif (Mandiri)",
-    houseOwnership: "Milik Sendiri",
-    electricity: "1300 VA (Non Subsidi)",
-    waterSource: "Mata Air Pegunungan",
-    sanitation: "Jamban Sehat Pribadi",
-    issueDate: "15 April 2018",
-    members: [
-      { id: "cit-5", nik: "3204151505750001", name: "Ujang Suherman", gender: "Laki-Laki", birthPlace: "Garut", birthDate: "15-05-1975", religion: "Islam", education: "SMP / Sederajat", occupation: "Petani Kopi & Ketua Gapoktan", maritalStatus: "Kawin", relation: "Kepala Keluarga", bloodType: "B", fatherName: "Suherman", motherName: "Enok", phone: "081234567890" },
-      { id: "cit-6", nik: "3204155207790002", name: "Imas Masitoh", gender: "Perempuan", birthPlace: "Bandung", birthDate: "12-07-1979", religion: "Islam", education: "SMA / Sederajat", occupation: "Pengrajin Olahan Kopi Desa", maritalStatus: "Kawin", relation: "Istri", bloodType: "B", fatherName: "Ahmad", motherName: "Siti", phone: "081398765432" },
-      { id: "cit-7", nik: "3204151001020003", name: "Fajar Maulana Suherman", gender: "Laki-Laki", birthPlace: "Bandung", birthDate: "10-01-2002", religion: "Islam", education: "Sarjana (S1)", occupation: "Mahasiswa / Petani Milenial", maritalStatus: "Belum Kawin", relation: "Anak", bloodType: "B", fatherName: "Ujang Suherman", motherName: "Imas Masitoh", phone: "085211223344" }
+      { id: "cit-1", nik: "3204151208850002", name: "Bambang Sudrajat", gender: "Laki-Laki", birthPlace: "Bandung", birthDate: "12-08-1985", religion: "Islam", education: "SMA / Sederajat", occupation: "Wiraswasta / Pemilik Warung", maritalStatus: "Kawin", relation: "Kepala Keluarga", bloodType: "O", fatherName: "Sudrajat", motherName: "Siti Aminah", phone: "081298765412" }
     ]
   }
 ];
@@ -217,34 +189,6 @@ export const letterTypes = [
     name: "Surat Keterangan Usaha (SKU)",
     description: "Surat pengantar untuk keperluan pengajuan kredit usaha, izin operasional, atau bantuan modal UMKM.",
     requirements: ["KTP Pemohon", "KK (Kartu Keluarga)", "Foto Tempat Usaha / Produk", "Surat Pengantar RT/RW"],
-    processingDays: "1 Hari Kerja"
-  },
-  {
-    id: "SK_JUAL_BELI",
-    name: "Surat Keterangan Jual Beli (Tanah / Bangunan / Barang)",
-    description: "Keterangan resmi transaksi jual beli tanah darat, sawah, bangunan, atau aset berharga disaksikan Pemdes.",
-    requirements: ["KTP Penjual & Pembeli", "KK Kedua Pihak", "Bukti Kepemilikan Asal (Letter C / SPPT / Kwitansi)", "Surat Pengantar RT/RW"],
-    processingDays: "1 Hari Kerja"
-  },
-  {
-    id: "SKTM",
-    name: "Surat Keterangan Tidak Mampu (SKTM)",
-    description: "Digunakan untuk pengajuan beasiswa pendidikan, keringanan biaya rumah sakit, atau bantuan sosial.",
-    requirements: ["KTP Pemohon", "KK (Kartu Keluarga)", "Surat Pengantar RT/RW", "Foto Rumah Tampak Depan"],
-    processingDays: "1 Hari Kerja"
-  },
-  {
-    id: "SKD",
-    name: "Surat Keterangan Domisili",
-    description: "Keterangan bukti bertempat tinggal resmi di wilayah Desa Sukamaju Mandiri.",
-    requirements: ["KTP Pemohon", "KK (Kartu Keluarga)", "Surat Pengantar RT/RW"],
-    processingDays: "1 Hari Kerja"
-  },
-  {
-    id: "SKCK",
-    name: "Surat Pengantar SKCK (Catatan Kepolisian)",
-    description: "Surat pengantar dari desa untuk pembuatan SKCK di Polsek / Polres setempat.",
-    requirements: ["KTP Pemohon", "KK (Kartu Keluarga)", "Akta Kelahiran / Ijazah", "Surat Pengantar RT/RW"],
     processingDays: "1 Hari Kerja"
   }
 ];
@@ -257,23 +201,10 @@ export const initialNewsList = [
     category: "Pemberdayaan",
     author: "Tim Kominfo Desa",
     date: "16 Agustus 2026",
-    summary: "Sebanyak 350 petani dari 4 gabungan kelompok tani (Gapoktan) menerima alokasi bibit varietas unggul bersertifikat untuk musim tanam gadu.",
-    content: "Sebagai bagian dari program ketahanan pangan desa tahun anggaran 2026, Pemerintah Desa Sukamaju Mandiri menyalurkan 2,5 ton bibit padi organik varietas Inpari 32 kepada seluruh Gapoktan. Program ini dibarengi dengan pelatihan pembuatan pupuk kompos cair organik yang dipandu langsung oleh penyuluh pertanian lapangan (PPL). Diharapkan produktivitas panen petani desa meningkat hingga 25% tanpa merusak ekosistem tanah.",
+    summary: "Sebanyak 350 petani dari 4 gabungan kelompok tani menerima alokasi bibit varietas unggul bersertifikat.",
+    content: "Sebagai bagian dari program ketahanan pangan desa tahun anggaran 2026, Pemerintah Desa Sukamaju Mandiri menyalurkan 2,5 ton bibit padi organik.",
     image: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=1000&q=80",
     views: 342,
-    isFeatured: true
-  },
-  {
-    id: "news-2",
-    title: "Peluncuran Pojok Baca Digital dan Akses WiFi Gratis di 6 Balai RW",
-    slug: "pojok-baca-digital-wifi-gratis",
-    category: "Teknologi",
-    author: "Ahmad Fauzi (Kasi Pelayanan)",
-    date: "12 Agustus 2026",
-    summary: "Fasilitas internet berkecepatan tinggi dan tablet edukasi kini dapat dimanfaatkan secara gratis oleh seluruh anak sekolah dan pemuda desa.",
-    content: "Mendukung percepatan literasi digital di era Smart Village, Pemerintah Desa bekerjasama dengan relawan TIK mendirikan Pojok Baca Digital di seluruh balai RW. Fasilitas ini dilengkapi akses ribuan e-book pelajaran, modul keterampilan kewirausahaan, serta koneksi WiFi berkecepatan 100 Mbps dengan sistem filter konten positif yang aman bagi anak-anak.",
-    image: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1000&q=80",
-    views: 520,
     isFeatured: true
   }
 ];
@@ -287,25 +218,11 @@ export const initialUmkmList = [
     unit: "Bungkus 200gr",
     owner: "Pak Ujang & BUMDes Sukamaju",
     phone: "6281234567890",
-    description: "Kopi arabika single origin hasil petik merah petani lokal di ketinggian 1.300 mdpl. Memiliki aroma floral dengan cita rasa karamel dan acidity yang segar.",
+    description: "Kopi arabika single origin hasil petik merah petani lokal di ketinggian 1.300 mdpl.",
     image: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80",
     rating: 4.9,
     soldCount: 840,
     badge: "Terlaris"
-  },
-  {
-    id: "umkm-2",
-    name: "Madu Murni Bunga Liar Hutan Desa",
-    category: "Kesehatan",
-    price: 85000,
-    unit: "Botol 500ml",
-    owner: "Kelompok Tani Lebah Apis Cerana",
-    phone: "6281398765432",
-    description: "Madu hutan murni tanpa pemanis buatan maupun pasteurisasi berlebih. Kaya enzim alami, antioksidan, dan sangat baik untuk menjaga daya tahan tubuh keluarga.",
-    image: "https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=800&q=80",
-    rating: 5.0,
-    soldCount: 420,
-    badge: "Organik"
   }
 ];
 
@@ -317,8 +234,8 @@ export const initialTourismList = [
     ticketPrice: 15000,
     openHours: "Setiap Hari | 07.30 - 17.00 WIB",
     location: "Dusun Pasirjati, RW 04 Desa Sukamaju",
-    description: "Air terjun alami setinggi 25 meter dengan air jernih menyegarkan yang mengalir langsung dari mata air pegunungan. Dikelilingi tebing batu eksotis dan rimbunnya pepohonan pinus.",
-    facilities: ["Spot Foto Bambu", "Gazebo Istirahat", "Warung Kuliner Desa", "Toilet & Mushola", "Area Parkir Luas"],
+    description: "Air terjun alami setinggi 25 meter dengan air jernih menyegarkan yang mengalir langsung dari mata air pegunungan.",
+    facilities: ["Spot Foto Bambu", "Gazebo Istirahat", "Warung Kuliner Desa", "Toilet & Mushola"],
     image: "https://images.unsplash.com/photo-1518457607834-6e8d80c183c5?auto=format&fit=crop&w=1000&q=80",
     rating: 4.9,
     highlight: "Favorit Wisatawan"
@@ -332,7 +249,7 @@ export const initialGalleryList = [
     category: "Kegiatan",
     date: "17 Agustus 2026",
     image: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=800&q=80",
-    description: "Khidmatnya upacara pengibaran bendera merah putih yang diikuti oleh seluruh aparatur dan warga se-Desa Sukamaju."
+    description: "Khidmatnya upacara pengibaran bendera merah putih."
   }
 ];
 
@@ -361,10 +278,10 @@ export const initialComplaints = [
     reporterName: "Wawan Kurniawan",
     phone: "081344556677",
     category: "Infrastruktur & Fasilitas Umum",
-    subject: "Lampu Penerangan Jalan Umum (PJU) Mati di Tikungan Dusun Pasirjati",
-    description: "Mohon izin melapor kepada Pemdes, lampu PJU di tikungan tajam dekat jembatan Dusun Pasirjati RW 04 sudah 3 hari mati.",
+    subject: "Lampu Penerangan Jalan Umum (PJU) Mati",
+    description: "Mohon izin melapor, lampu PJU di tikungan tajam Dusun Pasirjati RW 04 mati.",
     status: "DITINDAKLANJUTI",
     date: "16 Agustus 2026",
-    adminResponse: "Tim teknisi PJU desa sudah melakukan penggantian bohlam LED pada 17 Agustus 2026."
+    adminResponse: "Tim teknisi PJU desa sudah melakukan perbaikan."
   }
 ];
