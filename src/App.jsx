@@ -18,7 +18,8 @@ import Tourism from './pages/Tourism';
 import Services from './pages/Services';
 import Contact from './pages/Contact';
 
-// Admin CMS
+// Admin CMS & Login
+import AdminLogin from './admin/AdminLogin';
 import AdminLayout from './admin/AdminLayout';
 import AdminDashboard from './admin/AdminDashboard';
 import AdminNews from './admin/AdminNews';
@@ -34,6 +35,11 @@ import { StorageService } from './services/storageService';
 export default function App() {
   const [activePage, setActivePage] = useState('home'); // home, profile, news, gallery, umkm, tourism, services, contact, admin
   const [adminTab, setAdminTab] = useState('dashboard'); // dashboard, services, complaints, news, umkm, tourism, gallery, settings
+
+  // Admin Auth State
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(() => {
+    return localStorage.getItem('desa_admin_logged_in') === 'true';
+  });
 
   // Core Village Data State
   const [profile, setProfile] = useState(() => StorageService.getProfile());
@@ -82,6 +88,20 @@ export default function App() {
     window.addEventListener('desa-data-updated', handleDataUpdate);
     return () => window.removeEventListener('desa-data-updated', handleDataUpdate);
   }, []);
+
+  // Admin Auth Handlers
+  const handleAdminLoginSuccess = () => {
+    setIsAdminLoggedIn(true);
+    localStorage.setItem('desa_admin_logged_in', 'true');
+    addToast('Selamat datang! Berhasil login ke Dashboard Admin.', 'success');
+  };
+
+  const handleAdminLogout = () => {
+    setIsAdminLoggedIn(false);
+    localStorage.removeItem('desa_admin_logged_in');
+    setActivePage('home');
+    addToast('Anda telah keluar dari sesi Admin.', 'info');
+  };
 
   // Handlers for public letter submission
   const handleOpenServiceModal = (type = 'SKU') => {
@@ -213,86 +233,94 @@ export default function App() {
         profile={profile}
       />
 
-      {/* VIEW SWITCHER: ADMIN OR CITIZEN PORTAL */}
+      {/* VIEW SWITCHER: ADMIN LOGIN / DASHBOARD OR CITIZEN PORTAL */}
       {activePage === 'admin' ? (
-        <AdminLayout
-          activeTab={adminTab}
-          setActiveTab={setAdminTab}
-          onBackToPublic={() => setActivePage('home')}
-          profile={profile}
-          pendingCount={pendingRequestsCount}
-          complaintCount={pendingComplaintsCount}
-        >
-          {adminTab === 'dashboard' && (
-            <AdminDashboard
-              profile={profile}
-              newsList={newsList}
-              umkmList={umkmList}
-              tourismList={tourismList}
-              requestsList={requestsList}
-              complaintsList={complaintsList}
-              setActiveTab={setAdminTab}
-              onSelectRequestToPrint={(req) => setPrintLetterReq(req)}
-            />
-          )}
+        !isAdminLoggedIn ? (
+          <AdminLogin
+            profile={profile}
+            onLoginSuccess={handleAdminLoginSuccess}
+            onBackToHome={() => setActivePage('home')}
+          />
+        ) : (
+          <AdminLayout
+            activeTab={adminTab}
+            setActiveTab={setAdminTab}
+            onBackToPublic={handleAdminLogout}
+            profile={profile}
+            pendingCount={pendingRequestsCount}
+            complaintCount={pendingComplaintsCount}
+          >
+            {adminTab === 'dashboard' && (
+              <AdminDashboard
+                profile={profile}
+                newsList={newsList}
+                umkmList={umkmList}
+                tourismList={tourismList}
+                requestsList={requestsList}
+                complaintsList={complaintsList}
+                setActiveTab={setAdminTab}
+                onSelectRequestToPrint={(req) => setPrintLetterReq(req)}
+              />
+            )}
 
-          {adminTab === 'services' && (
-            <AdminServices
-              requestsList={requestsList}
-              onUpdateStatus={handleUpdateRequestStatus}
-              onSelectPrint={(req) => setPrintLetterReq(req)}
-            />
-          )}
+            {adminTab === 'services' && (
+              <AdminServices
+                requestsList={requestsList}
+                onUpdateStatus={handleUpdateRequestStatus}
+                onSelectPrint={(req) => setPrintLetterReq(req)}
+              />
+            )}
 
-          {adminTab === 'complaints' && (
-            <AdminComplaints
-              complaintsList={complaintsList}
-              onUpdateComplaint={handleUpdateComplaintStatus}
-            />
-          )}
+            {adminTab === 'complaints' && (
+              <AdminComplaints
+                complaintsList={complaintsList}
+                onUpdateComplaint={handleUpdateComplaintStatus}
+              />
+            )}
 
-          {adminTab === 'news' && (
-            <AdminNews
-              newsList={newsList}
-              onAddNews={handleAddNews}
-              onUpdateNews={handleUpdateNews}
-              onDeleteNews={handleDeleteNews}
-            />
-          )}
+            {adminTab === 'news' && (
+              <AdminNews
+                newsList={newsList}
+                onAddNews={handleAddNews}
+                onUpdateNews={handleUpdateNews}
+                onDeleteNews={handleDeleteNews}
+              />
+            )}
 
-          {adminTab === 'umkm' && (
-            <AdminUmkm
-              umkmList={umkmList}
-              onAddUmkm={handleAddUmkm}
-              onUpdateUmkm={handleUpdateUmkm}
-              onDeleteUmkm={handleDeleteUmkm}
-            />
-          )}
+            {adminTab === 'umkm' && (
+              <AdminUmkm
+                umkmList={umkmList}
+                onAddUmkm={handleAddUmkm}
+                onUpdateUmkm={handleUpdateUmkm}
+                onDeleteUmkm={handleDeleteUmkm}
+              />
+            )}
 
-          {adminTab === 'tourism' && (
-            <AdminTourism
-              tourismList={tourismList}
-              onAddTourism={handleAddTourism}
-              onUpdateTourism={handleUpdateTourism}
-              onDeleteTourism={handleDeleteTourism}
-            />
-          )}
+            {adminTab === 'tourism' && (
+              <AdminTourism
+                tourismList={tourismList}
+                onAddTourism={handleAddTourism}
+                onUpdateTourism={handleUpdateTourism}
+                onDeleteTourism={handleDeleteTourism}
+              />
+            )}
 
-          {adminTab === 'gallery' && (
-            <AdminGallery
-              galleryList={galleryList}
-              onAddGallery={handleAddGallery}
-              onDeleteGallery={handleDeleteGallery}
-            />
-          )}
+            {adminTab === 'gallery' && (
+              <AdminGallery
+                galleryList={galleryList}
+                onAddGallery={handleAddGallery}
+                onDeleteGallery={handleDeleteGallery}
+              />
+            )}
 
-          {adminTab === 'settings' && (
-            <AdminSettings
-              profile={profile}
-              onUpdateProfile={handleUpdateProfile}
-            />
-          )}
-        </AdminLayout>
+            {adminTab === 'settings' && (
+              <AdminSettings
+                profile={profile}
+                onUpdateProfile={handleUpdateProfile}
+              />
+            )}
+          </AdminLayout>
+        )
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
           {/* Public Navbar */}
