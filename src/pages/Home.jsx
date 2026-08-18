@@ -61,7 +61,6 @@ export default function Home({
   const sedangBerjalanCount = workProgramsList.filter(p => p.status === 'SEDANG_BERJALAN').length;
   const waktuDekatCount = workProgramsList.filter(p => p.status === 'WAKTU_DEKAT').length;
   const rencanaNantiCount = workProgramsList.filter(p => p.status === 'RENCANA_SELANJUTNYA').length;
-  const totalBudget = workProgramsList.reduce((acc, p) => acc + (p.budget || 0), 0);
 
   const filteredPrograms = workProgramsList.filter(p => {
     if (programFilter === 'ALL') return true;
@@ -71,14 +70,14 @@ export default function Home({
   const getStatusBadge = (status) => {
     switch (status) {
       case 'PRIORITAS':
-        return <span className="badge badge-danger">🌟 Prioritas Utama</span>;
+        return <span className="badge badge-danger" style={{ fontSize: '0.7rem', padding: '0.15rem 0.5rem' }}>🌟 Prioritas Utama</span>;
       case 'SEDANG_BERJALAN':
-        return <span className="badge badge-success">⏳ Sedang Dikerjakan</span>;
+        return <span className="badge badge-success" style={{ fontSize: '0.7rem', padding: '0.15rem 0.5rem' }}>⏳ Sedang Dikerjakan</span>;
       case 'WAKTU_DEKAT':
-        return <span className="badge badge-warning">🗓️ Waktu Dekat</span>;
+        return <span className="badge badge-warning" style={{ fontSize: '0.7rem', padding: '0.15rem 0.5rem' }}>🗓️ Waktu Dekat</span>;
       case 'RENCANA_SELANJUTNYA':
       default:
-        return <span className="badge badge-neutral">📋 Rencana Selanjutnya</span>;
+        return <span className="badge badge-neutral" style={{ fontSize: '0.7rem', padding: '0.15rem 0.5rem' }}>📋 Rencana</span>;
     }
   };
 
@@ -226,123 +225,117 @@ export default function Home({
         </div>
       </div>
 
-      {/* 3. TRANSPARANSI PROGRAM KERJA PEMERINTAH DESA & APBDes */}
-      <section className="section" style={{ background: '#ffffff', borderBottom: '1px solid var(--light-border)' }}>
+      {/* 3. TRANSPARANSI PROGRAM KERJA PEMERINTAH DESA (KOMPAK / LIST / KOTAK KECIL) */}
+      <section className="section" style={{ background: '#ffffff', borderBottom: '1px solid var(--light-border)', paddingTop: '2rem', paddingBottom: '2.5rem' }}>
         <div className="container">
           
-          <div className="section-title-wrap" style={{ marginBottom: '1.75rem' }}>
-            <span className="section-badge">
-              <Briefcase size={13} /> Transparansi APBDes & Pembangunan
-            </span>
-            <h2 className="section-title">Program Kerja Pemerintah Desa</h2>
-            <p className="section-subtitle">
-              Keterbukaan informasi program prioritas, kegiatan yang sedang berjalan, dan rencana pembangunan desa yang bersumber dari Dana Desa, ADD, dan PADes.
-            </p>
+          {/* Header & Filter in One Compact Row */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+            <div>
+              <span className="section-badge" style={{ marginBottom: '0.25rem' }}>
+                <Briefcase size={12} /> Transparansi APBDes
+              </span>
+              <h2 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
+                Program Kerja Pemerintah Desa
+              </h2>
+            </div>
+
+            {/* Compact Filter Buttons */}
+            <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap' }}>
+              <button
+                className={`btn btn-sm ${programFilter === 'ALL' ? 'btn-primary' : 'btn-secondary'}`}
+                style={{ padding: '0.25rem 0.6rem', fontSize: '0.75rem' }}
+                onClick={() => setProgramFilter('ALL')}
+              >
+                Semua ({workProgramsList.length})
+              </button>
+              <button
+                className={`btn btn-sm ${programFilter === 'PRIORITAS' ? 'btn-primary' : 'btn-secondary'}`}
+                style={{ padding: '0.25rem 0.6rem', fontSize: '0.75rem' }}
+                onClick={() => setProgramFilter('PRIORITAS')}
+              >
+                🌟 Prioritas ({prioritasCount})
+              </button>
+              <button
+                className={`btn btn-sm ${programFilter === 'SEDANG_BERJALAN' ? 'btn-primary' : 'btn-secondary'}`}
+                style={{ padding: '0.25rem 0.6rem', fontSize: '0.75rem' }}
+                onClick={() => setProgramFilter('SEDANG_BERJALAN')}
+              >
+                ⏳ Dikerjakan ({sedangBerjalanCount})
+              </button>
+              <button
+                className={`btn btn-sm ${programFilter === 'WAKTU_DEKAT' ? 'btn-primary' : 'btn-secondary'}`}
+                style={{ padding: '0.25rem 0.6rem', fontSize: '0.75rem' }}
+                onClick={() => setProgramFilter('WAKTU_DEKAT')}
+              >
+                🗓️ Waktu Dekat ({waktuDekatCount})
+              </button>
+              <button
+                className={`btn btn-sm ${programFilter === 'RENCANA_SELANJUTNYA' ? 'btn-primary' : 'btn-secondary'}`}
+                style={{ padding: '0.25rem 0.6rem', fontSize: '0.75rem' }}
+                onClick={() => setProgramFilter('RENCANA_SELANJUTNYA')}
+              >
+                📋 Rencana ({rencanaNantiCount})
+              </button>
+            </div>
           </div>
 
-          {/* Filter Status Bar */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            gap: '0.5rem',
-            marginBottom: '2rem',
-            flexWrap: 'wrap'
-          }}>
-            <button
-              className={`btn btn-sm ${programFilter === 'ALL' ? 'btn-primary' : 'btn-secondary'}`}
-              onClick={() => setProgramFilter('ALL')}
-            >
-              Semua Program ({workProgramsList.length})
-            </button>
-            <button
-              className={`btn btn-sm ${programFilter === 'PRIORITAS' ? 'btn-primary' : 'btn-secondary'}`}
-              onClick={() => setProgramFilter('PRIORITAS')}
-            >
-              🌟 Prioritas Utama ({prioritasCount})
-            </button>
-            <button
-              className={`btn btn-sm ${programFilter === 'SEDANG_BERJALAN' ? 'btn-primary' : 'btn-secondary'}`}
-              onClick={() => setProgramFilter('SEDANG_BERJALAN')}
-            >
-              ⏳ Sedang Dikerjakan ({sedangBerjalanCount})
-            </button>
-            <button
-              className={`btn btn-sm ${programFilter === 'WAKTU_DEKAT' ? 'btn-primary' : 'btn-secondary'}`}
-              onClick={() => setProgramFilter('WAKTU_DEKAT')}
-            >
-              🗓️ Waktu Dekat ({waktuDekatCount})
-            </button>
-            <button
-              className={`btn btn-sm ${programFilter === 'RENCANA_SELANJUTNYA' ? 'btn-primary' : 'btn-secondary'}`}
-              onClick={() => setProgramFilter('RENCANA_SELANJUTNYA')}
-            >
-              📋 Rencana Selanjutnya ({rencanaNantiCount})
-            </button>
-          </div>
-
-          {/* Programs Grid Cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))', gap: '1.5rem' }}>
+          {/* Compact Grid List (Kotak Kecil Ringkas) */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))', gap: '0.85rem' }}>
             {filteredPrograms.map((prog) => (
               <div 
                 key={prog.id} 
-                className="card"
-                style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
+                style={{
+                  background: '#f8fafc',
+                  border: '1px solid var(--light-border)',
+                  borderRadius: 'var(--radius-md)',
+                  padding: '0.85rem 1rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  gap: '0.5rem',
+                  transition: 'var(--transition)'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.borderColor = '#86efac'}
+                onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--light-border)'}
               >
                 <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.65rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
                     {getStatusBadge(prog.status)}
-                    <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>
-                      {prog.category}
+                    <span style={{ fontSize: '0.7rem', color: '#059669', fontWeight: 700 }}>
+                      {formatRupiah(prog.budget)}
                     </span>
                   </div>
 
-                  <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 0.5rem 0', lineHeight: 1.35 }}>
+                  <h4 style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 0.25rem 0', lineHeight: 1.3 }}>
                     {prog.title}
-                  </h3>
+                  </h4>
 
-                  <p style={{ fontSize: '0.825rem', color: 'var(--text-muted)', lineHeight: 1.55, marginBottom: '1.25rem' }}>
-                    {prog.description}
-                  </p>
-
-                  <div style={{ background: '#f8fafc', padding: '0.85rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--light-border)', marginBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '0.4rem', fontSize: '0.8rem' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ color: 'var(--text-muted)' }}>Alokasi Anggaran:</span>
-                      <strong style={{ color: '#064e3b', fontSize: '0.95rem' }}>{formatRupiah(prog.budget)}</strong>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ color: 'var(--text-muted)' }}>Sumber Dana:</span>
-                      <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{prog.fundingSource}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ color: 'var(--text-muted)' }}>Jadwal / Rencana:</span>
-                      <span style={{ fontWeight: 600, color: '#2563eb' }}>{prog.schedule}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ color: 'var(--text-muted)' }}>Lokasi / Dusun:</span>
-                      <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{prog.location}</span>
-                    </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.725rem', color: 'var(--text-muted)', flexWrap: 'wrap' }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                      <MapPin size={11} color="#059669" /> {prog.location}
+                    </span>
+                    <span>•</span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                      <Calendar size={11} color="#2563eb" /> {prog.schedule}
+                    </span>
+                    <span>•</span>
+                    <span>{prog.fundingSource}</span>
                   </div>
                 </div>
 
-                {/* Progress bar for in-progress or started projects */}
-                <div>
-                  {(prog.status === 'SEDANG_BERJALAN' || prog.progress > 0) && (
-                    <div style={{ marginBottom: '0.75rem' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', fontWeight: 700, marginBottom: '4px', color: 'var(--text-main)' }}>
-                        <span>Realisasi Fisik Proyek:</span>
-                        <span style={{ color: '#059669' }}>{prog.progress}%</span>
-                      </div>
-                      <div style={{ height: '7px', background: '#e2e8f0', borderRadius: '4px', overflow: 'hidden' }}>
-                        <div style={{ width: `${prog.progress}%`, height: '100%', background: 'linear-gradient(90deg, #10b981, #059669)', borderRadius: '4px' }}></div>
-                      </div>
+                {/* Progress bar if ongoing */}
+                {(prog.status === 'SEDANG_BERJALAN' || prog.progress > 0) && (
+                  <div style={{ marginTop: '0.2rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', fontWeight: 700, marginBottom: '2px', color: 'var(--text-main)' }}>
+                      <span>Realisasi Fisik:</span>
+                      <span style={{ color: '#059669' }}>{prog.progress}%</span>
                     </div>
-                  )}
-
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid var(--light-border)', paddingTop: '0.65rem' }}>
-                    <span>Pelaksana: <strong>{prog.pic}</strong></span>
-                    <span style={{ color: '#059669', fontWeight: 700 }}>✓ Transparan</span>
+                    <div style={{ height: '5px', background: '#e2e8f0', borderRadius: '3px', overflow: 'hidden' }}>
+                      <div style={{ width: `${prog.progress}%`, height: '100%', background: '#10b981', borderRadius: '3px' }}></div>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             ))}
           </div>
