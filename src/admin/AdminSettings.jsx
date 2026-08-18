@@ -381,10 +381,61 @@ export default function AdminSettings({ profile, onUpdateProfile }) {
                   })}
                 />
               </div>
+            </div>
+
+            {/* Sub-Section 4: Kontak & Lokasi Kantor Balai Desa */}
+            <div style={{ background: '#f8fafc', padding: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--light-border)' }}>
+              <h4 style={{ fontSize: '0.9rem', fontWeight: 800, color: '#059669', marginBottom: '1rem' }}>
+                4. Kontak Resmi & Lokasi Pelayanan Kantor Desa
+              </h4>
+
+              <div className="form-group">
+                <label className="form-label">Alamat Lengkap Kantor Balai Desa</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={formData.contact?.address || ''}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    contact: { ...formData.contact, address: e.target.value }
+                  })}
+                  placeholder="Jl. Raya Desa Sukamaju Mandiri No. 01, Kec. Harapan Makmur"
+                />
+              </div>
 
               <div className="form-row">
                 <div className="form-group">
-                  <label className="form-label">Nomor Telepon Kantor</label>
+                  <label className="form-label">Jam Pelayanan Kantor</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={formData.contact?.openingHours || ''}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      contact: { ...formData.contact, openingHours: e.target.value }
+                    })}
+                    placeholder="Senin - Jumat: 08.00 - 15.30 WIB"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Nomor WhatsApp Resmi (Layanan Warga)</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={formData.contact?.whatsapp || ''}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      contact: { ...formData.contact, whatsapp: e.target.value }
+                    })}
+                    placeholder="6281234567890"
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Nomor Telepon Kantor Balai Desa</label>
                   <input
                     type="text"
                     className="form-control"
@@ -393,6 +444,7 @@ export default function AdminSettings({ profile, onUpdateProfile }) {
                       ...formData,
                       contact: { ...formData.contact, phone: e.target.value }
                     })}
+                    placeholder="(022) 8765-4321"
                   />
                 </div>
 
@@ -406,7 +458,52 @@ export default function AdminSettings({ profile, onUpdateProfile }) {
                       ...formData,
                       contact: { ...formData.contact, email: e.target.value }
                     })}
+                    placeholder="pemdes@desasukamaju.id"
                   />
+                </div>
+              </div>
+
+              <div className="form-group" style={{ marginTop: '0.5rem' }}>
+                <label className="form-label" style={{ fontWeight: 800, color: 'var(--text-main)' }}>
+                  Kontak Siaga Darurat 24 Jam (Emergency)
+                </label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '0.75rem', marginTop: '0.35rem' }}>
+                  {(formData.contact?.emergencyContacts || [
+                    { role: "Puskesmas / Bidan Desa", name: "Ibu Bidan Nurlaela", phone: "0812-9988-7766" },
+                    { role: "Babinsa Desa (TNI)", name: "Sertu Hendra Gunawan", phone: "0813-1122-4455" },
+                    { role: "Bhabinkamtibmas (Polri)", name: "Aipda Dedi Prasetyo", phone: "0852-6677-8899" },
+                    { role: "Mobil Siaga / Ambulans Desa", name: "Call Center 24 Jam", phone: "0821-3344-5566" }
+                  ]).map((em, idx) => (
+                    <div key={idx} style={{ background: 'var(--light-surface)', padding: '0.75rem', borderRadius: '6px', border: '1px solid var(--light-border)' }}>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#dc2626', display: 'block' }}>{em.role}</span>
+                      <div style={{ display: 'flex', gap: '0.35rem', marginTop: '0.25rem' }}>
+                        <input
+                          type="text"
+                          className="form-control"
+                          style={{ fontSize: '0.775rem', height: '32px' }}
+                          value={em.name}
+                          placeholder="Nama Petugas"
+                          onChange={(e) => {
+                            const updatedEm = [...(formData.contact?.emergencyContacts || [])];
+                            updatedEm[idx] = { ...updatedEm[idx], name: e.target.value };
+                            setFormData({ ...formData, contact: { ...formData.contact, emergencyContacts: updatedEm } });
+                          }}
+                        />
+                        <input
+                          type="text"
+                          className="form-control"
+                          style={{ fontSize: '0.775rem', height: '32px' }}
+                          value={em.phone}
+                          placeholder="Nomor Telepon"
+                          onChange={(e) => {
+                            const updatedEm = [...(formData.contact?.emergencyContacts || [])];
+                            updatedEm[idx] = { ...updatedEm[idx], phone: e.target.value };
+                            setFormData({ ...formData, contact: { ...formData.contact, emergencyContacts: updatedEm } });
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
