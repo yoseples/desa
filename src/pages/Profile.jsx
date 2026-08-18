@@ -271,7 +271,7 @@ export default function Profile({ profile }) {
 
           {/* Results Grid */}
           {filteredApparatus.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '3rem', background: '#fff', borderRadius: 'var(--radius-lg)', border: '1px solid var(--light-border)' }}>
+            <div style={{ textAlign: 'center', padding: '3rem', background: 'var(--light-surface)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--light-border)' }}>
               <Users size={40} color="#94a3b8" style={{ margin: '0 auto 0.75rem' }} />
               <h3 style={{ fontSize: '1.1rem', color: 'var(--text-main)' }}>Tidak ditemukan pengurus yang cocok</h3>
               <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Coba ubah kata kunci pencarian atau ganti filter kategori.</p>

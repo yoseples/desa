@@ -35,6 +35,16 @@ export default function VillageChatbot({ profile, onOpenServiceModal, onOpenTrac
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Auto-open chatbot after 1 minute (60,000 ms) of visitor session
+  useEffect(() => {
+    const autoOpenTimer = setTimeout(() => {
+      setIsOpen(true);
+      setUnreadBadge(false);
+    }, 60000); // 1 menit
+
+    return () => clearTimeout(autoOpenTimer);
+  }, []);
+
   useEffect(() => {
     if (isOpen) {
       setUnreadBadge(false);

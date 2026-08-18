@@ -140,9 +140,34 @@
 [data-theme="dark"] .admin-sidebar,
 [data-theme="dark"] .admin-topbar,
 [data-theme="dark"] .table-wrapper,
-[data-theme="dark"] .form-card {
+[data-theme="dark"] .form-card,
+[data-theme="dark"] .form-control {
   background-color: #121c2f;
   border-color: #22314e;
+}
+
+[data-theme="dark"] [style*="background: #ffffff"],
+[data-theme="dark"] [style*="background: #fff"],
+[data-theme="dark"] [style*="background-color: #ffffff"],
+[data-theme="dark"] [style*="background-color: #fff"] {
+  background-color: #121c2f !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] [style*="background: #f8fafc"],
+[data-theme="dark"] [style*="background-color: #f8fafc"],
+[data-theme="dark"] [style*="background: #f1f5f9"],
+[data-theme="dark"] [style*="background-color: #f1f5f9"] {
+  background-color: #090d16 !important;
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] select,
+[data-theme="dark"] .form-control {
+  background-color: #090e1a !important;
+  border-color: #22314e !important;
+  color: #f8fafc !important;
 }
 
 [data-theme="dark"] .quick-action-text h4 {

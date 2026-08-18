@@ -144,7 +144,7 @@ export default function Services({ onOpenServiceModal, onOpenTracking, onSubmitC
       </div>
 
       {/* 2. ALUR PENGAJUAN SURAT (HOW IT WORKS) */}
-      <section className="section" style={{ background: '#fff', borderTop: '1px solid var(--light-border)', borderBottom: '1px solid var(--light-border)' }}>
+      <section className="section" style={{ background: 'var(--light-bg)', borderTop: '1px solid var(--light-border)', borderBottom: '1px solid var(--light-border)' }}>
         <div className="container">
           <div className="section-title-wrap">
             <span className="section-badge">Panduan Praktis</span>
@@ -196,7 +196,7 @@ export default function Services({ onOpenServiceModal, onOpenTracking, onSubmitC
             <p className="section-subtitle">Sampaikan saran, keluhan jalan/infrastruktur, atau aspirasi pembangunan langsung ke Pemdes.</p>
           </div>
 
-          <div style={{ background: '#fff', borderRadius: '20px', padding: '2.5rem', border: '1px solid var(--light-border)', boxShadow: 'var(--shadow-md)' }}>
+          <div style={{ background: 'var(--light-surface)', borderRadius: '20px', padding: '2.5rem', border: '1px solid var(--light-border)', boxShadow: 'var(--shadow-md)' }}>
             {complaintSent ? (
               <div style={{ textAlign: 'center', padding: '2rem 0' }}>
                 <div style={{ width: '64px', height: '64px', background: '#d1fae5', color: '#059669', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>

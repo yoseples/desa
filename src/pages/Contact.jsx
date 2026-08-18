@@ -122,7 +122,7 @@ export default function Contact({ profile, onSubmitComplaint }) {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 380px), 1fr))', gap: '2rem', alignItems: 'start' }}>
           {/* Left: Office Details & Map */}
           <div>
-            <div style={{ background: '#ffffff', borderRadius: 'var(--radius-lg)', padding: '1.75rem', border: '1px solid var(--light-border)', marginBottom: '1.5rem', boxShadow: 'var(--shadow-card)' }}>
+            <div style={{ background: 'var(--light-surface)', borderRadius: 'var(--radius-lg)', padding: '1.75rem', border: '1px solid var(--light-border)', marginBottom: '1.5rem', boxShadow: 'var(--shadow-card)' }}>
               <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '1.25rem', color: 'var(--text-main)' }}>
                 Kantor Pemerintah Desa Sukamaju Mandiri
               </h3>
@@ -164,8 +164,8 @@ export default function Contact({ profile, onSubmitComplaint }) {
             </div>
 
             {/* Map Frame Card */}
-            <div style={{ background: '#ffffff', borderRadius: 'var(--radius-lg)', overflow: 'hidden', border: '1px solid var(--light-border)', boxShadow: 'var(--shadow-card)' }}>
-              <div style={{ padding: '0.85rem 1.25rem', background: '#f8fafc', borderBottom: '1px solid var(--light-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ background: 'var(--light-surface)', borderRadius: 'var(--radius-lg)', overflow: 'hidden', border: '1px solid var(--light-border)', boxShadow: 'var(--shadow-card)' }}>
+              <div style={{ padding: '0.85rem 1.25rem', background: 'var(--light-bg)', borderBottom: '1px solid var(--light-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontWeight: 700, fontSize: '0.85rem', color: 'var(--text-main)' }}>
                   Peta Lokasi Kantor Desa
                 </span>
@@ -193,7 +193,7 @@ export default function Contact({ profile, onSubmitComplaint }) {
           </div>
 
           {/* Right: Direct Message Form */}
-          <div style={{ background: '#ffffff', borderRadius: 'var(--radius-lg)', padding: '1.75rem', border: '1px solid var(--light-border)', boxShadow: 'var(--shadow-card)' }}>
+          <div style={{ background: 'var(--light-surface)', borderRadius: 'var(--radius-lg)', padding: '1.75rem', border: '1px solid var(--light-border)', boxShadow: 'var(--shadow-card)' }}>
             <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '0.35rem', color: 'var(--text-main)' }}>
               Kirim Pesan Langsung
             </h3>
