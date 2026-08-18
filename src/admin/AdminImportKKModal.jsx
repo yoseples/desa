@@ -224,6 +224,65 @@ export default function AdminImportKKModal({ isOpen, onClose, onImportSuccess })
     }
   };
 
+  const handleDownloadTemplate = () => {
+    if (importType === 'json') {
+      const jsonSample = [
+        {
+          "noKk": "3204150801120001",
+          "headName": "Bambang Sudrajat",
+          "address": "Jl. Pasirjati No. 12",
+          "rt": "001",
+          "rw": "001",
+          "dusun": "Dusun Pasirjati",
+          "postalCode": "40375",
+          "economicStatus": "Desil 2 (Tidak Mampu)",
+          "bpjsStatus": "Aktif (PBI Pemerintah)",
+          "issueDate": "14 Agustus 2023",
+          "members": [
+            {
+              "nik": "3204150801800001",
+              "name": "Bambang Sudrajat",
+              "gender": "Laki-Laki",
+              "birthPlace": "Bandung",
+              "birthDate": "1980-05-12",
+              "religion": "Islam",
+              "education": "SMA / Sederajat",
+              "occupation": "Wiraswasta",
+              "maritalStatus": "Kawin",
+              "relation": "Kepala Keluarga",
+              "bloodType": "O",
+              "fatherName": "Kusnadi",
+              "motherName": "Siti Aminah",
+              "phone": "081234567890"
+            }
+          ]
+        }
+      ];
+      const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(jsonSample, null, 2));
+      const link = document.createElement('a');
+      link.setAttribute('href', dataUri);
+      link.setAttribute('download', 'Template_Data_Kartu_Keluarga.json');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      const headers = ['NO_KK', 'KEPALA_KELUARGA', 'ALAMAT', 'RT', 'RW', 'DUSUN', 'STATUS_EKONOMI', 'NIK', 'NAMA_LENGKAP', 'JENIS_KELAMIN', 'TEMPAT_LAHIR', 'TANGGAL_LAHIR', 'AGAMA', 'PENDIDIKAN', 'PEKERJAAN', 'STATUS_KAWIN', 'HUBUNGAN_KELUARGA', 'GOL_DARAH', 'NAMA_AYAH', 'NAMA_IBU', 'NO_HP'];
+      const sampleRows = [
+        ['3204150801120001', 'Bambang Sudrajat', 'Jl. Pasirjati No. 12', '001', '001', 'Dusun Pasirjati', 'Desil 2 (Tidak Mampu)', '3204150801800001', 'Bambang Sudrajat', 'Laki-Laki', 'Bandung', '1980-05-12', 'Islam', 'SMA / Sederajat', 'Wiraswasta', 'Kawin', 'Kepala Keluarga', 'O', 'Kusnadi', 'Siti Aminah', '081234567890'],
+        ['3204150801120001', 'Bambang Sudrajat', 'Jl. Pasirjati No. 12', '001', '001', 'Dusun Pasirjati', 'Desil 2 (Tidak Mampu)', '3204150801850002', 'Siti Maryam', 'Perempuan', 'Bandung', '1985-08-20', 'Islam', 'SMA / Sederajat', 'Mengurus Rumah Tangga', 'Kawin', 'Istri', 'A', 'Rahmat Hidayat', 'Nurhayati', '081234567891'],
+        ['3204150801120001', 'Bambang Sudrajat', 'Jl. Pasirjati No. 12', '001', '001', 'Dusun Pasirjati', 'Desil 2 (Tidak Mampu)', '3204150801100003', 'Rizky Pratama', 'Laki-Laki', 'Bandung', '2010-03-15', 'Islam', 'SMP / Sederajat', 'Pelajar', 'Belum Kawin', 'Anak', 'O', 'Bambang Sudrajat', 'Siti Maryam', '-']
+      ];
+      const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + [headers.join(','), ...sampleRows.map(r => r.map(c => `"${c}"`).join(','))].join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', 'Template_Data_Kartu_Keluarga_Desa.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
   const handleExecuteImport = () => {
     if (!parsedData || parsedData.length === 0) {
       alert('Mohon lakukan validasi data terlebih dahulu!');
@@ -311,14 +370,15 @@ export default function AdminImportKKModal({ isOpen, onClose, onImportSuccess })
               >
                 <Sparkles size={14} /> Muat Contoh Data (Demo)
               </button>
-              <a
-                href={importType === 'json' ? '/contoh_import_kartu_keluarga.json' : '/contoh_import_kartu_keluarga.csv'}
-                download
+              <button
+                type="button"
+                onClick={handleDownloadTemplate}
                 className="btn btn-sm btn-secondary"
-                title="Download Template"
+                style={{ color: '#0369a1', borderColor: '#bae6fd', fontWeight: 600 }}
+                title="Download Template Format Excel / CSV"
               >
-                <Download size={14} /> Unduh Template
-              </a>
+                <Download size={14} /> Unduh Template Excel
+              </button>
             </div>
           </div>
 

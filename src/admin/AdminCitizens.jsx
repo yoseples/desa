@@ -585,6 +585,121 @@ export default function AdminCitizens({
     document.body.removeChild(link);
   };
 
+  const downloadExcelTemplate = () => {
+    const headers = [
+      'NO_KK',
+      'NIK',
+      'NAMA_LENGKAP',
+      'HUBUNGAN_KELUARGA',
+      'JENIS_KELAMIN',
+      'TEMPAT_LAHIR',
+      'TANGGAL_LAHIR',
+      'AGAMA',
+      'PENDIDIKAN',
+      'JENIS_PEKERJAAN',
+      'STATUS_PERKAWINAN',
+      'GOLONGAN_DARAH',
+      'NAMA_AYAH',
+      'NAMA_IBU',
+      'ALAMAT_DOMISILI',
+      'DUSUN',
+      'RW',
+      'RT',
+      'KODE_POS',
+      'STATUS_BPS',
+      'STATUS_BPJS',
+      'NO_HP'
+    ];
+
+    const sampleRows = [
+      [
+        '3204150801120001',
+        '3204150801800001',
+        'Bambang Sudrajat',
+        'Kepala Keluarga',
+        'Laki-Laki',
+        'Bandung',
+        '1980-05-12',
+        'Islam',
+        'SMA / Sederajat',
+        'Wiraswasta',
+        'Kawin',
+        'O',
+        'Kusnadi',
+        'Siti Aminah',
+        'Jl. Pasirjati No. 12',
+        'Dusun Pasirjati',
+        '01',
+        '001',
+        '40375',
+        'Desil 2 (Tidak Mampu)',
+        'Aktif (PBI Pemerintah)',
+        '081234567890'
+      ],
+      [
+        '3204150801120001',
+        '3204150801850002',
+        'Siti Maryam',
+        'Istri',
+        'Perempuan',
+        'Bandung',
+        '1985-08-20',
+        'Islam',
+        'SMA / Sederajat',
+        'Mengurus Rumah Tangga',
+        'Kawin',
+        'A',
+        'Rahmat Hidayat',
+        'Nurhayati',
+        'Jl. Pasirjati No. 12',
+        'Dusun Pasirjati',
+        '01',
+        '001',
+        '40375',
+        'Desil 2 (Tidak Mampu)',
+        'Aktif (PBI Pemerintah)',
+        '081234567891'
+      ],
+      [
+        '3204150801120001',
+        '3204150801100003',
+        'Rizky Pratama',
+        'Anak',
+        'Laki-Laki',
+        'Bandung',
+        '2010-03-15',
+        'Islam',
+        'SMP / Sederajat',
+        'Pelajar',
+        'Belum Kawin',
+        'O',
+        'Bambang Sudrajat',
+        'Siti Maryam',
+        'Jl. Pasirjati No. 12',
+        'Dusun Pasirjati',
+        '01',
+        '001',
+        '40375',
+        'Desil 2 (Tidak Mampu)',
+        'Aktif (PBI Pemerintah)',
+        '-'
+      ]
+    ];
+
+    const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + [
+      headers.join(','),
+      ...sampleRows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\n');
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', 'Template_Data_Kartu_Keluarga_Desa.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       
@@ -677,6 +792,14 @@ export default function AdminCitizens({
           </span>
 
           <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+            <button
+              className="btn btn-secondary btn-sm"
+              onClick={downloadExcelTemplate}
+              style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem', color: '#0369a1', borderColor: '#bae6fd', fontWeight: 600 }}
+              title="Download Template Format Excel / CSV untuk Pengisian Data KK & Warga"
+            >
+              <FileSpreadsheet size={13} /> Template Excel
+            </button>
             <button
               className="btn btn-secondary btn-sm"
               onClick={() => setImportModalOpen(true)}
