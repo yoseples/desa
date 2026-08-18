@@ -27,7 +27,13 @@ function getFromStorage(key, fallback) {
       localStorage.setItem(key, JSON.stringify(fallback));
       return fallback;
     }
-    return JSON.parse(item);
+    const parsed = JSON.parse(item);
+    // If profile and apparatus count is smaller than initial, update with enriched list
+    if (key === STORAGE_KEYS.PROFILE && parsed.apparatus && parsed.apparatus.length < 15 && fallback.apparatus) {
+      parsed.apparatus = fallback.apparatus;
+      localStorage.setItem(key, JSON.stringify(parsed));
+    }
+    return parsed;
   } catch (e) {
     console.error('Storage error:', e);
     return fallback;
@@ -79,7 +85,6 @@ export const StorageService = {
     } else {
       const existing = this.getFamilies();
       const existingMap = new Map(existing.map(f => [f.noKk, f]));
-      // merge or add
       newFamilies.forEach(nf => {
         existingMap.set(nf.noKk, nf);
       });
