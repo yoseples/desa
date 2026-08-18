@@ -7,6 +7,9 @@ export const initialVillageProfile = {
   regency: "Kabupaten Nusantara",
   province: "Jawa Barat",
   postalCode: "40375",
+  logo: "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?auto=format&fit=crop&w=200&q=80",
+  bannerImage: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=1200&q=80",
+  officePhoto: "https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=800&q=80",
   headOfVillage: {
     name: "H. Budi Santoso, S.AP",
     title: "Kepala Desa Sukamaju Mandiri",
@@ -111,7 +114,7 @@ export const initialFamiliesList = [
     rw: "003",
     dusun: "Dusun Pasirjati",
     postalCode: "40375",
-    economicStatus: "Menengah", // Sejahtera, Menengah, Prasejahtera (DTKS/Bansos)
+    economicStatus: "Menengah",
     bpjsStatus: "Aktif (Mandiri)",
     issueDate: "12 Januari 2020",
     members: [

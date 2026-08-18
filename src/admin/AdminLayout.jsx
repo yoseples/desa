@@ -13,7 +13,8 @@ import {
   LogOut, 
   ShieldCheck, 
   Menu, 
-  X 
+  X,
+  Building2 
 } from 'lucide-react';
 
 export default function AdminLayout({ 
@@ -22,7 +23,7 @@ export default function AdminLayout({
   onBackToPublic, 
   profile, 
   pendingCount, 
-  complaintCount,
+  complaintCount, 
   familyCount,
   children 
 }) {
@@ -37,37 +38,49 @@ export default function AdminLayout({
     { id: 'umkm', label: 'Kelola Produk UMKM', icon: ShoppingBag },
     { id: 'tourism', label: 'Kelola Wisata Desa', icon: Palmtree },
     { id: 'gallery', label: 'Kelola Galeri Foto', icon: Image },
-    { id: 'settings', label: 'Pengaturan Profil Desa', icon: Settings },
+    { id: 'settings', label: 'Pengaturan Profil & Logo', icon: Settings },
   ];
 
   return (
     <div className="admin-layout">
       {/* Sidebar */}
-      <aside className={`admin-sidebar ${sidebarOpen ? 'open' : ''}`} style={{
-        position: 'sticky',
-        top: 0,
-        height: '100vh',
-        zIndex: 1000
-      }}>
+      <aside className={`admin-sidebar ${sidebarOpen ? 'open' : ''}`}>
         {/* Sidebar Header */}
         <div className="admin-sidebar-header">
-          <div style={{
-            width: '38px',
-            height: '38px',
-            borderRadius: '10px',
-            background: 'linear-gradient(135deg, #10b981, #059669)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#fff'
-          }}>
-            <ShieldCheck size={22} />
-          </div>
+          {profile?.logo ? (
+            <img
+              src={profile.logo}
+              alt="Logo Desa"
+              style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '10px',
+                objectFit: 'contain',
+                background: '#ffffff',
+                padding: '2px',
+                flexShrink: 0
+              }}
+            />
+          ) : (
+            <div style={{
+              width: '38px',
+              height: '38px',
+              borderRadius: '10px',
+              background: 'linear-gradient(135deg, #10b981, #059669)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#fff',
+              flexShrink: 0
+            }}>
+              <ShieldCheck size={22} />
+            </div>
+          )}
           <div style={{ flex: 1, minWidth: 0 }}>
-            <h3 style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              Admin Panel Desa
+            <h3 style={{ fontSize: '0.95rem', fontWeight: 800, color: '#fff', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {profile?.name || 'Admin Panel Desa'}
             </h3>
-            <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 600 }}>
+            <span style={{ fontSize: '0.725rem', color: '#10b981', fontWeight: 600 }}>
               Smart CMS v2.0
             </span>
           </div>
@@ -130,7 +143,7 @@ export default function AdminLayout({
       <div className="admin-main">
         {/* Topbar */}
         <header className="admin-topbar">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <button
               className="mobile-toggle"
               onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -138,23 +151,23 @@ export default function AdminLayout({
             >
               <Menu size={22} />
             </button>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
+            <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
               {menuItems.find(m => m.id === activeTab)?.label || 'Dashboard'}
             </h2>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
               <img
                 src={profile?.headOfVillage?.photo}
                 alt="Admin"
                 style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #10b981' }}
               />
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--text-main)' }}>
+                <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-main)' }}>
                   Administrator
                 </span>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                <span style={{ fontSize: '0.725rem', color: 'var(--text-muted)' }}>
                   {profile?.name}
                 </span>
               </div>

@@ -4,104 +4,122 @@ import {
   Home, 
   Info, 
   Newspaper, 
-  Image, 
   ShoppingBag, 
   Palmtree, 
+  Image, 
   FileText, 
-  PhoneCall, 
+  Phone, 
   ShieldCheck, 
-  Search, 
-  Menu, 
-  X 
+  Search,
+  Menu,
+  X
 } from 'lucide-react';
 
 export default function Navbar({ activePage, setActivePage, onOpenTracking, profile }) {
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems = [
     { id: 'home', label: 'Beranda', icon: Home },
     { id: 'profile', label: 'Profil Desa', icon: Info },
     { id: 'news', label: 'Berita', icon: Newspaper },
-    { id: 'gallery', label: 'Galeri', icon: Image },
     { id: 'umkm', label: 'Produk UMKM', icon: ShoppingBag },
     { id: 'tourism', label: 'Wisata', icon: Palmtree },
+    { id: 'gallery', label: 'Galeri', icon: Image },
     { id: 'services', label: 'Pelayanan', icon: FileText },
-    { id: 'contact', label: 'Kontak', icon: PhoneCall },
+    { id: 'contact', label: 'Kontak', icon: Phone },
   ];
 
   const handleNavClick = (pageId) => {
     setActivePage(pageId);
-    setMobileOpen(false);
+    setMobileMenuOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
-    <nav className="navbar-wrapper">
+    <header className="navbar-wrapper">
       <div className="container navbar-container">
-        {/* Brand */}
-        <a 
-          href="#home" 
+        {/* Brand Logo */}
+        <div 
           className="brand-logo" 
-          onClick={(e) => { e.preventDefault(); handleNavClick('home'); }}
+          onClick={() => handleNavClick('home')}
+          style={{ cursor: 'pointer' }}
         >
-          <div className="brand-icon">
-            <Building2 size={24} />
-          </div>
+          {profile?.logo ? (
+            <img
+              src={profile.logo}
+              alt="Logo Desa"
+              style={{
+                width: '42px',
+                height: '42px',
+                borderRadius: '10px',
+                objectFit: 'contain',
+                background: '#ffffff',
+                border: '1px solid var(--light-border)',
+                padding: '2px'
+              }}
+            />
+          ) : (
+            <div className="brand-icon">
+              <Building2 size={22} />
+            </div>
+          )}
           <div className="brand-text">
-            <h1>{profile?.name || 'Desa Pintar'}</h1>
+            <h1>{profile?.name || 'Desa Sukamaju'}</h1>
             <span>Smart Village Portal</span>
           </div>
-        </a>
+        </div>
 
-        {/* Desktop Nav */}
-        <ul className={`nav-links ${mobileOpen ? 'open' : ''}`}>
+        {/* Desktop Navigation Links */}
+        <nav className={`nav-links ${mobileMenuOpen ? 'open' : ''}`}>
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activePage === item.id;
             return (
-              <li key={item.id}>
-                <button
-                  className={`nav-link ${isActive ? 'active' : ''}`}
-                  onClick={() => handleNavClick(item.id)}
-                  style={{ background: 'none', border: 'none', width: '100%', textAlign: 'left' }}
-                >
-                  <Icon size={16} />
-                  <span>{item.label}</span>
-                </button>
-              </li>
+              <a
+                key={item.id}
+                href={`#${item.id}`}
+                className={`nav-link ${isActive ? 'active' : ''}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick(item.id);
+                }}
+              >
+                <Icon size={16} />
+                <span>{item.label}</span>
+              </a>
             );
           })}
-        </ul>
+        </nav>
 
-        {/* Action Buttons */}
+        {/* Action Buttons: Tracking & Admin */}
         <div className="nav-actions">
-          <button 
+          <button
             className="btn btn-secondary btn-sm"
             onClick={onOpenTracking}
-            title="Lacak Status Surat Anda"
+            title="Lacak status pengajuan surat warga"
           >
             <Search size={15} />
-            <span>Lacak Surat</span>
+            <span className="hide-mobile">Lacak Surat</span>
           </button>
 
-          <button 
+          <button
             className="btn btn-primary btn-sm"
             onClick={() => handleNavClick('admin')}
-            style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+            title="Masuk ke Dashboard Admin"
           >
-            <ShieldCheck size={16} />
+            <ShieldCheck size={15} />
             <span>Admin</span>
           </button>
 
           <button 
             className="mobile-toggle"
-            onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label="Toggle Navigation"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle Menu"
           >
-            {mobileOpen ? <X size={26} /> : <Menu size={26} />}
+            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
       </div>
-    </nav>
+    </header>
   );
 }

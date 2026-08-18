@@ -1,382 +1,741 @@
 import React, { useState } from 'react';
-import { Settings, Save, RefreshCw, Building2, User, Phone, MapPin, Target, AlertTriangle } from 'lucide-react';
+import { 
+  Save, 
+  RefreshCw, 
+  Upload, 
+  Image as ImageIcon, 
+  User, 
+  Building, 
+  MapPin, 
+  Phone, 
+  Mail, 
+  CheckCircle2, 
+  X, 
+  Sparkles,
+  Layers,
+  Camera
+} from 'lucide-react';
 import { StorageService } from '../services/storageService';
 
 export default function AdminSettings({ profile, onUpdateProfile }) {
-  const [formData, setFormData] = useState({
-    name: profile?.name || '',
-    tagline: profile?.tagline || '',
-    district: profile?.district || '',
-    regency: profile?.regency || '',
-    province: profile?.province || '',
-    postalCode: profile?.postalCode || '',
-    code: profile?.code || '',
-    headName: profile?.headOfVillage?.name || '',
-    headTitle: profile?.headOfVillage?.title || '',
-    headPeriod: profile?.headOfVillage?.period || '',
-    headPhoto: profile?.headOfVillage?.photo || '',
-    headSpeech: profile?.headOfVillage?.welcomeSpeech || '',
-    history: profile?.history || '',
-    vision: profile?.vision || '',
-    missionsText: profile?.missions ? profile?.missions.join('\n') : '',
-    address: profile?.contact?.address || '',
-    phone: profile?.contact?.phone || '',
-    email: profile?.contact?.email || '',
-    whatsapp: profile?.contact?.whatsapp || '',
-    openingHours: profile?.contact?.openingHours || '',
-    population: profile?.stats?.population || 4850,
-    households: profile?.stats?.households || 1320,
-    rtCount: profile?.stats?.rtCount || 24,
-    rwCount: profile?.stats?.rwCount || 6,
-    areaSize: profile?.stats?.areaSize || '14.8 km²'
-  });
+  const [formData, setFormData] = useState({ ...profile });
+  const [activeSettingsTab, setActiveSettingsTab] = useState('branding'); // branding, general, vision, apparatus, contact
+  const [savedNotice, setSavedNotice] = useState(false);
 
-  const [savedSuccess, setSavedSuccess] = useState(false);
+  // File Upload Handlers (converts local image files to base64 DataURL for instant local preview and persistence)
+  const handleImageFileChange = (e, fieldPath) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Check size limit (max ~3MB)
+    if (file.size > 3.5 * 1024 * 1024) {
+      alert('Ukuran file terlalu besar! Silakan gunakan gambar berukuran di bawah 3 MB.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64 = event.target.result;
+      if (fieldPath === 'logo') {
+        setFormData(prev => ({ ...prev, logo: base64 }));
+      } else if (fieldPath === 'headPhoto') {
+        setFormData(prev => ({
+          ...prev,
+          headOfVillage: { ...prev.headOfVillage, photo: base64 }
+        }));
+      } else if (fieldPath === 'bannerImage') {
+        setFormData(prev => ({ ...prev, bannerImage: base64 }));
+      } else if (fieldPath === 'officePhoto') {
+        setFormData(prev => ({ ...prev, officePhoto: base64 }));
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleApparatusPhotoChange = (e, index) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64 = event.target.result;
+      const updatedApp = [...formData.apparatus];
+      updatedApp[index].photo = base64;
+      setFormData(prev => ({ ...prev, apparatus: updatedApp }));
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    const updatedProfile = {
-      ...profile,
-      name: formData.name,
-      tagline: formData.tagline,
-      district: formData.district,
-      regency: formData.regency,
-      province: formData.province,
-      postalCode: formData.postalCode,
-      code: formData.code,
-      headOfVillage: {
-        ...profile.headOfVillage,
-        name: formData.headName,
-        title: formData.headTitle,
-        period: formData.headPeriod,
-        photo: formData.headPhoto,
-        welcomeSpeech: formData.headSpeech
-      },
-      history: formData.history,
-      vision: formData.vision,
-      missions: formData.missionsText.split('\n').map(s => s.trim()).filter(Boolean),
-      contact: {
-        ...profile.contact,
-        address: formData.address,
-        phone: formData.phone,
-        email: formData.email,
-        whatsapp: formData.whatsapp,
-        openingHours: formData.openingHours
-      },
-      stats: {
-        ...profile.stats,
-        population: Number(formData.population),
-        households: Number(formData.households),
-        rtCount: Number(formData.rtCount),
-        rwCount: Number(formData.rwCount),
-        areaSize: formData.areaSize
-      }
-    };
-
-    onUpdateProfile(updatedProfile);
-    setSavedSuccess(true);
-    setTimeout(() => setSavedSuccess(false), 4000);
+    onUpdateProfile(formData);
+    setSavedNotice(true);
+    setTimeout(() => setSavedNotice(false), 4000);
   };
 
   const handleResetDefaults = () => {
-    if (window.confirm('PERINGATAN: Apakah Anda yakin ingin mereset seluruh data aplikasi ke pengaturan awal contoh desa? Semua data baru yang belum diexport akan dikembalikan ke data default.')) {
+    if (window.confirm('PERINGATAN: Apakah Anda yakin ingin mereset seluruh data website desa ke pengaturan awal pabrik?')) {
       StorageService.resetToDefaults();
     }
   };
 
   return (
-    <div style={{ maxWidth: '900px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-      <form onSubmit={handleSubmit}>
-        {/* 1. INFORMASI UMUM DESA */}
-        <div style={{ background: '#fff', borderRadius: '16px', padding: '2rem', border: '1px solid var(--light-border)', marginBottom: '1.5rem', boxShadow: 'var(--shadow-sm)' }}>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#059669' }}>
-            <Building2 size={20} /> Identitas & Informasi Umum Desa
-          </h3>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      {/* Settings Navigation Tabs */}
+      <div style={{
+        display: 'flex',
+        gap: '0.5rem',
+        background: '#ffffff',
+        padding: '0.75rem 1rem',
+        borderRadius: 'var(--radius-lg)',
+        border: '1px solid var(--light-border)',
+        boxShadow: 'var(--shadow-sm)',
+        overflowX: 'auto',
+        flexWrap: 'wrap'
+      }}>
+        <button
+          className={`btn btn-sm ${activeSettingsTab === 'branding' ? 'btn-primary' : 'btn-secondary'}`}
+          onClick={() => setActiveSettingsTab('branding')}
+        >
+          <Camera size={15} /> Upload Logo & Foto Desa
+        </button>
+        <button
+          className={`btn btn-sm ${activeSettingsTab === 'general' ? 'btn-primary' : 'btn-secondary'}`}
+          onClick={() => setActiveSettingsTab('general')}
+        >
+          <Building size={15} /> Identitas & Sambutan Kades
+        </button>
+        <button
+          className={`btn btn-sm ${activeSettingsTab === 'vision' ? 'btn-primary' : 'btn-secondary'}`}
+          onClick={() => setActiveSettingsTab('vision')}
+        >
+          <Sparkles size={15} /> Visi, Misi & Sejarah
+        </button>
+        <button
+          className={`btn btn-sm ${activeSettingsTab === 'apparatus' ? 'btn-primary' : 'btn-secondary'}`}
+          onClick={() => setActiveSettingsTab('apparatus')}
+        >
+          <User size={15} /> Struktur Aparatur
+        </button>
+        <button
+          className={`btn btn-sm ${activeSettingsTab === 'contact' ? 'btn-primary' : 'btn-secondary'}`}
+          onClick={() => setActiveSettingsTab('contact')}
+        >
+          <Phone size={15} /> Kontak & Peta Kantor
+        </button>
+      </div>
 
-          <div className="form-group">
-            <label className="form-label">Nama Desa *</label>
-            <input
-              type="text"
-              required
-              className="form-control"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Motto / Tagline Desa *</label>
-            <input
-              type="text"
-              required
-              className="form-control"
-              value={formData.tagline}
-              onChange={(e) => setFormData({ ...formData, tagline: e.target.value })}
-            />
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label className="form-label">Kecamatan</label>
-              <input
-                type="text"
-                className="form-control"
-                value={formData.district}
-                onChange={(e) => setFormData({ ...formData, district: e.target.value })}
-              />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Kabupaten / Kota</label>
-              <input
-                type="text"
-                className="form-control"
-                value={formData.regency}
-                onChange={(e) => setFormData({ ...formData, regency: e.target.value })}
-              />
-            </div>
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label className="form-label">Provinsi</label>
-              <input
-                type="text"
-                className="form-control"
-                value={formData.province}
-                onChange={(e) => setFormData({ ...formData, province: e.target.value })}
-              />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Kode Pos</label>
-              <input
-                type="text"
-                className="form-control"
-                value={formData.postalCode}
-                onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
-              />
-            </div>
-          </div>
+      {/* Success Alert */}
+      {savedNotice && (
+        <div style={{
+          background: '#dcfce7',
+          border: '1px solid #86efac',
+          borderRadius: 'var(--radius-md)',
+          padding: '0.85rem 1.25rem',
+          color: '#166534',
+          fontWeight: 700,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.65rem'
+        }}>
+          <CheckCircle2 size={20} color="#16a34a" />
+          Perubahan profil, logo, dan foto desa berhasil disimpan secara permanen!
         </div>
+      )}
 
-        {/* 2. DATA KEPALA DESA & SAMBUTAN */}
-        <div style={{ background: '#fff', borderRadius: '16px', padding: '2rem', border: '1px solid var(--light-border)', marginBottom: '1.5rem', boxShadow: 'var(--shadow-sm)' }}>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#059669' }}>
-            <User size={20} /> Data Kepala Desa & Sambutan
-          </h3>
+      {/* Form Card */}
+      <form onSubmit={handleSubmit} className="table-wrapper" style={{ padding: 'clamp(1.25rem, 3vw, 2rem)' }}>
+        
+        {/* 1. BRANDING & IMAGE UPLOAD TAB */}
+        {activeSettingsTab === 'branding' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            <div>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '0.35rem' }}>
+                Pengaturan Logo & Media Visual Desa
+              </h3>
+              <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', margin: 0 }}>
+                Unggah logo resmi dan foto desa. Gambar yang diunggah akan otomatis diperbarui di seluruh portal publik, kop surat resmi, dan panel admin.
+              </p>
+            </div>
 
-          <div className="form-row">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))', gap: '1.75rem' }}>
+              
+              {/* Box 1: LOGO DESA */}
+              <div style={{
+                background: '#f8fafc',
+                border: '1px solid var(--light-border)',
+                borderRadius: 'var(--radius-lg)',
+                padding: '1.5rem',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '1rem'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h4 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <ImageIcon size={18} color="#059669" /> Logo Resmi Desa
+                  </h4>
+                  <span className="badge badge-info">PNG / JPG / SVG</span>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+                  <div style={{
+                    width: '90px',
+                    height: '90px',
+                    borderRadius: 'var(--radius-md)',
+                    background: '#ffffff',
+                    border: '2px dashed #059669',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    overflow: 'hidden',
+                    flexShrink: 0,
+                    padding: '4px'
+                  }}>
+                    {formData.logo ? (
+                      <img src={formData.logo} alt="Logo Desa" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                    ) : (
+                      <Building size={32} color="#94a3b8" />
+                    )}
+                  </div>
+
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <label className="btn btn-primary btn-sm" style={{ cursor: 'pointer', alignSelf: 'flex-start' }}>
+                      <Upload size={14} /> Pilih Logo dari Komputer
+                      <input
+                        type="file"
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        onChange={(e) => handleImageFileChange(e, 'logo')}
+                      />
+                    </label>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Rekomendasi rasio 1:1, latar transparan (PNG).</span>
+                  </div>
+                </div>
+
+                <div className="form-group" style={{ marginBottom: 0 }}>
+                  <label className="form-label" style={{ fontSize: '0.8rem' }}>Atau Masukkan URL Gambar Logo:</label>
+                  <input
+                    type="url"
+                    placeholder="https://domain.com/logo-desa.png"
+                    className="form-control"
+                    style={{ fontSize: '0.85rem' }}
+                    value={formData.logo || ''}
+                    onChange={(e) => setFormData({ ...formData, logo: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              {/* Box 2: FOTO KEPALA DESA */}
+              <div style={{
+                background: '#f8fafc',
+                border: '1px solid var(--light-border)',
+                borderRadius: 'var(--radius-lg)',
+                padding: '1.5rem',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '1rem'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h4 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <User size={18} color="#059669" /> Foto Kepala Desa
+                  </h4>
+                  <span className="badge badge-success">Portret Resmi</span>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+                  <div style={{
+                    width: '90px',
+                    height: '90px',
+                    borderRadius: '50%',
+                    background: '#ffffff',
+                    border: '3px solid #059669',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    overflow: 'hidden',
+                    flexShrink: 0
+                  }}>
+                    <img
+                      src={formData.headOfVillage?.photo}
+                      alt="Kepala Desa"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  </div>
+
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <label className="btn btn-primary btn-sm" style={{ cursor: 'pointer', alignSelf: 'flex-start' }}>
+                      <Upload size={14} /> Ganti Foto Kades
+                      <input
+                        type="file"
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        onChange={(e) => handleImageFileChange(e, 'headPhoto')}
+                      />
+                    </label>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Foto profil berseragam dinas atau formal.</span>
+                  </div>
+                </div>
+
+                <div className="form-group" style={{ marginBottom: 0 }}>
+                  <label className="form-label" style={{ fontSize: '0.8rem' }}>Atau Masukkan URL Foto Kades:</label>
+                  <input
+                    type="url"
+                    placeholder="https://..."
+                    className="form-control"
+                    style={{ fontSize: '0.85rem' }}
+                    value={formData.headOfVillage?.photo || ''}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      headOfVillage: { ...formData.headOfVillage, photo: e.target.value }
+                    })}
+                  />
+                </div>
+              </div>
+
+              {/* Box 3: FOTO BANNER HERO DESA */}
+              <div style={{
+                background: '#f8fafc',
+                border: '1px solid var(--light-border)',
+                borderRadius: 'var(--radius-lg)',
+                padding: '1.5rem',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '1rem'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h4 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <ImageIcon size={18} color="#059669" /> Banner / Wallpaper Desa
+                  </h4>
+                  <span className="badge badge-neutral">Landscape (16:9)</span>
+                </div>
+
+                <div style={{ height: '110px', borderRadius: 'var(--radius-md)', overflow: 'hidden', background: '#e2e8f0', position: 'relative' }}>
+                  <img
+                    src={formData.bannerImage || formData.officePhoto}
+                    alt="Banner Desa"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                </div>
+
+                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                  <label className="btn btn-primary btn-sm" style={{ cursor: 'pointer' }}>
+                    <Upload size={14} /> Upload Banner Baru
+                    <input
+                      type="file"
+                      accept="image/*"
+                      style={{ display: 'none' }}
+                      onChange={(e) => handleImageFileChange(e, 'bannerImage')}
+                    />
+                  </label>
+                </div>
+
+                <div className="form-group" style={{ marginBottom: 0 }}>
+                  <label className="form-label" style={{ fontSize: '0.8rem' }}>URL Gambar Banner:</label>
+                  <input
+                    type="url"
+                    placeholder="https://..."
+                    className="form-control"
+                    style={{ fontSize: '0.85rem' }}
+                    value={formData.bannerImage || ''}
+                    onChange={(e) => setFormData({ ...formData, bannerImage: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              {/* Box 4: FOTO KANTOR / BALAI DESA */}
+              <div style={{
+                background: '#f8fafc',
+                border: '1px solid var(--light-border)',
+                borderRadius: 'var(--radius-lg)',
+                padding: '1.5rem',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '1rem'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h4 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <Building size={18} color="#059669" /> Foto Gedung Kantor Balai Desa
+                  </h4>
+                  <span className="badge badge-neutral">Tampak Depan</span>
+                </div>
+
+                <div style={{ height: '110px', borderRadius: 'var(--radius-md)', overflow: 'hidden', background: '#e2e8f0' }}>
+                  <img
+                    src={formData.officePhoto}
+                    alt="Kantor Desa"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                </div>
+
+                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                  <label className="btn btn-primary btn-sm" style={{ cursor: 'pointer' }}>
+                    <Upload size={14} /> Upload Foto Kantor
+                    <input
+                      type="file"
+                      accept="image/*"
+                      style={{ display: 'none' }}
+                      onChange={(e) => handleImageFileChange(e, 'officePhoto')}
+                    />
+                  </label>
+                </div>
+
+                <div className="form-group" style={{ marginBottom: 0 }}>
+                  <label className="form-label" style={{ fontSize: '0.8rem' }}>URL Foto Kantor:</label>
+                  <input
+                    type="url"
+                    placeholder="https://..."
+                    className="form-control"
+                    style={{ fontSize: '0.85rem' }}
+                    value={formData.officePhoto || ''}
+                    onChange={(e) => setFormData({ ...formData, officePhoto: e.target.value })}
+                  />
+                </div>
+              </div>
+
+            </div>
+          </div>
+        )}
+
+        {/* 2. GENERAL & SPEECH TAB */}
+        {activeSettingsTab === 'general' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
+              Identitas Desa & Sambutan Kepala Desa
+            </h3>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label className="form-label">Nama Resmi Desa *</label>
+                <input
+                  type="text"
+                  required
+                  className="form-control"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Kode Wilayah Desa</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={formData.code}
+                  onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                />
+              </div>
+            </div>
+
             <div className="form-group">
-              <label className="form-label">Nama Kepala Desa *</label>
+              <label className="form-label">Slogan / Tagline Desa *</label>
               <input
                 type="text"
                 required
                 className="form-control"
-                value={formData.headName}
-                onChange={(e) => setFormData({ ...formData, headName: e.target.value })}
+                value={formData.tagline}
+                onChange={(e) => setFormData({ ...formData, tagline: e.target.value })}
               />
             </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label className="form-label">Kecamatan</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={formData.district}
+                  onChange={(e) => setFormData({ ...formData, district: e.target.value })}
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Kabupaten / Kota</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={formData.regency}
+                  onChange={(e) => setFormData({ ...formData, regency: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <div style={{ borderTop: '1px solid var(--light-border)', paddingTop: '1.25rem' }}>
+              <h4 style={{ fontSize: '1.05rem', fontWeight: 700, marginBottom: '1rem', color: '#059669' }}>
+                Profil & Sambutan Kepala Desa
+              </h4>
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Nama Lengkap & Gelar Kades</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={formData.headOfVillage?.name}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      headOfVillage: { ...formData.headOfVillage, name: e.target.value }
+                    })}
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Masa Jabatan / Periode</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={formData.headOfVillage?.period}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      headOfVillage: { ...formData.headOfVillage, period: e.target.value }
+                    })}
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Naskah Sambutan Kepala Desa</label>
+                <textarea
+                  rows={4}
+                  className="form-control"
+                  value={formData.headOfVillage?.welcomeSpeech}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    headOfVillage: { ...formData.headOfVillage, welcomeSpeech: e.target.value }
+                  })}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 3. VISION, MISSION, HISTORY TAB */}
+        {activeSettingsTab === 'vision' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
+              Visi, Misi & Sejarah Desa
+            </h3>
+
             <div className="form-group">
-              <label className="form-label">Periode Jabatan</label>
+              <label className="form-label">Visi Desa Sukamaju</label>
+              <textarea
+                rows={3}
+                className="form-control"
+                value={formData.vision}
+                onChange={(e) => setFormData({ ...formData, vision: e.target.value })}
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Misi Pembangunan Desa (Satu poin per baris)</label>
+              <textarea
+                rows={6}
+                className="form-control"
+                value={formData.missions ? formData.missions.join('\n') : ''}
+                onChange={(e) => setFormData({
+                  ...formData,
+                  missions: e.target.value.split('\n').filter(Boolean)
+                })}
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Ringkasan Sejarah & Asal-usul Desa</label>
+              <textarea
+                rows={5}
+                className="form-control"
+                value={formData.history}
+                onChange={(e) => setFormData({ ...formData, history: e.target.value })}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* 4. APPARATUS STRUCTURE TAB */}
+        {activeSettingsTab === 'apparatus' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
+                Daftar & Foto Aparatur Pemerintah Desa
+              </h3>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: '1.25rem' }}>
+              {formData.apparatus?.map((app, idx) => (
+                <div
+                  key={app.id || idx}
+                  style={{
+                    background: '#f8fafc',
+                    border: '1px solid var(--light-border)',
+                    borderRadius: 'var(--radius-md)',
+                    padding: '1.15rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.75rem'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+                    <div style={{ width: '56px', height: '56px', borderRadius: '50%', overflow: 'hidden', background: '#e2e8f0', flexShrink: 0 }}>
+                      <img src={app.photo} alt={app.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <label className="btn btn-secondary btn-sm" style={{ cursor: 'pointer', padding: '0.2rem 0.5rem', fontSize: '0.75rem' }}>
+                        <Upload size={12} /> Ganti Foto
+                        <input
+                          type="file"
+                          accept="image/*"
+                          style={{ display: 'none' }}
+                          onChange={(e) => handleApparatusPhotoChange(e, idx)}
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="form-group" style={{ marginBottom: '0.5rem' }}>
+                    <label className="form-label" style={{ fontSize: '0.775rem' }}>Nama Lengkap & Gelar</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={app.name}
+                      onChange={(e) => {
+                        const updated = [...formData.apparatus];
+                        updated[idx].name = e.target.value;
+                        setFormData({ ...formData, apparatus: updated });
+                      }}
+                    />
+                  </div>
+
+                  <div className="form-group" style={{ marginBottom: '0.5rem' }}>
+                    <label className="form-label" style={{ fontSize: '0.775rem' }}>Jabatan Pemerintahan</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={app.position}
+                      onChange={(e) => {
+                        const updated = [...formData.apparatus];
+                        updated[idx].position = e.target.value;
+                        setFormData({ ...formData, apparatus: updated });
+                      }}
+                    />
+                  </div>
+
+                  <div className="form-row">
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label" style={{ fontSize: '0.75rem' }}>NIP / NIAP</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={app.nip || '-'}
+                        onChange={(e) => {
+                          const updated = [...formData.apparatus];
+                          updated[idx].nip = e.target.value;
+                          setFormData({ ...formData, apparatus: updated });
+                        }}
+                      />
+                    </div>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label" style={{ fontSize: '0.75rem' }}>No. HP / WA</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={app.phone || '-'}
+                        onChange={(e) => {
+                          const updated = [...formData.apparatus];
+                          updated[idx].phone = e.target.value;
+                          setFormData({ ...formData, apparatus: updated });
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 5. CONTACT & EMERGENCY TAB */}
+        {activeSettingsTab === 'contact' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
+              Informasi Kontak & Jam Operasional
+            </h3>
+
+            <div className="form-group">
+              <label className="form-label">Alamat Kantor Desa</label>
               <input
                 type="text"
-                placeholder="2021 - 2027"
                 className="form-control"
-                value={formData.headPeriod}
-                onChange={(e) => setFormData({ ...formData, headPeriod: e.target.value })}
+                value={formData.contact?.address}
+                onChange={(e) => setFormData({
+                  ...formData,
+                  contact: { ...formData.contact, address: e.target.value }
+                })}
               />
             </div>
-          </div>
 
-          <div className="form-group">
-            <label className="form-label">URL Foto Kepala Desa</label>
-            <input
-              type="url"
-              className="form-control"
-              value={formData.headPhoto}
-              onChange={(e) => setFormData({ ...formData, headPhoto: e.target.value })}
-            />
-          </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label className="form-label">Email Resmi Desa</label>
+                <input
+                  type="email"
+                  className="form-control"
+                  value={formData.contact?.email}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    contact: { ...formData.contact, email: e.target.value }
+                  })}
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Nomor Telepon Kantor</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={formData.contact?.phone}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    contact: { ...formData.contact, phone: e.target.value }
+                  })}
+                />
+              </div>
+            </div>
 
-          <div className="form-group">
-            <label className="form-label">Pesan / Sambutan Kepala Desa</label>
-            <textarea
-              rows={4}
-              className="form-control"
-              value={formData.headSpeech}
-              onChange={(e) => setFormData({ ...formData, headSpeech: e.target.value })}
-            />
-          </div>
-        </div>
-
-        {/* 3. VISI & MISI DESA */}
-        <div style={{ background: '#fff', borderRadius: '16px', padding: '2rem', border: '1px solid var(--light-border)', marginBottom: '1.5rem', boxShadow: 'var(--shadow-sm)' }}>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#059669' }}>
-            <Target size={20} /> Visi, Misi & Sejarah
-          </h3>
-
-          <div className="form-group">
-            <label className="form-label">Visi Desa *</label>
-            <textarea
-              rows={2}
-              required
-              className="form-control"
-              value={formData.vision}
-              onChange={(e) => setFormData({ ...formData, vision: e.target.value })}
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Misi Desa (Satu butir per baris baru) *</label>
-            <textarea
-              rows={5}
-              required
-              className="form-control"
-              value={formData.missionsText}
-              onChange={(e) => setFormData({ ...formData, missionsText: e.target.value })}
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Sejarah Singkat Desa</label>
-            <textarea
-              rows={4}
-              className="form-control"
-              value={formData.history}
-              onChange={(e) => setFormData({ ...formData, history: e.target.value })}
-            />
-          </div>
-        </div>
-
-        {/* 4. KONTAK & JADWAL KANTOR */}
-        <div style={{ background: '#fff', borderRadius: '16px', padding: '2rem', border: '1px solid var(--light-border)', marginBottom: '1.5rem', boxShadow: 'var(--shadow-sm)' }}>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#059669' }}>
-            <Phone size={20} /> Kontak Kantor Pemerintah Desa
-          </h3>
-
-          <div className="form-group">
-            <label className="form-label">Alamat Kantor Desa *</label>
-            <input
-              type="text"
-              required
-              className="form-control"
-              value={formData.address}
-              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-            />
-          </div>
-
-          <div className="form-row">
             <div className="form-group">
-              <label className="form-label">Telepon Kantor</label>
+              <label className="form-label">Jam Pelayanan Kantor</label>
               <input
                 type="text"
                 className="form-control"
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Email Resmi</label>
-              <input
-                type="email"
-                className="form-control"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                value={formData.contact?.openingHours}
+                onChange={(e) => setFormData({
+                  ...formData,
+                  contact: { ...formData.contact, openingHours: e.target.value }
+                })}
               />
             </div>
           </div>
+        )}
 
-          <div className="form-group">
-            <label className="form-label">Jam Operasional Kantor</label>
-            <input
-              type="text"
-              className="form-control"
-              value={formData.openingHours}
-              onChange={(e) => setFormData({ ...formData, openingHours: e.target.value })}
-            />
-          </div>
-        </div>
+        {/* Bottom Actions Bar */}
+        <div style={{
+          marginTop: '2rem',
+          paddingTop: '1.5rem',
+          borderTop: '1px solid var(--light-border)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '1rem'
+        }}>
+          <button
+            type="button"
+            className="btn btn-secondary btn-sm"
+            onClick={handleResetDefaults}
+            style={{ color: '#dc2626', borderColor: '#fca5a5' }}
+          >
+            <RefreshCw size={14} /> Reset ke Pengaturan Default
+          </button>
 
-        {/* 5. STATISTIK KEPENDUDUKAN */}
-        <div style={{ background: '#fff', borderRadius: '16px', padding: '2rem', border: '1px solid var(--light-border)', marginBottom: '2rem', boxShadow: 'var(--shadow-sm)' }}>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#059669' }}>
-            <Settings size={20} /> Statistik & Demografi
-          </h3>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label className="form-label">Jumlah Penduduk (Jiwa)</label>
-              <input
-                type="number"
-                className="form-control"
-                value={formData.population}
-                onChange={(e) => setFormData({ ...formData, population: e.target.value })}
-              />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Jumlah KK (Kepala Keluarga)</label>
-              <input
-                type="number"
-                className="form-control"
-                value={formData.households}
-                onChange={(e) => setFormData({ ...formData, households: e.target.value })}
-              />
-            </div>
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label className="form-label">Jumlah RT</label>
-              <input
-                type="number"
-                className="form-control"
-                value={formData.rtCount}
-                onChange={(e) => setFormData({ ...formData, rtCount: e.target.value })}
-              />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Jumlah RW</label>
-              <input
-                type="number"
-                className="form-control"
-                value={formData.rwCount}
-                onChange={(e) => setFormData({ ...formData, rwCount: e.target.value })}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Save Bar */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.5rem 0' }}>
-          <div>
-            {savedSuccess && (
-              <span style={{ color: '#059669', fontWeight: 700, fontSize: '0.95rem' }}>
-                ✓ Pengaturan profil desa berhasil disimpan!
-              </span>
-            )}
-          </div>
-          <button type="submit" className="btn btn-primary btn-lg">
-            <Save size={18} /> Simpan Pengaturan Profil Desa
+          <button type="submit" className="btn btn-primary">
+            <Save size={16} /> Simpan Seluruh Pengaturan Profil
           </button>
         </div>
-      </form>
 
-      {/* Danger Zone: Reset Data */}
-      <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '16px', padding: '2rem', marginTop: '1rem' }}>
-        <h4 style={{ color: '#991b1b', fontSize: '1.1rem', fontWeight: 800, margin: '0 0 0.5rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <AlertTriangle size={20} color="#dc2626" /> Reset Data Aplikasi ke Data Awal
-        </h4>
-        <p style={{ fontSize: '0.875rem', color: '#b91c1c', marginBottom: '1rem' }}>
-          Tindakan ini akan mengembalikan seluruh artikel berita, produk UMKM, destinasi wisata, permohonan surat, dan profil desa ke data sampel mula-mula.
-        </p>
-        <button
-          type="button"
-          className="btn btn-danger btn-sm"
-          onClick={handleResetDefaults}
-        >
-          <RefreshCw size={14} /> Reset ke Data Default
-        </button>
-      </div>
+      </form>
     </div>
   );
 }
