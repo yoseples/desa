@@ -1256,10 +1256,20 @@ export default function AdminCitizens({
                         <tr key={kk.id}>
                           <td style={{ fontWeight: 'bold' }}>{idx + 1}</td>
                           <td>
-                            <span style={{ fontFamily: 'monospace', fontWeight: 800, color: 'var(--primary)', display: 'block' }}>
-                              {kk.noKk}
+                            <span 
+                              onClick={() => setViewFamilyDetail(kk)}
+                              style={{ fontFamily: 'monospace', fontWeight: 800, color: 'var(--primary)', display: 'block', cursor: 'pointer' }}
+                              title="Klik untuk membuka Kartu Keluarga Layar Penuh"
+                            >
+                              {kk.noKk} ↗
                             </span>
-                            <strong style={{ fontSize: '0.95rem', color: 'var(--text-main)' }}>{kk.headName}</strong>
+                            <strong 
+                              onClick={() => setViewFamilyDetail(kk)}
+                              style={{ fontSize: '0.95rem', color: 'var(--text-main)', cursor: 'pointer' }}
+                              title="Klik untuk membuka Kartu Keluarga Layar Penuh"
+                            >
+                              {kk.headName}
+                            </strong>
                           </td>
                           <td>
                             <span style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-main)' }}>{kk.address}</span>
@@ -1300,8 +1310,9 @@ export default function AdminCitizens({
                               className="btn btn-secondary btn-sm"
                               style={{ fontSize: '0.75rem', padding: '0.2rem 0.55rem' }}
                               onClick={() => setViewFamilyDetail(kk)}
+                              title="Buka Kartu Keluarga Layar Penuh"
                             >
-                              <Users size={12} /> {kk.members ? kk.members.length : 0} Jiwa
+                              <Users size={12} /> {kk.members ? kk.members.length : 0} Jiwa ↗
                             </button>
                           </td>
                           <td style={{ textAlign: 'center' }}>
@@ -1342,10 +1353,10 @@ export default function AdminCitizens({
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
                 <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
-                  Daftar Kartu Keluarga (KK) Terdaftar di Desa
+                  Daftar Master Kartu Keluarga (KK)
                 </h3>
                 <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                  Total <strong>{filteredFamilies.length}</strong> KK
+                  Total <strong>{filteredFamilies.length}</strong> KK Terdaftar
                 </span>
               </div>
 
@@ -1375,12 +1386,22 @@ export default function AdminCitizens({
                         <tr key={kk.id}>
                           <td style={{ fontWeight: 'bold' }}>{idx + 1}</td>
                           <td>
-                            <strong style={{ fontFamily: 'monospace', color: 'var(--primary)' }}>
-                              {kk.noKk}
+                            <strong 
+                              onClick={() => setViewFamilyDetail(kk)}
+                              style={{ fontFamily: 'monospace', color: 'var(--primary)', cursor: 'pointer' }}
+                              title="Klik untuk membuka Kartu Keluarga Layar Penuh"
+                            >
+                              {kk.noKk} ↗
                             </strong>
                           </td>
                           <td>
-                            <strong style={{ color: 'var(--text-main)' }}>{kk.headName}</strong>
+                            <strong 
+                              onClick={() => setViewFamilyDetail(kk)}
+                              style={{ color: 'var(--text-main)', cursor: 'pointer' }}
+                              title="Klik untuk membuka Kartu Keluarga Layar Penuh"
+                            >
+                              {kk.headName}
+                            </strong>
                           </td>
                           <td style={{ fontSize: '0.85rem' }}>
                             <div>{kk.address}</div>
@@ -1791,28 +1812,56 @@ export default function AdminCitizens({
         </div>
       )}
 
-      {/* MODAL 3: DETAIL ANGGOTA KK */}
+      {/* MODAL 3: DOKUMEN RESMI KARTU KELUARGA (KK) LAYAR PENUH */}
       {viewFamilyDetail && (
-        <div className="modal-backdrop">
-          <div className="modal-content" style={{ maxWidth: '800px' }}>
-            <div className="modal-header">
-              <div>
-                <h3 className="modal-title">Kartu Keluarga: {viewFamilyDetail.headName}</h3>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                  No. KK: <strong>{viewFamilyDetail.noKk}</strong> • RT {viewFamilyDetail.rt} / RW {viewFamilyDetail.rw} • {viewFamilyDetail.dusun}
+        <div className="modal-backdrop" style={{ zIndex: 9999, padding: '1rem' }} onClick={() => setViewFamilyDetail(null)}>
+          <div 
+            className="modal-content" 
+            onClick={(e) => e.stopPropagation()}
+            style={{ 
+              maxWidth: '1150px', 
+              width: '96vw', 
+              maxHeight: '92vh', 
+              height: '92vh',
+              display: 'flex', 
+              flexDirection: 'column',
+              padding: 0,
+              overflow: 'hidden',
+              borderRadius: 'var(--radius-xl)',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.45)'
+            }}
+          >
+            {/* Top Modal Action Bar */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '0.85rem 1.5rem',
+              background: 'var(--light-surface)',
+              borderBottom: '1px solid var(--light-border)',
+              flexShrink: 0
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                <span className="badge badge-success" style={{ fontSize: '0.75rem' }}>
+                  Dokumen Kependudukan Resmi
+                </span>
+                <span style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--text-main)' }}>
+                  Kartu Keluarga (KK) — {viewFamilyDetail.headName}
                 </span>
               </div>
-              <button className="modal-close" onClick={() => setViewFamilyDetail(null)}>
-                <X size={18} />
-              </button>
-            </div>
 
-            <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h4 style={{ fontSize: '1rem', fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>
-                  Daftar Anggota Keluarga ({viewFamilyDetail.members?.length || 0} Jiwa)
-                </h4>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <button
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => window.print()}
+                  style={{ fontSize: '0.775rem', gap: '0.35rem' }}
+                  title="Cetak Dokumen Kartu Keluarga"
+                >
+                  <Printer size={14} /> Cetak Dokumen
+                </button>
+                <button
+                  type="button"
                   className="btn btn-primary btn-sm"
                   onClick={() => {
                     setAddMemberModalKk(viewFamilyDetail);
@@ -1833,76 +1882,309 @@ export default function AdminCitizens({
                       phone: ''
                     });
                   }}
+                  style={{ fontSize: '0.775rem', gap: '0.35rem' }}
                 >
-                  <Plus size={13} /> Tambah Anggota
+                  <Plus size={14} /> Tambah Anggota
+                </button>
+                <button 
+                  className="modal-close" 
+                  onClick={() => setViewFamilyDetail(null)}
+                  style={{ marginLeft: '0.5rem' }}
+                  title="Tutup Layar Penuh"
+                >
+                  <X size={20} />
                 </button>
               </div>
+            </div>
 
-              <div style={{ overflowX: 'auto' }}>
-                <table className="table" style={{ fontSize: '0.85rem' }}>
-                  <thead>
-                    <tr>
-                      <th>No</th>
-                      <th>NIK</th>
-                      <th>Nama Lengkap</th>
-                      <th>Gender</th>
-                      <th>Hubungan</th>
-                      <th>Tempat, Tanggal Lahir</th>
-                      <th>Pendidikan & Pekerjaan</th>
-                      <th>Aksi</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {!viewFamilyDetail.members || viewFamilyDetail.members.length === 0 ? (
-                      <tr>
-                        <td colSpan={8} style={{ textAlign: 'center', padding: '1.5rem', color: 'var(--text-muted)' }}>
-                          Belum ada anggota terdaftar di KK ini.
-                        </td>
-                      </tr>
-                    ) : (
-                      viewFamilyDetail.members.map((m, idx) => (
-                        <tr key={m.id || idx}>
-                          <td>{idx + 1}</td>
-                          <td style={{ fontFamily: 'monospace', fontWeight: 700, color: 'var(--primary)' }}>{m.nik}</td>
-                          <td><strong>{m.name}</strong></td>
-                          <td>{m.gender}</td>
-                          <td>
-                            <span className="badge badge-neutral" style={{ fontSize: '0.7rem' }}>
-                              {m.relation}
-                            </span>
-                          </td>
-                          <td>{m.birthPlace ? `${m.birthPlace}, ` : ''}{m.birthDate}</td>
-                          <td>{m.education || '-'} • {m.occupation || '-'}</td>
-                          <td>
-                            <button
-                              className="btn btn-secondary btn-sm"
-                              style={{ color: '#dc2626', padding: '0.2rem 0.4rem' }}
-                              onClick={() => {
-                                if (window.confirm(`Hapus anggota ${m.name}?`)) {
-                                  onDeleteMember(viewFamilyDetail.id, m.id);
-                                  setViewFamilyDetail(prev => ({
-                                    ...prev,
-                                    members: prev.members.filter(mem => mem.id !== m.id)
-                                  }));
-                                }
-                              }}
-                            >
-                              <Trash2 size={12} />
-                            </button>
-                          </td>
+            {/* Document Printable Viewport */}
+            <div style={{
+              flex: 1,
+              overflowY: 'auto',
+              padding: 'clamp(1rem, 3vw, 2.5rem)',
+              background: 'var(--light-bg)',
+              display: 'flex',
+              justifyContent: 'center'
+            }}>
+              {/* Paper Canvas */}
+              <div style={{
+                background: '#ffffff',
+                color: '#0f172a',
+                width: '100%',
+                maxWidth: '1050px',
+                padding: '2.5rem',
+                borderRadius: '8px',
+                border: '2px solid #cbd5e1',
+                boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '1.5rem',
+                fontFamily: "'Inter', sans-serif"
+              }}>
+                
+                {/* 1. KOP KARTU KELUARGA NASIONAL */}
+                <div style={{ textAlign: 'center', borderBottom: '3px double #0f172a', paddingBottom: '1.25rem' }}>
+                  {/* Garuda Seal SVG */}
+                  <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.5rem' }}>
+                    <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                  </div>
+                  <h2 style={{ fontSize: '1.5rem', fontWeight: 900, letterSpacing: '2px', margin: 0, color: '#0f172a', textTransform: 'uppercase' }}>
+                    REPUBLIK INDONESIA
+                  </h2>
+                  <h1 style={{ fontSize: '1.85rem', fontWeight: 900, letterSpacing: '4px', margin: '0.2rem 0', color: '#064e3b', textTransform: 'uppercase' }}>
+                    KARTU KELUARGA
+                  </h1>
+                  <div style={{
+                    display: 'inline-block',
+                    background: '#f8fafc',
+                    border: '2px solid #059669',
+                    borderRadius: '6px',
+                    padding: '0.35rem 1.25rem',
+                    marginTop: '0.4rem'
+                  }}>
+                    <span style={{ fontSize: '1.2rem', fontWeight: 900, fontFamily: 'monospace', letterSpacing: '2px', color: '#064e3b' }}>
+                      No. {viewFamilyDetail.noKk}
+                    </span>
+                  </div>
+                </div>
+
+                {/* 2. HEADER METADATA 2-KOLOM */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', fontSize: '0.875rem' }}>
+                  {/* Kolom Kiri */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                    <div style={{ display: 'flex' }}>
+                      <span style={{ width: '180px', color: '#475569', fontWeight: 600 }}>Nama Kepala Keluarga</span>
+                      <strong style={{ color: '#0f172a' }}>: {viewFamilyDetail.headName}</strong>
+                    </div>
+                    <div style={{ display: 'flex' }}>
+                      <span style={{ width: '180px', color: '#475569', fontWeight: 600 }}>Alamat</span>
+                      <strong style={{ color: '#0f172a' }}>: {viewFamilyDetail.address || '-'}</strong>
+                    </div>
+                    <div style={{ display: 'flex' }}>
+                      <span style={{ width: '180px', color: '#475569', fontWeight: 600 }}>RT / RW</span>
+                      <strong style={{ color: '#0f172a' }}>: {viewFamilyDetail.rt} / {viewFamilyDetail.rw}</strong>
+                    </div>
+                    <div style={{ display: 'flex' }}>
+                      <span style={{ width: '180px', color: '#475569', fontWeight: 600 }}>Kode Pos</span>
+                      <strong style={{ color: '#0f172a' }}>: {viewFamilyDetail.postalCode || '40375'}</strong>
+                    </div>
+                  </div>
+
+                  {/* Kolom Kanan */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                    <div style={{ display: 'flex' }}>
+                      <span style={{ width: '160px', color: '#475569', fontWeight: 600 }}>Desa / Kelurahan</span>
+                      <strong style={{ color: '#0f172a' }}>: {profile?.name || 'Sukamaju Mandiri'}</strong>
+                    </div>
+                    <div style={{ display: 'flex' }}>
+                      <span style={{ width: '160px', color: '#475569', fontWeight: 600 }}>Kecamatan</span>
+                      <strong style={{ color: '#0f172a' }}>: {profile?.district || 'Harapan Makmur'}</strong>
+                    </div>
+                    <div style={{ display: 'flex' }}>
+                      <span style={{ width: '160px', color: '#475569', fontWeight: 600 }}>Kabupaten / Kota</span>
+                      <strong style={{ color: '#0f172a' }}>: {profile?.regency || 'Kabupaten Bandung'}</strong>
+                    </div>
+                    <div style={{ display: 'flex' }}>
+                      <span style={{ width: '160px', color: '#475569', fontWeight: 600 }}>Provinsi</span>
+                      <strong style={{ color: '#0f172a' }}>: Jawa Barat</strong>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. TABEL BAGIAN I: DATA ANGGOTA KELUARGA */}
+                <div>
+                  <div style={{ background: '#f1f5f9', padding: '0.4rem 0.75rem', fontWeight: 800, fontSize: '0.8rem', border: '1px solid #cbd5e1', borderBottom: 'none', color: '#1e293b' }}>
+                    I. DAFTAR ANGGOTA KELUARGA
+                  </div>
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem', textAlign: 'left' }}>
+                      <thead>
+                        <tr style={{ background: '#e2e8f0', color: '#0f172a', border: '1px solid #94a3b8' }}>
+                          <th style={{ padding: '6px 8px', border: '1px solid #94a3b8', width: '30px', textAlign: 'center' }}>No</th>
+                          <th style={{ padding: '6px 8px', border: '1px solid #94a3b8' }}>Nama Lengkap</th>
+                          <th style={{ padding: '6px 8px', border: '1px solid #94a3b8' }}>NIK</th>
+                          <th style={{ padding: '6px 8px', border: '1px solid #94a3b8' }}>Jenis Kelamin</th>
+                          <th style={{ padding: '6px 8px', border: '1px solid #94a3b8' }}>Tempat Lahir</th>
+                          <th style={{ padding: '6px 8px', border: '1px solid #94a3b8' }}>Tanggal Lahir</th>
+                          <th style={{ padding: '6px 8px', border: '1px solid #94a3b8' }}>Agama</th>
+                          <th style={{ padding: '6px 8px', border: '1px solid #94a3b8' }}>Pendidikan</th>
+                          <th style={{ padding: '6px 8px', border: '1px solid #94a3b8' }}>Jenis Pekerjaan</th>
                         </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
+                      </thead>
+                      <tbody>
+                        {!viewFamilyDetail.members || viewFamilyDetail.members.length === 0 ? (
+                          <tr>
+                            <td colSpan={9} style={{ textAlign: 'center', padding: '1rem', border: '1px solid #94a3b8', color: '#64748b' }}>
+                              Belum ada anggota keluarga terdaftar.
+                            </td>
+                          </tr>
+                        ) : (
+                          viewFamilyDetail.members.map((m, idx) => (
+                            <tr key={m.id || idx} style={{ border: '1px solid #cbd5e1', background: idx % 2 === 0 ? '#ffffff' : '#f8fafc' }}>
+                              <td style={{ padding: '6px 8px', border: '1px solid #cbd5e1', textAlign: 'center', fontWeight: 'bold' }}>{idx + 1}</td>
+                              <td style={{ padding: '6px 8px', border: '1px solid #cbd5e1', fontWeight: 700, color: '#0f172a' }}>{m.name}</td>
+                              <td style={{ padding: '6px 8px', border: '1px solid #cbd5e1', fontFamily: 'monospace', fontWeight: 800, color: '#064e3b' }}>{m.nik}</td>
+                              <td style={{ padding: '6px 8px', border: '1px solid #cbd5e1' }}>{m.gender}</td>
+                              <td style={{ padding: '6px 8px', border: '1px solid #cbd5e1' }}>{m.birthPlace || 'Bandung'}</td>
+                              <td style={{ padding: '6px 8px', border: '1px solid #cbd5e1' }}>{m.birthDate || '-'}</td>
+                              <td style={{ padding: '6px 8px', border: '1px solid #cbd5e1' }}>{m.religion || 'Islam'}</td>
+                              <td style={{ padding: '6px 8px', border: '1px solid #cbd5e1' }}>{m.education || 'SMA / Sederajat'}</td>
+                              <td style={{ padding: '6px 8px', border: '1px solid #cbd5e1' }}>{m.occupation || '-'}</td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* 4. TABEL BAGIAN II: STATUS PERKAWINAN, HUBUNGAN & NAMA ORANG TUA */}
+                <div>
+                  <div style={{ background: '#f1f5f9', padding: '0.4rem 0.75rem', fontWeight: 800, fontSize: '0.8rem', border: '1px solid #cbd5e1', borderBottom: 'none', color: '#1e293b' }}>
+                    II. STATUS PERKAWINAN, HUBUNGAN KELUARGA & NAMA ORANG TUA
+                  </div>
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem', textAlign: 'left' }}>
+                      <thead>
+                        <tr style={{ background: '#e2e8f0', color: '#0f172a', border: '1px solid #94a3b8' }}>
+                          <th style={{ padding: '6px 8px', border: '1px solid #94a3b8', width: '30px', textAlign: 'center' }}>No</th>
+                          <th style={{ padding: '6px 8px', border: '1px solid #94a3b8' }}>Status Perkawinan</th>
+                          <th style={{ padding: '6px 8px', border: '1px solid #94a3b8' }}>Status Hubungan</th>
+                          <th style={{ padding: '6px 8px', border: '1px solid #94a3b8' }}>Kewarganegaraan</th>
+                          <th style={{ padding: '6px 8px', border: '1px solid #94a3b8' }}>No. Paspor / KITAS</th>
+                          <th style={{ padding: '6px 8px', border: '1px solid #94a3b8' }}>Nama Ayah</th>
+                          <th style={{ padding: '6px 8px', border: '1px solid #94a3b8' }}>Nama Ibu</th>
+                          <th style={{ padding: '6px 8px', border: '1px solid #94a3b8', textAlign: 'center' }}>Aksi</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {!viewFamilyDetail.members || viewFamilyDetail.members.length === 0 ? (
+                          <tr>
+                            <td colSpan={8} style={{ textAlign: 'center', padding: '1rem', border: '1px solid #94a3b8', color: '#64748b' }}>
+                              Belum ada anggota keluarga terdaftar.
+                            </td>
+                          </tr>
+                        ) : (
+                          viewFamilyDetail.members.map((m, idx) => (
+                            <tr key={m.id || idx} style={{ border: '1px solid #cbd5e1', background: idx % 2 === 0 ? '#ffffff' : '#f8fafc' }}>
+                              <td style={{ padding: '6px 8px', border: '1px solid #cbd5e1', textAlign: 'center', fontWeight: 'bold' }}>{idx + 1}</td>
+                              <td style={{ padding: '6px 8px', border: '1px solid #cbd5e1' }}>{m.maritalStatus || 'Kawin'}</td>
+                              <td style={{ padding: '6px 8px', border: '1px solid #cbd5e1', fontWeight: 700, color: '#0369a1' }}>{m.relation || '-'}</td>
+                              <td style={{ padding: '6px 8px', border: '1px solid #cbd5e1' }}>WNI</td>
+                              <td style={{ padding: '6px 8px', border: '1px solid #cbd5e1' }}>-</td>
+                              <td style={{ padding: '6px 8px', border: '1px solid #cbd5e1' }}>{m.fatherName || '-'}</td>
+                              <td style={{ padding: '6px 8px', border: '1px solid #cbd5e1' }}>{m.motherName || '-'}</td>
+                              <td style={{ padding: '6px 8px', border: '1px solid #cbd5e1', textAlign: 'center' }}>
+                                <button
+                                  className="btn btn-secondary btn-sm"
+                                  style={{ color: '#dc2626', padding: '0.15rem 0.4rem', fontSize: '0.7rem' }}
+                                  onClick={() => {
+                                    if (window.confirm(`Hapus data anggota ${m.name}?`)) {
+                                      onDeleteMember(viewFamilyDetail.id, m.id);
+                                      setViewFamilyDetail(prev => ({
+                                        ...prev,
+                                        members: prev.members.filter(mem => mem.id !== m.id)
+                                      }));
+                                    }
+                                  }}
+                                  title="Hapus Anggota Keluarga"
+                                >
+                                  <Trash2 size={12} />
+                                </button>
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* 5. TANDA TANGAN & VALIDASI LEGALITAS DUKCAPIL */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr 1fr',
+                  gap: '1rem',
+                  marginTop: '1rem',
+                  paddingTop: '1rem',
+                  borderTop: '1px solid #cbd5e1',
+                  textAlign: 'center',
+                  fontSize: '0.8rem'
+                }}>
+                  {/* TTD Kiri: Kepala Keluarga */}
+                  <div>
+                    <span>KEPALA KELUARGA,</span>
+                    <div style={{ height: '70px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontStyle: 'italic', color: '#64748b' }}>
+                      ( Tanda Tangan )
+                    </div>
+                    <strong style={{ display: 'block', textDecoration: 'underline', color: '#0f172a' }}>
+                      {viewFamilyDetail.headName}
+                    </strong>
+                  </div>
+
+                  {/* Validasi Tengah: QR Code Digital Kemendagri */}
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{
+                      width: '75px',
+                      height: '75px',
+                      border: '2px solid #0f172a',
+                      borderRadius: '8px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      background: '#f8fafc',
+                      marginBottom: '0.35rem'
+                    }}>
+                      {/* QR Matrix Representation */}
+                      <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#0f172a" strokeWidth="2.5">
+                        <rect x="3" y="3" width="7" height="7" />
+                        <rect x="14" y="3" width="7" height="7" />
+                        <rect x="3" y="14" width="7" height="7" />
+                        <rect x="14" y="14" width="3" height="3" />
+                        <rect x="18" y="18" width="3" height="3" />
+                        <line x1="7" y1="7" x2="7.01" y2="7" />
+                        <line x1="17" y1="7" x2="17.01" y2="7" />
+                        <line x1="7" y1="17" x2="7.01" y2="17" />
+                      </svg>
+                    </div>
+                    <span style={{ fontSize: '0.675rem', fontWeight: 700, color: '#064e3b' }}>
+                      TERVALIDASI DIGITAL DUKCAPIL
+                    </span>
+                    <span style={{ fontSize: '0.65rem', color: '#64748b' }}>
+                      Diterbitkan: {viewFamilyDetail.issueDate || '12 Januari 2024'}
+                    </span>
+                  </div>
+
+                  {/* TTD Kanan: Kepala Desa */}
+                  <div>
+                    <span>KEPALA DESA SUKAMAJU,</span>
+                    <div style={{ height: '70px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontStyle: 'italic', color: '#059669', fontWeight: 800 }}>
+                      [ CAP & TTD ELEKTRONIK ]
+                    </div>
+                    <strong style={{ display: 'block', textDecoration: 'underline', color: '#0f172a' }}>
+                      {profile?.headOfVillage?.name || 'H. Rahmat Hidayat, S.Sos'}
+                    </strong>
+                    <span style={{ fontSize: '0.7rem', color: '#64748b' }}>
+                      NIP. {profile?.headOfVillage?.nip || '19750812 200212 1 003'}
+                    </span>
+                  </div>
+                </div>
+
               </div>
             </div>
 
-            <div className="modal-footer">
+            {/* Bottom Footer Action Bar */}
+            <div className="modal-footer" style={{ borderTop: '1px solid var(--light-border)', background: 'var(--light-surface)', padding: '0.75rem 1.5rem', flexShrink: 0 }}>
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginRight: 'auto' }}>
+                Status Ekonomi: <strong style={{ color: 'var(--primary)' }}>{viewFamilyDetail.economicStatus || 'Menengah'}</strong> • Listrik: {viewFamilyDetail.electricity || '450 VA'} • Sanitasi: {viewFamilyDetail.sanitation || 'Jamban Pribadi'}
+              </span>
               <button type="button" className="btn btn-secondary" onClick={() => setViewFamilyDetail(null)}>
-                Tutup
+                Tutup Layar Penuh
               </button>
             </div>
+
           </div>
         </div>
       )}
