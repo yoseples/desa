@@ -100,23 +100,29 @@ export default function Navbar({ activePage, setActivePage, onOpenTracking, prof
         {/* 3. Action Buttons & Quick Controls */}
         <div className="navbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
           
-          {/* Automatic / Dark / Light Mode Switcher */}
+          {/* Automatic / Dark / Light Mode Switcher (Icon Only) */}
           <button 
             className="navbar-btn-secondary navbar-theme-btn"
             onClick={handleCycleTheme}
-            title={`Tema: ${colorMode === 'auto' ? 'Otomatis (Sesuai Sistem)' : colorMode === 'dark' ? 'Mode Gelap' : 'Mode Terang'} - Klik untuk mengubah`}
-            style={{ padding: '0.35rem 0.65rem', gap: '0.35rem', fontSize: '0.75rem' }}
+            title={`Mode Tampilan: ${colorMode === 'auto' ? 'Otomatis (Sesuai Sistem)' : colorMode === 'dark' ? 'Mode Gelap' : 'Mode Terang'} (Klik untuk ganti)`}
+            aria-label="Ganti Mode Tampilan"
+            style={{ 
+              width: '34px', 
+              height: '34px', 
+              padding: 0, 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              borderRadius: 'var(--radius-full)'
+            }}
           >
             {colorMode === 'auto' ? (
-              <Monitor size={14} className="text-emerald-500" />
+              <Monitor size={15} style={{ color: 'var(--primary)' }} />
             ) : colorMode === 'dark' ? (
-              <Moon size={14} style={{ color: '#38bdf8' }} />
+              <Moon size={15} style={{ color: '#38bdf8' }} />
             ) : (
-              <Sun size={14} style={{ color: '#f59e0b' }} />
+              <Sun size={15} style={{ color: '#f59e0b' }} />
             )}
-            <span style={{ fontWeight: 600 }}>
-              {colorMode === 'auto' ? 'Otomatis' : colorMode === 'dark' ? 'Gelap' : 'Terang'}
-            </span>
           </button>
 
           {/* Lacak Permohonan Resi Button */}
@@ -211,11 +217,18 @@ export default function Navbar({ activePage, setActivePage, onOpenTracking, prof
           <div className="mobile-actions-row" style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
             <button 
               className="navbar-btn-secondary"
-              style={{ flex: 1, justifyContent: 'center' }}
+              style={{ width: '42px', height: '40px', padding: 0, justifyContent: 'center', borderRadius: '8px' }}
               onClick={handleCycleTheme}
+              title={`Mode Tampilan: ${colorMode === 'auto' ? 'Otomatis' : colorMode === 'dark' ? 'Gelap' : 'Terang'}`}
+              aria-label="Ganti Mode Tampilan"
             >
-              {colorMode === 'auto' ? <Monitor size={14} /> : colorMode === 'dark' ? <Moon size={14} /> : <Sun size={14} />}
-              <span>Mode: {colorMode === 'auto' ? 'Otomatis' : colorMode === 'dark' ? 'Gelap' : 'Terang'}</span>
+              {colorMode === 'auto' ? (
+                <Monitor size={17} style={{ color: 'var(--primary)' }} />
+              ) : colorMode === 'dark' ? (
+                <Moon size={17} style={{ color: '#38bdf8' }} />
+              ) : (
+                <Sun size={17} style={{ color: '#f59e0b' }} />
+              )}
             </button>
             <button 
               className="navbar-btn-secondary"
