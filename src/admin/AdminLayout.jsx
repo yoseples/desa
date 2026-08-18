@@ -36,7 +36,7 @@ export default function AdminLayout({
 
   const menuSections = [
     {
-      title: 'Menu Utama',
+      title: 'Utama',
       items: [
         { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
         { id: 'programs', label: 'RAPBDes', icon: Briefcase, badge: programCount, badgeColor: '#059669' },
@@ -44,7 +44,7 @@ export default function AdminLayout({
       ]
     },
     {
-      title: 'Pelayanan & Aspirasi',
+      title: 'Layanan',
       items: [
         { id: 'services', label: 'Permohonan', icon: FileText, badge: pendingCount, badgeColor: '#2563eb' },
         { id: 'letter-templates', label: 'Template Surat', icon: Printer },
@@ -52,16 +52,16 @@ export default function AdminLayout({
       ]
     },
     {
-      title: 'Publikasi & Potensi',
+      title: 'Informasi',
       items: [
-        { id: 'news', label: 'Berita Desa', icon: Newspaper },
-        { id: 'umkm', label: 'Produk UMKM', icon: ShoppingBag },
-        { id: 'tourism', label: 'Wisata Desa', icon: Palmtree },
-        { id: 'gallery', label: 'Galeri Foto', icon: Image },
+        { id: 'news', label: 'Berita', icon: Newspaper },
+        { id: 'umkm', label: 'UMKM', icon: ShoppingBag },
+        { id: 'tourism', label: 'Wisata', icon: Palmtree },
+        { id: 'gallery', label: 'Galeri', icon: Image },
       ]
     },
     {
-      title: 'Sistem & Identitas',
+      title: 'Sistem',
       items: [
         { id: 'settings', label: 'Pengaturan', icon: Settings },
       ]

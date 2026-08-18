@@ -574,31 +574,31 @@ export default function AdminCitizens({
         flexWrap: 'wrap',
         gap: '0.75rem'
       }}>
-        {/* Navigation Tabs */}
+        {/* Navigation Sub-Tabs */}
         <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
           <button
             className={`btn btn-sm ${activeSubTab === 'area-classification' ? 'btn-primary' : 'btn-secondary'}`}
             onClick={() => setActiveSubTab('area-classification')}
           >
-            <MapPin size={15} /> 🏘️ Klasifikasi Wilayah (10 RW & 20 RT)
+            <MapPin size={14} /> Wilayah (RT/RW)
           </button>
           <button
             className={`btn btn-sm ${activeSubTab === 'bps-classification' ? 'btn-primary' : 'btn-secondary'}`}
             onClick={() => setActiveSubTab('bps-classification')}
           >
-            <TrendingDown size={15} /> 📊 Klasifikasi Sosial Ekonomi BPS / DTKS
+            <TrendingDown size={14} /> Status BPS / DTKS
           </button>
           <button
             className={`btn btn-sm ${activeSubTab === 'families-list' ? 'btn-primary' : 'btn-secondary'}`}
             onClick={() => setActiveSubTab('families-list')}
           >
-            <Building size={15} /> Daftar Kartu Keluarga (KK) ({familiesList.length})
+            <Building size={14} /> Kartu Keluarga ({familiesList.length})
           </button>
           <button
             className={`btn btn-sm ${activeSubTab === 'citizens-list' ? 'btn-primary' : 'btn-secondary'}`}
             onClick={() => setActiveSubTab('citizens-list')}
           >
-            <Users size={15} /> Seluruh Warga ({allCitizens.length} Jiwa)
+            <Users size={14} /> Seluruh Warga ({allCitizens.length})
           </button>
         </div>
 
@@ -610,7 +610,7 @@ export default function AdminCitizens({
             title="Muat Ulang Contoh Data Lengkap 20 RT & 10 RW"
             style={{ color: '#059669', borderColor: '#a7f3d0' }}
           >
-            <RotateCcw size={14} /> 🎲 Muat Contoh Data (20 RT / 10 RW)
+            <RotateCcw size={14} /> Muat Contoh Data
           </button>
           <button
             className="btn btn-secondary btn-sm"
@@ -621,7 +621,7 @@ export default function AdminCitizens({
             style={{ color: '#dc2626', borderColor: '#fca5a5' }}
             title="Hapus massal warga per RT / RW tertentu"
           >
-            <UserX size={14} /> 🗑️ Hapus Warga per RT/RW
+            <UserX size={14} /> Hapus per RT/RW
           </button>
           <button
             className="btn btn-secondary btn-sm"

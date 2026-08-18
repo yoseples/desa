@@ -150,31 +150,31 @@ export default function AdminSettings({ profile, onUpdateProfile }) {
             className={`btn btn-sm ${activeTab === 'general' ? 'btn-primary' : 'btn-secondary'}`}
             onClick={() => setActiveTab('general')}
           >
-            <Building size={14} /> General (Umum & Media)
+            <Building size={14} /> Profil Desa
           </button>
           <button
             className={`btn btn-sm ${activeTab === 'seo' ? 'btn-primary' : 'btn-secondary'}`}
             onClick={() => setActiveTab('seo')}
           >
-            <Share2 size={14} /> SEO, Open Graph & Favicon
+            <Share2 size={14} /> SEO & Favicon
           </button>
           <button
             className={`btn btn-sm ${activeTab === 'layout' ? 'btn-primary' : 'btn-secondary'}`}
             onClick={() => setActiveTab('layout')}
           >
-            <Layout size={14} /> Layout (Tata Letak)
+            <Layout size={14} /> Tata Letak
           </button>
           <button
             className={`btn btn-sm ${activeTab === 'styling' ? 'btn-primary' : 'btn-secondary'}`}
             onClick={() => setActiveTab('styling')}
           >
-            <Palette size={14} /> Styling (Tema & Warna)
+            <Palette size={14} /> Warna & Tema
           </button>
           <button
             className={`btn btn-sm ${activeTab === 'typography' ? 'btn-primary' : 'btn-secondary'}`}
             onClick={() => setActiveTab('typography')}
           >
-            <Type size={14} /> Typography (Tipografi)
+            <Type size={14} /> Huruf & Font
           </button>
         </div>
 
