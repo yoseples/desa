@@ -155,7 +155,7 @@ export default function AdminCitizens({
   onResetSampleFamilies,
   profile 
 }) {
-  const [activeSubTab, setActiveSubTab] = useState('area-classification'); // 'area-classification', 'bps-classification', 'families-list', 'citizens-list'
+  const [activeSubTab, setActiveSubTab] = useState('citizens-list'); // 'citizens-list', 'families-list', 'area-classification', 'bps-classification'
   const [searchQuery, setSearchQuery] = useState('');
   const [filterEconomic, setFilterEconomic] = useState('Semua');
   const [filterDusun, setFilterDusun] = useState('Semua');
@@ -576,6 +576,20 @@ export default function AdminCitizens({
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
           <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
             <button
+              className={`btn btn-sm ${activeSubTab === 'citizens-list' ? 'btn-primary' : 'btn-secondary'}`}
+              onClick={() => setActiveSubTab('citizens-list')}
+              style={{ fontWeight: 700 }}
+            >
+              <Users size={14} /> Data Warga ({allCitizens.length})
+            </button>
+            <button
+              className={`btn btn-sm ${activeSubTab === 'families-list' ? 'btn-primary' : 'btn-secondary'}`}
+              onClick={() => setActiveSubTab('families-list')}
+              style={{ fontWeight: 700 }}
+            >
+              <Building size={14} /> Kartu Keluarga ({familiesList.length})
+            </button>
+            <button
               className={`btn btn-sm ${activeSubTab === 'area-classification' ? 'btn-primary' : 'btn-secondary'}`}
               onClick={() => setActiveSubTab('area-classification')}
               style={{ fontWeight: 700 }}
@@ -588,20 +602,6 @@ export default function AdminCitizens({
               style={{ fontWeight: 700 }}
             >
               <TrendingDown size={14} /> Status Sosial (BPS)
-            </button>
-            <button
-              className={`btn btn-sm ${activeSubTab === 'families-list' ? 'btn-primary' : 'btn-secondary'}`}
-              onClick={() => setActiveSubTab('families-list')}
-              style={{ fontWeight: 700 }}
-            >
-              <Building size={14} /> Kartu Keluarga ({familiesList.length})
-            </button>
-            <button
-              className={`btn btn-sm ${activeSubTab === 'citizens-list' ? 'btn-primary' : 'btn-secondary'}`}
-              onClick={() => setActiveSubTab('citizens-list')}
-              style={{ fontWeight: 700 }}
-            >
-              <Users size={14} /> Data Warga ({allCitizens.length})
             </button>
           </div>
 
