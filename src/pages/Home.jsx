@@ -8,7 +8,6 @@ import {
   Newspaper, 
   ArrowRight, 
   CheckCircle2, 
-  ChevronRight, 
   Sparkles, 
   ShieldCheck,
   HeartHandshake,
@@ -17,7 +16,9 @@ import {
   ExternalLink,
   Star,
   MapPin,
-  Clock
+  Clock,
+  Sun,
+  Activity
 } from 'lucide-react';
 import { StorageService } from '../services/storageService';
 
@@ -49,18 +50,20 @@ export default function Home({
 
   return (
     <div>
-      {/* 1. HERO SECTION */}
+      {/* 1. HERO SECTION WITH MODERN AURORA EFFECT */}
       <section className="hero-wrapper">
         <div className="hero-pattern"></div>
-        <div className="hero-glow"></div>
+        <div className="aurora-orb-1"></div>
+        <div className="aurora-orb-2"></div>
 
         <div className="container">
           <div className="hero-grid">
             {/* Left Col: Main Pitch */}
             <div>
-              <div className="hero-badge">
-                <Sparkles size={14} color="#6ee7b7" />
-                <span>Portal Resmi Smart Village Digital</span>
+              {/* Live Status Ticker */}
+              <div className="status-ticker">
+                <span className="pulsing-dot"></span>
+                <span>Kantor Buka • Layanan Mandiri 24 Jam • Smart Village v2.0</span>
               </div>
 
               <h1 className="hero-title">
@@ -89,21 +92,21 @@ export default function Home({
               {/* Quick Checklist */}
               <div className="hero-quick-features">
                 <div className="quick-feature-item">
-                  <span className="quick-feature-icon">✓</span>
+                  <div className="quick-feature-icon">✓</div>
                   <span>Layanan Online 24 Jam</span>
                 </div>
                 <div className="quick-feature-item">
-                  <span className="quick-feature-icon">✓</span>
+                  <div className="quick-feature-icon">✓</div>
                   <span>TTE Surat Sah Terverifikasi</span>
                 </div>
                 <div className="quick-feature-item">
-                  <span className="quick-feature-icon">✓</span>
-                  <span>Transparansi Anggaran</span>
+                  <div className="quick-feature-icon">✓</div>
+                  <span>Transparansi Kependudukan</span>
                 </div>
               </div>
             </div>
 
-            {/* Right Col: Head of Village Card */}
+            {/* Right Col: Head of Village Glassmorphic Card */}
             <div>
               <div className="hero-card-preview">
                 <div className="head-speech-card">
@@ -123,14 +126,14 @@ export default function Home({
                     "{profile?.headOfVillage?.welcomeSpeech}"
                   </div>
 
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '0.5rem' }}>
-                    <span style={{ fontSize: '0.75rem', color: '#a7f3d0' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '0.25rem' }}>
+                    <span style={{ fontSize: '0.75rem', color: '#a7f3d0', fontWeight: 600 }}>
                       Pemerintah Desa Sukamaju Mandiri
                     </span>
                     <button 
                       className="btn btn-sm btn-secondary"
                       onClick={() => setActivePage('profile')}
-                      style={{ fontSize: '0.75rem', padding: '0.25rem 0.65rem' }}
+                      style={{ fontSize: '0.75rem', padding: '0.3rem 0.75rem' }}
                     >
                       Lihat Visi & Misi →
                     </button>
@@ -142,7 +145,7 @@ export default function Home({
         </div>
       </section>
 
-      {/* 2. QUICK ACTION BAR (FLOATING) */}
+      {/* 2. QUICK ACTION BAR (FLOATING CARDS) */}
       <div className="container">
         <div className="quick-action-bar">
           <div className="quick-action-grid">
@@ -172,7 +175,7 @@ export default function Home({
               </div>
               <div className="quick-action-text">
                 <h4>Produk UMKM</h4>
-                <p>Belanja produk khas lokal</p>
+                <p>Belanja produk lokal desa</p>
               </div>
             </div>
 
@@ -193,10 +196,12 @@ export default function Home({
       <section className="section" style={{ background: '#ffffff', borderBottom: '1px solid var(--light-border)' }}>
         <div className="container">
           <div className="section-title-wrap">
-            <span className="section-badge">Data Desa Terkini</span>
+            <span className="section-badge">
+              <Activity size={13} /> Data Desa Terkini
+            </span>
             <h2 className="section-title">Statistik & Kependudukan Wilayah</h2>
             <p className="section-subtitle">
-              Transparansi data demografi kependudukan, luas wilayah, dan potensi ekonomi Desa Sukamaju Mandiri.
+              Transparansi data demografi kependudukan, potensi ekonomi warga, dan luas wilayah Desa Sukamaju Mandiri.
             </p>
           </div>
 
@@ -207,7 +212,7 @@ export default function Home({
               </div>
               <div className="stat-data">
                 <h3>{totalCitizensCount?.toLocaleString('id-ID')}</h3>
-                <p>Jiwa Penduduk</p>
+                <p>Jiwa Penduduk Terdata</p>
               </div>
             </div>
 
@@ -249,7 +254,9 @@ export default function Home({
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2.5rem', flexWrap: 'wrap', gap: '1rem' }}>
             <div>
-              <span className="section-badge">Warta Desa</span>
+              <span className="section-badge">
+                <Newspaper size={13} /> Warta Desa
+              </span>
               <h2 className="section-title" style={{ margin: 0 }}>Kabar & Informasi Terkini</h2>
             </div>
             <button 
@@ -284,7 +291,7 @@ export default function Home({
                   <h3 className="card-title">{article.title}</h3>
                   <p className="card-desc">{article.summary}</p>
                   <div className="card-footer">
-                    <span style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 700 }}>
+                    <span style={{ fontSize: '0.825rem', color: 'var(--primary)', fontWeight: 700 }}>
                       Baca Selengkapnya →
                     </span>
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
@@ -303,7 +310,9 @@ export default function Home({
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2.5rem', flexWrap: 'wrap', gap: '1rem' }}>
             <div>
-              <span className="section-badge">Potensi Ekonomi</span>
+              <span className="section-badge">
+                <ShoppingBag size={13} /> Potensi Ekonomi
+              </span>
               <h2 className="section-title" style={{ margin: 0 }}>Produk Unggulan UMKM Desa</h2>
             </div>
             <button 
@@ -343,7 +352,7 @@ export default function Home({
                       {formatRupiah(product.price)}
                       <span> / {product.unit}</span>
                     </div>
-                    <span style={{ fontSize: '0.8rem', color: '#059669', fontWeight: 700 }}>
+                    <span style={{ fontSize: '0.825rem', color: '#059669', fontWeight: 700 }}>
                       Pesan Sekarang →
                     </span>
                   </div>
@@ -355,18 +364,18 @@ export default function Home({
       </section>
 
       {/* 6. BANNER CALL TO ACTION - PELAYANAN SURAT */}
-      <section className="section" style={{ background: 'linear-gradient(135deg, #059669, #064e3b)', color: '#ffffff' }}>
+      <section className="section" style={{ background: 'linear-gradient(135deg, #044332, #065f46)', color: '#ffffff' }}>
         <div className="container">
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 360px), 1fr))', gap: '2.5rem', alignItems: 'center' }}>
             <div>
-              <span style={{ background: 'rgba(255,255,255,0.2)', padding: '0.35rem 0.85rem', borderRadius: 'var(--radius-full)', fontSize: '0.8rem', fontWeight: 700 }}>
-                Pelayanan Tanpa Antre
+              <span style={{ background: 'rgba(255,255,255,0.18)', padding: '0.35rem 0.85rem', borderRadius: 'var(--radius-full)', fontSize: '0.8rem', fontWeight: 700 }}>
+                Pelayanan Mandiri Tanpa Antre
               </span>
               <h2 style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.35rem)', fontWeight: 800, margin: '0.85rem 0 1rem', lineHeight: 1.25 }}>
                 Urus Surat Keterangan Desa Kapan Saja & Di Mana Saja
               </h2>
               <p style={{ color: '#d1fae5', fontSize: '1rem', lineHeight: 1.65, marginBottom: '1.75rem' }}>
-                Warga tidak perlu repot datang dan mengantre di kantor desa. Isi formulir mandiri secara online, pantau status prosesnya via nomor resi, dan surat siap diunduh secara resmi ber-Tanda Tangan Elektronik (TTE).
+                Warga tidak perlu repot mengantre di kantor desa. Cukup isi formulir online, pantau statusnya lewat nomor resi, dan cetak surat resmi ber-Tanda Tangan Elektronik (TTE).
               </p>
               <div style={{ display: 'flex', gap: '0.85rem', flexWrap: 'wrap' }}>
                 <button 
@@ -379,19 +388,19 @@ export default function Home({
                   className="btn btn-outline-white btn-lg"
                   onClick={() => setActivePage('services')}
                 >
-                  Lihat Semua Jenis Layanan →
+                  Lihat Semua Layanan →
                 </button>
               </div>
             </div>
 
-            <div style={{ background: 'rgba(255,255,255,0.1)', padding: '2rem', borderRadius: 'var(--radius-xl)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.2)' }}>
+            <div style={{ background: 'rgba(255,255,255,0.09)', padding: '2rem', borderRadius: 'var(--radius-xl)', backdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.18)', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}>
               <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '1.25rem' }}>Langkah Pengajuan Mandiri:</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
                 <div style={{ display: 'flex', gap: '0.85rem', alignItems: 'flex-start' }}>
                   <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--accent)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.85rem', flexShrink: 0 }}>1</div>
                   <div>
                     <h4 style={{ fontSize: '0.95rem', fontWeight: 700, margin: 0 }}>Pilih Jenis Surat</h4>
-                    <p style={{ fontSize: '0.825rem', color: '#d1fae5', margin: 0 }}>Pilih SKU, SKTM, Domisili, SKCK, atau Surat Keterangan lainnya.</p>
+                    <p style={{ fontSize: '0.825rem', color: '#d1fae5', margin: 0 }}>Pilih SKU, SKTM, Domisili, SKCK, atau Keterangan lainnya.</p>
                   </div>
                 </div>
 
@@ -407,7 +416,7 @@ export default function Home({
                   <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--accent)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.85rem', flexShrink: 0 }}>3</div>
                   <div>
                     <h4 style={{ fontSize: '0.95rem', fontWeight: 700, margin: 0 }}>Dapatkan Resi & Pantau Proses</h4>
-                    <p style={{ fontSize: '0.825rem', color: '#d1fae5', margin: 0 }}>Petugas desa memverifikasi dan mencetak surat resmi ber-TTE.</p>
+                    <p style={{ fontSize: '0.825rem', color: '#d1fae5', margin: 0 }}>Petugas desa memverifikasi dan menerbitkan surat resmi ber-TTE.</p>
                   </div>
                 </div>
               </div>
