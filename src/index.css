@@ -1833,20 +1833,28 @@ h1, h2, h3, h4, .section-title, .hero-title, .modal-title, .card-title {
 
 /* Print Styles */
 @media print {
+  @page {
+    size: A4 landscape;
+    margin: 5mm;
+  }
   body * {
     visibility: hidden;
   }
-  .print-area, .print-area * {
+  .print-area, .print-area *,
+  .kk-printable-document, .kk-printable-document * {
     visibility: visible;
   }
-  .print-area {
-    position: absolute;
+  .print-area, .kk-printable-document {
+    position: fixed;
     left: 0;
     top: 0;
-    width: 100%;
+    width: 100vw;
+    height: 100vh;
     margin: 0;
-    padding: 15px;
-    background: #ffffff;
-    color: #000000;
+    padding: 5mm 8mm;
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: none !important;
+    box-shadow: none !important;
   }
 }
