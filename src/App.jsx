@@ -248,6 +248,16 @@ export default function App() {
     addToast(`Berhasil mengimpor ${importedList.length} data Kartu Keluarga!`, 'success');
   };
 
+  const handleBulkDeleteFamilies = (filterArea) => {
+    const result = StorageService.bulkDeleteFamiliesByArea(filterArea);
+    addToast(`Berhasil menghapus ${result.deletedCount} data Kartu Keluarga pada wilayah terpilih!`, 'info');
+  };
+
+  const handleResetSampleFamilies = () => {
+    StorageService.resetSampleFamilies();
+    addToast('Data contoh seluruh warga lengkap (10 RW & 20 RT) berhasil dimuat ulang!', 'success');
+  };
+
   // Public letter submission
   const handleOpenServiceModal = (type = 'SKU') => {
     setSelectedLetterType(type);
@@ -436,6 +446,8 @@ export default function App() {
                 onAddMember={handleAddMember}
                 onDeleteMember={handleDeleteMember}
                 onBatchImport={handleBatchImportFamilies}
+                onBulkDeleteFamilies={handleBulkDeleteFamilies}
+                onResetSampleFamilies={handleResetSampleFamilies}
                 profile={profile}
               />
             )}

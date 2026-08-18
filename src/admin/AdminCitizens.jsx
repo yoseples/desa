@@ -19,24 +19,148 @@ import {
   TrendingDown,
   AlertTriangle,
   Building,
-  HeartHandshake
+  HeartHandshake,
+  MapPin,
+  RotateCcw,
+  Sparkles,
+  Home,
+  UserX
 } from 'lucide-react';
 import AdminImportKKModal from './AdminImportKKModal';
 
+// Master Struktur Wilayah Administrasi Desa: 3 Dusun, 10 RW, 20 RT
+export const villageTerritoryStructure = [
+  {
+    dusunName: "Dusun 1 (Pasirjati)",
+    dusunShort: "Dusun Pasirjati",
+    description: "Kawasan agraris terpadu & permukiman lereng timur",
+    rws: [
+      {
+        rw: "001",
+        rwName: "RW 01 (Pasirjati Timur)",
+        chief: "Bpk. H. Sutisna",
+        rts: [
+          { rt: "001", rtName: "RT 01 / RW 01", chief: "Bpk. Mamat" },
+          { rt: "002", rtName: "RT 02 / RW 01", chief: "Bpk. Rohman" }
+        ]
+      },
+      {
+        rw: "002",
+        rwName: "RW 02 (Pasir Salam)",
+        chief: "Bpk. Cecep Hidayat",
+        rts: [
+          { rt: "003", rtName: "RT 03 / RW 02", chief: "Bpk. Ujang" },
+          { rt: "004", rtName: "RT 04 / RW 02", chief: "Bpk. Hendra" }
+        ]
+      },
+      {
+        rw: "003",
+        rwName: "RW 03 (Pasir Luhur)",
+        chief: "Bpk. Dudung Suherman",
+        rts: [
+          { rt: "005", rtName: "RT 05 / RW 03", chief: "Bpk. Agus" },
+          { rt: "006", rtName: "RT 06 / RW 03", chief: "Bpk. Sobari" }
+        ]
+      }
+    ]
+  },
+  {
+    dusunName: "Dusun 2 (Sukamukti)",
+    dusunShort: "Dusun Sukamukti",
+    description: "Pusat UMKM pengolahan susu, peternakan & perdagangan",
+    rws: [
+      {
+        rw: "04",
+        rwName: "RW 04 (Sukamukti Tengah)",
+        chief: "Bpk. Nanang Koswara",
+        rts: [
+          { rt: "007", rtName: "RT 07 / RW 04", chief: "Bpk. Tatang" },
+          { rt: "008", rtName: "RT 08 / RW 04", chief: "Bpk. Dayat" }
+        ]
+      },
+      {
+        rw: "05",
+        rwName: "RW 05 (Sukaluyu)",
+        chief: "Bpk. Eko Prasetyo",
+        rts: [
+          { rt: "009", rtName: "RT 09 / RW 05", chief: "Bpk. Rudi" },
+          { rt: "010", rtName: "RT 10 / RW 05", chief: "Bpk. Asep" }
+        ]
+      },
+      {
+        rw: "06",
+        rwName: "RW 06 (Sukasari)",
+        chief: "Bpk. Iwan Setiawan",
+        rts: [
+          { rt: "011", rtName: "RT 11 / RW 06", chief: "Bpk. Deden" },
+          { rt: "012", rtName: "RT 12 / RW 06", chief: "Bpk. Juhana" }
+        ]
+      }
+    ]
+  },
+  {
+    dusunName: "Dusun 3 (Mekarwangi)",
+    dusunShort: "Dusun Mekarwangi",
+    description: "Kawasan agrowisata kopi, perkebunan teh & kerajinan anyaman",
+    rws: [
+      {
+        rw: "07",
+        rwName: "RW 07 (Mekar Jaya)",
+        chief: "Bpk. Ujang Saepudin",
+        rts: [
+          { rt: "013", rtName: "RT 13 / RW 07", chief: "Bpk. Wawan" },
+          { rt: "014", rtName: "RT 14 / RW 07", chief: "Bpk. Mulyadi" }
+        ]
+      },
+      {
+        rw: "08",
+        rwName: "RW 08 (Mekar Bakti)",
+        chief: "Bpk. Jajang Nurjaman",
+        rts: [
+          { rt: "015", rtName: "RT 15 / RW 08", chief: "Bpk. Endang" },
+          { rt: "016", rtName: "RT 16 / RW 08", chief: "Bpk. Ade" }
+        ]
+      },
+      {
+        rw: "09",
+        rwName: "RW 09 (Mekar Asih)",
+        chief: "Bpk. Supardi",
+        rts: [
+          { rt: "017", rtName: "RT 17 / RW 09", chief: "Bpk. Gunawan" },
+          { rt: "018", rtName: "RT 18 / RW 09", chief: "Bpk. Sugeng" }
+        ]
+      },
+      {
+        rw: "10",
+        rwName: "RW 10 (Mekar Wangi)",
+        chief: "Bpk. Rohmat Hidayat",
+        rts: [
+          { rt: "019", rtName: "RT 19 / RW 10", chief: "Bpk. Dedi" },
+          { rt: "020", rtName: "RT 20 / RW 10", chief: "Bpk. Anwar" }
+        ]
+      }
+    ]
+  }
+];
+
 export default function AdminCitizens({ 
-  familiesList, 
+  familiesList = [], 
   onAddFamily, 
   onUpdateFamily, 
   onDeleteFamily, 
   onAddMember, 
   onDeleteMember, 
   onBatchImport,
+  onBulkDeleteFamilies,
+  onResetSampleFamilies,
   profile 
 }) {
-  const [activeSubTab, setActiveSubTab] = useState('bps-classification'); // 'bps-classification', 'families-list', 'citizens-list'
+  const [activeSubTab, setActiveSubTab] = useState('area-classification'); // 'area-classification', 'bps-classification', 'families-list', 'citizens-list'
   const [searchQuery, setSearchQuery] = useState('');
   const [filterEconomic, setFilterEconomic] = useState('Semua');
+  const [filterDusun, setFilterDusun] = useState('Semua');
   const [filterRw, setFilterRw] = useState('Semua');
+  const [filterRt, setFilterRt] = useState('Semua');
 
   // Modals
   const [importModalOpen, setImportModalOpen] = useState(false);
@@ -44,6 +168,14 @@ export default function AdminCitizens({
   const [viewFamilyDetail, setViewFamilyDetail] = useState(null);
   const [addMemberModalKk, setAddMemberModalKk] = useState(null);
   const [editClassificationModal, setEditClassificationModal] = useState(null);
+  const [bulkDeleteModalOpen, setBulkDeleteModalOpen] = useState(false);
+
+  // Bulk Delete Filter Target
+  const [bulkDeleteTarget, setBulkDeleteTarget] = useState({
+    dusun: 'Semua',
+    rw: 'Semua',
+    rt: 'Semua'
+  });
 
   // New Family Form State
   const [familyForm, setFamilyForm] = useState({
@@ -92,6 +224,14 @@ export default function AdminCitizens({
     motherName: '',
     phone: ''
   });
+
+  // Helper matching function for RT / RW normalization
+  const normalizeArea = (val) => {
+    if (!val) return '';
+    const num = String(val).replace(/\D/g, '');
+    if (!num) return String(val).trim().toLowerCase();
+    return String(parseInt(num, 10));
+  };
 
   // BPS Socioeconomic Deciles & Status Definitions
   const bpsClassifications = [
@@ -176,10 +316,12 @@ export default function AdminCitizens({
       kk.members.forEach((m) => {
         allCitizens.push({
           ...m,
+          kkId: kk.id,
           noKk: kk.noKk,
           rt: kk.rt,
           rw: kk.rw,
           dusun: kk.dusun,
+          address: kk.address,
           economicStatus: kk.economicStatus || 'Menengah'
         });
       });
@@ -199,23 +341,98 @@ export default function AdminCitizens({
     };
   });
 
-  // Filtered Families
+  // RT & RW Stats Calculator
+  const getRtStats = (rwNum, rtNum) => {
+    const normRw = normalizeArea(rwNum);
+    const normRt = normalizeArea(rtNum);
+
+    const matchedFamilies = familiesList.filter(f => 
+      normalizeArea(f.rw) === normRw && normalizeArea(f.rt) === normRt
+    );
+
+    const kkCount = matchedFamilies.length;
+    let totalSouls = 0;
+    let maleCount = 0;
+    let femaleCount = 0;
+    let dtksCount = 0;
+
+    matchedFamilies.forEach(f => {
+      if (f.economicStatus && (f.economicStatus.toLowerCase().includes('desil 1') || f.economicStatus.toLowerCase().includes('desil 2') || f.economicStatus.toLowerCase().includes('tidak mampu'))) {
+        dtksCount++;
+      }
+      if (f.members && Array.isArray(f.members)) {
+        totalSouls += f.members.length;
+        f.members.forEach(m => {
+          if (m.gender === 'Laki-Laki') maleCount++;
+          else if (m.gender === 'Perempuan') femaleCount++;
+        });
+      }
+    });
+
+    return {
+      kkCount,
+      totalSouls,
+      maleCount,
+      femaleCount,
+      dtksCount,
+      families: matchedFamilies
+    };
+  };
+
+  const getRwStats = (rwNum) => {
+    const normRw = normalizeArea(rwNum);
+    const matchedFamilies = familiesList.filter(f => normalizeArea(f.rw) === normRw);
+    const kkCount = matchedFamilies.length;
+    let totalSouls = 0;
+    let dtksCount = 0;
+    matchedFamilies.forEach(f => {
+      if (f.economicStatus && (f.economicStatus.toLowerCase().includes('desil 1') || f.economicStatus.toLowerCase().includes('desil 2') || f.economicStatus.toLowerCase().includes('tidak mampu'))) {
+        dtksCount++;
+      }
+      if (f.members && Array.isArray(f.members)) {
+        totalSouls += f.members.length;
+      }
+    });
+    return { kkCount, totalSouls, dtksCount };
+  };
+
+  const getDusunStats = (dusunName) => {
+    const matchedFamilies = familiesList.filter(f => 
+      f.dusun?.toLowerCase().includes(dusunName.toLowerCase()) || dusunName.toLowerCase().includes(f.dusun?.toLowerCase())
+    );
+    const kkCount = matchedFamilies.length;
+    let totalSouls = 0;
+    matchedFamilies.forEach(f => {
+      if (f.members && Array.isArray(f.members)) {
+        totalSouls += f.members.length;
+      }
+    });
+    return { kkCount, totalSouls };
+  };
+
+  // Filtered Families for Lists
   const filteredFamilies = familiesList.filter((kk) => {
     const matchesSearch = kk.noKk.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           kk.headName.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           (kk.address && kk.address.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesEconomic = filterEconomic === 'Semua' || matchBpsCategory(kk.economicStatus, filterEconomic);
-    const matchesRw = filterRw === 'Semua' || kk.rw === filterRw || `RW ${kk.rw}` === filterRw;
-    return matchesSearch && matchesEconomic && matchesRw;
+    const matchesDusun = filterDusun === 'Semua' || kk.dusun?.toLowerCase().includes(filterDusun.toLowerCase());
+    const matchesRw = filterRw === 'Semua' || normalizeArea(kk.rw) === normalizeArea(filterRw);
+    const matchesRt = filterRt === 'Semua' || normalizeArea(kk.rt) === normalizeArea(filterRt);
+    return matchesSearch && matchesEconomic && matchesDusun && matchesRw && matchesRt;
   });
 
-  // Filtered Citizens
+  // Filtered Citizens for Lists
   const filteredCitizens = allCitizens.filter((c) => {
     const matchesSearch = c.nik.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          c.noKk.toLowerCase().includes(searchQuery.toLowerCase());
+                          c.noKk.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          (c.occupation && c.occupation.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesEconomic = filterEconomic === 'Semua' || matchBpsCategory(c.economicStatus, filterEconomic);
-    return matchesSearch && matchesEconomic;
+    const matchesDusun = filterDusun === 'Semua' || c.dusun?.toLowerCase().includes(filterDusun.toLowerCase());
+    const matchesRw = filterRw === 'Semua' || normalizeArea(c.rw) === normalizeArea(filterRw);
+    const matchesRt = filterRt === 'Semua' || normalizeArea(c.rt) === normalizeArea(filterRt);
+    return matchesSearch && matchesEconomic && matchesDusun && matchesRw && matchesRt;
   });
 
   // Handlers
@@ -281,6 +498,40 @@ export default function AdminCitizens({
     setAddMemberModalKk(null);
   };
 
+  // Bulk Delete Live Calculation
+  const getMatchingForDeletion = () => {
+    return familiesList.filter(kk => {
+      const matchDusun = !bulkDeleteTarget.dusun || bulkDeleteTarget.dusun === 'Semua' || kk.dusun?.toLowerCase().includes(bulkDeleteTarget.dusun.toLowerCase());
+      const matchRw = !bulkDeleteTarget.rw || bulkDeleteTarget.rw === 'Semua' || normalizeArea(kk.rw) === normalizeArea(bulkDeleteTarget.rw);
+      const matchRt = !bulkDeleteTarget.rt || bulkDeleteTarget.rt === 'Semua' || normalizeArea(kk.rt) === normalizeArea(bulkDeleteTarget.rt);
+      return matchDusun && matchRw && matchRt;
+    });
+  };
+
+  const matchingDeleteList = getMatchingForDeletion();
+  const matchingDeleteSouls = matchingDeleteList.reduce((acc, f) => acc + (f.members ? f.members.length : 0), 0);
+
+  const handleConfirmBulkDelete = () => {
+    if (matchingDeleteList.length === 0) {
+      alert('Tidak ada data Kartu Keluarga / Warga yang cocok dengan filter penghapusan.');
+      return;
+    }
+    if (window.confirm(`PERINGATAN: Anda yakin ingin MENGHAPUS SEMUA ${matchingDeleteList.length} Kartu Keluarga (${matchingDeleteSouls} Jiwa) pada wilayah tersebut? Tindakan ini tidak dapat dibatalkan!`)) {
+      if (onBulkDeleteFamilies) {
+        onBulkDeleteFamilies(bulkDeleteTarget);
+      }
+      setBulkDeleteModalOpen(false);
+    }
+  };
+
+  const handleTriggerResetSample = () => {
+    if (window.confirm('Muat ulang seluruh contoh data warga lengkap untuk 10 RW & 20 RT (3 Dusun)? Data saat ini akan digantikan dengan master contoh data lengkap.')) {
+      if (onResetSampleFamilies) {
+        onResetSampleFamilies();
+      }
+    }
+  };
+
   const exportBpsCsv = () => {
     const headers = ['No KK', 'Nama Kepala Keluarga', 'Alamat', 'RT', 'RW', 'Dusun', 'Klasifikasi BPS (DTKS)', 'Status BPJS', 'Daya Listrik', 'Status Rumah', 'Jumlah Jiwa'];
     const rows = filteredFamilies.map(f => [
@@ -301,7 +552,7 @@ export default function AdminCitizens({
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `Rekap_Klasifikasi_Ekonomi_BPS_${profile?.name || 'Desa'}.csv`);
+    link.setAttribute('download', `Rekap_Warga_RTRW_${profile?.name || 'Desa'}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -315,7 +566,7 @@ export default function AdminCitizens({
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        background: '#ffffff',
+        background: 'var(--light-surface)',
         padding: '0.75rem 1rem',
         borderRadius: 'var(--radius-lg)',
         border: '1px solid var(--light-border)',
@@ -325,6 +576,12 @@ export default function AdminCitizens({
       }}>
         {/* Navigation Tabs */}
         <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+          <button
+            className={`btn btn-sm ${activeSubTab === 'area-classification' ? 'btn-primary' : 'btn-secondary'}`}
+            onClick={() => setActiveSubTab('area-classification')}
+          >
+            <MapPin size={15} /> 🏘️ Klasifikasi Wilayah (10 RW & 20 RT)
+          </button>
           <button
             className={`btn btn-sm ${activeSubTab === 'bps-classification' ? 'btn-primary' : 'btn-secondary'}`}
             onClick={() => setActiveSubTab('bps-classification')}
@@ -349,15 +606,33 @@ export default function AdminCitizens({
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
           <button
             className="btn btn-secondary btn-sm"
+            onClick={handleTriggerResetSample}
+            title="Muat Ulang Contoh Data Lengkap 20 RT & 10 RW"
+            style={{ color: '#059669', borderColor: '#a7f3d0' }}
+          >
+            <RotateCcw size={14} /> 🎲 Muat Contoh Data (20 RT / 10 RW)
+          </button>
+          <button
+            className="btn btn-secondary btn-sm"
+            onClick={() => {
+              setBulkDeleteTarget({ dusun: 'Semua', rw: 'Semua', rt: 'Semua' });
+              setBulkDeleteModalOpen(true);
+            }}
+            style={{ color: '#dc2626', borderColor: '#fca5a5' }}
+            title="Hapus massal warga per RT / RW tertentu"
+          >
+            <UserX size={14} /> 🗑️ Hapus Warga per RT/RW
+          </button>
+          <button
+            className="btn btn-secondary btn-sm"
             onClick={exportBpsCsv}
             title="Download Rekap CSV / Excel"
           >
-            <FileDown size={14} /> Ekspor Data CSV
+            <FileDown size={14} /> Ekspor CSV
           </button>
           <button
             className="btn btn-secondary btn-sm"
             onClick={() => setImportModalOpen(true)}
-            style={{ color: '#059669', borderColor: '#86efac' }}
           >
             <Upload size={14} /> Import Data KK
           </button>
@@ -389,676 +664,967 @@ export default function AdminCitizens({
         </div>
       </div>
 
-      {/* 2. STATISTIK DISTRIBUSI STATUS EKONOMI BPS (5 DESIL) */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 210px), 1fr))', gap: '1rem' }}>
-        {statsByBps.map((cat) => (
-          <div
-            key={cat.id}
-            onClick={() => setFilterEconomic(cat.id === filterEconomic ? 'Semua' : cat.id)}
-            style={{
-              background: '#ffffff',
-              border: filterEconomic === cat.id ? `2px solid ${cat.color}` : '1px solid var(--light-border)',
-              borderRadius: 'var(--radius-lg)',
-              padding: '1.15rem',
-              boxShadow: filterEconomic === cat.id ? '0 10px 20px -5px rgba(0,0,0,0.1)' : 'var(--shadow-sm)',
-              cursor: 'pointer',
-              transition: 'var(--transition)',
-              position: 'relative',
-              overflow: 'hidden'
-            }}
-          >
-            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: cat.color }}></div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
-              <span style={{ fontSize: '0.75rem', fontWeight: 800, color: cat.color, textTransform: 'uppercase' }}>
-                {cat.label.split('/')[0]}
-              </span>
-              <span style={{ fontSize: '0.75rem', fontWeight: 800, background: cat.bg, color: cat.color, padding: '0.15rem 0.45rem', borderRadius: '999px' }}>
-                {cat.percentage}%
-              </span>
-            </div>
-
-            <div style={{ fontSize: '1.6rem', fontWeight: 900, color: 'var(--text-main)' }}>
-              {cat.kkCount} <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)' }}>KK</span>
-            </div>
-
-            <div style={{ fontSize: '0.775rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-              Populasi: <strong>{cat.soulsCount} Jiwa</strong>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* 3. FILTER TOOLBAR */}
-      <div style={{
-        background: '#ffffff',
-        padding: '1rem 1.25rem',
-        borderRadius: 'var(--radius-lg)',
-        border: '1px solid var(--light-border)',
-        boxShadow: 'var(--shadow-sm)',
-        display: 'flex',
-        gap: '1rem',
-        flexWrap: 'wrap',
-        alignItems: 'center'
-      }}>
-        <div style={{ position: 'relative', flex: 1, minWidth: '220px' }}>
-          <Search size={16} style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-          <input
-            type="text"
-            placeholder="Cari Nomor KK, NIK, Nama Warga, atau Alamat..."
-            className="form-control"
-            style={{ paddingLeft: '2.4rem', height: '40px', fontSize: '0.875rem' }}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-
-        {/* Filter Klasifikasi BPS */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-          <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)' }}>Status BPS:</span>
-          <select
-            className="form-control"
-            style={{ height: '40px', fontSize: '0.85rem', minWidth: '170px' }}
-            value={filterEconomic}
-            onChange={(e) => setFilterEconomic(e.target.value)}
-          >
-            <option value="Semua">Semua Klasifikasi ({familiesList.length} KK)</option>
-            {bpsClassifications.map(c => (
-              <option key={c.id} value={c.id}>{c.label}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* Filter RW */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-          <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)' }}>Wilayah RW:</span>
-          <select
-            className="form-control"
-            style={{ height: '40px', fontSize: '0.85rem', minWidth: '120px' }}
-            value={filterRw}
-            onChange={(e) => setFilterRw(e.target.value)}
-          >
-            <option value="Semua">Semua RW</option>
-            {[...Array(10)].map((_, i) => {
-              const rwNum = String(i + 1).padStart(2, '0');
-              return <option key={rwNum} value={rwNum}>RW {rwNum}</option>;
-            })}
-          </select>
-        </div>
-
-        {filterEconomic !== 'Semua' && (
-          <button
-            className="btn btn-secondary btn-sm"
-            onClick={() => setFilterEconomic('Semua')}
-            style={{ height: '38px', fontSize: '0.75rem' }}
-          >
-            Reset Filter
-          </button>
-        )}
-      </div>
-
-      {/* 4. MAIN DATA TABLE (BERDASARKAN TAB AKTIF) */}
-      <div className="table-wrapper" style={{ padding: '1.25rem' }}>
-        
-        {/* VIEW 1: KLASIFIKASI SOSIAL EKONOMI BPS & DTKS */}
-        {activeSubTab === 'bps-classification' && (
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
-                Data Penerima Manfaat & Status Kesejahteraan Warga (Standar BPS & DTKS)
-              </h3>
-              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                Menampilkan <strong>{filteredFamilies.length}</strong> Kartu Keluarga
-              </span>
-            </div>
-
-            <div style={{ overflowX: 'auto' }}>
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>No</th>
-                    <th>Nomor KK & Kepala Keluarga</th>
-                    <th>Alamat & RT/RW</th>
-                    <th>Klasifikasi BPS / DTKS</th>
-                    <th>Kondisi Rumah & Fasilitas</th>
-                    <th>Jaminan Kesehatan (BPJS)</th>
-                    <th>Anggota Jiwa</th>
-                    <th style={{ textAlign: 'center' }}>Aksi</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredFamilies.length === 0 ? (
-                    <tr>
-                      <td colSpan={8} style={{ textAlign: 'center', padding: '2.5rem', color: 'var(--text-muted)' }}>
-                        Tidak ditemukan data keluarga dengan filter yang dipilih.
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredFamilies.map((kk, idx) => (
-                      <tr key={kk.id}>
-                        <td style={{ fontWeight: 'bold' }}>{idx + 1}</td>
-                        <td>
-                          <span style={{ fontFamily: 'monospace', fontWeight: 800, color: '#064e3b', display: 'block' }}>
-                            {kk.noKk}
-                          </span>
-                          <strong style={{ fontSize: '0.95rem' }}>{kk.headName}</strong>
-                        </td>
-                        <td>
-                          <span style={{ display: 'block', fontSize: '0.85rem' }}>{kk.address}</span>
-                          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                            RT {kk.rt} / RW {kk.rw} • {kk.dusun}
-                          </span>
-                        </td>
-                        <td>
-                          <span 
-                            className="badge"
-                            style={{
-                              background: kk.economicStatus?.includes('Desil 1') || kk.economicStatus?.includes('Sangat') ? '#fee2e2' :
-                                         kk.economicStatus?.includes('Desil 2') || kk.economicStatus?.includes('Tidak Mampu') ? '#fef3c7' :
-                                         kk.economicStatus?.includes('Desil 3') || kk.economicStatus?.includes('Kurang') ? '#e0f2fe' : '#dcfce7',
-                              color: kk.economicStatus?.includes('Desil 1') || kk.economicStatus?.includes('Sangat') ? '#dc2626' :
-                                     kk.economicStatus?.includes('Desil 2') || kk.economicStatus?.includes('Tidak Mampu') ? '#d97706' :
-                                     kk.economicStatus?.includes('Desil 3') || kk.economicStatus?.includes('Kurang') ? '#0284c7' : '#16a34a',
-                              fontWeight: 800,
-                              fontSize: '0.75rem',
-                              padding: '0.25rem 0.6rem'
-                            }}
-                          >
-                            {kk.economicStatus || 'Mampu (Sejahtera)'}
-                          </span>
-                        </td>
-                        <td style={{ fontSize: '0.775rem', color: '#475569' }}>
-                          <div>• Rumah: <strong>{kk.houseOwnership || 'Milik Sendiri'}</strong></div>
-                          <div>• Listrik: <strong>{kk.electricity || '450 VA'}</strong></div>
-                        </td>
-                        <td>
-                          <span className={`badge ${kk.bpjsStatus?.includes('PBI') ? 'badge-info' : 'badge-neutral'}`} style={{ fontSize: '0.725rem' }}>
-                            {kk.bpjsStatus || 'Aktif'}
-                          </span>
-                        </td>
-                        <td style={{ fontWeight: 800, color: '#059669', textAlign: 'center' }}>
-                          {kk.members ? kk.members.length : 0} Jiwa
-                        </td>
-                        <td style={{ textAlign: 'center' }}>
-                          <div style={{ display: 'flex', justifyContent: 'center', gap: '0.35rem' }}>
-                            <button
-                              className="btn btn-sm btn-primary"
-                              style={{ fontSize: '0.75rem', padding: '0.25rem 0.55rem' }}
-                              onClick={() => handleOpenEditClassification(kk)}
-                              title="Ubah Klasifikasi BPS & Bansos"
-                            >
-                              <Edit size={13} /> Update Status
-                            </button>
-                            <button
-                              className="btn btn-sm btn-secondary"
-                              style={{ fontSize: '0.75rem', padding: '0.25rem 0.45rem' }}
-                              onClick={() => setViewFamilyDetail(kk)}
-                              title="Lihat Detail Kartu Keluarga"
-                            >
-                              <Eye size={13} />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
-        {/* VIEW 2: DAFTAR LENGKAP KARTU KELUARGA (KK) */}
-        {activeSubTab === 'families-list' && (
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
-                Data Registrasi Kartu Keluarga (KK)
-              </h3>
-              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                Total: <strong>{filteredFamilies.length}</strong> KK
-              </span>
-            </div>
-
-            <div style={{ overflowX: 'auto' }}>
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>No</th>
-                    <th>Nomor Kartu Keluarga</th>
-                    <th>Kepala Keluarga</th>
-                    <th>Alamat Lengkap</th>
-                    <th>RT / RW</th>
-                    <th>Dusun</th>
-                    <th>Status Ekonomi</th>
-                    <th>Jumlah Jiwa</th>
-                    <th style={{ textAlign: 'center' }}>Aksi</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredFamilies.map((kk, idx) => (
-                    <tr key={kk.id}>
-                      <td style={{ fontWeight: 'bold' }}>{idx + 1}</td>
-                      <td>
-                        <span style={{ fontFamily: 'monospace', fontWeight: 800, color: '#064e3b' }}>
-                          {kk.noKk}
-                        </span>
-                      </td>
-                      <td><strong>{kk.headName}</strong></td>
-                      <td>{kk.address}</td>
-                      <td>RT {kk.rt} / RW {kk.rw}</td>
-                      <td>{kk.dusun}</td>
-                      <td>
-                        <span className="badge badge-neutral" style={{ fontSize: '0.75rem' }}>
-                          {kk.economicStatus}
-                        </span>
-                      </td>
-                      <td style={{ fontWeight: 800, textAlign: 'center' }}>
-                        {kk.members ? kk.members.length : 0}
-                      </td>
-                      <td style={{ textAlign: 'center' }}>
-                        <div style={{ display: 'flex', justifyContent: 'center', gap: '0.35rem' }}>
-                          <button
-                            className="btn btn-sm btn-secondary"
-                            style={{ fontSize: '0.75rem', padding: '0.25rem 0.5rem' }}
-                            onClick={() => setViewFamilyDetail(kk)}
-                          >
-                            <Eye size={13} /> Format KK
-                          </button>
-                          <button
-                            className="btn btn-sm btn-danger"
-                            style={{ padding: '0.25rem 0.45rem' }}
-                            onClick={() => {
-                              if (window.confirm(`Hapus data Kartu Keluarga No. ${kk.noKk}?`)) {
-                                onDeleteFamily(kk.id);
-                              }
-                            }}
-                          >
-                            <Trash2 size={13} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
-        {/* VIEW 3: DAFTAR SELURUH WARGA INDIVIDU (NIK) */}
-        {activeSubTab === 'citizens-list' && (
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
-                Data Penduduk Individu (Berdasarkan NIK)
-              </h3>
-              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                Total: <strong>{filteredCitizens.length}</strong> Jiwa
-              </span>
-            </div>
-
-            <div style={{ overflowX: 'auto' }}>
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>No</th>
-                    <th>Nomor Induk Kependudukan (NIK)</th>
-                    <th>Nama Lengkap</th>
-                    <th>Jenis Kelamin</th>
-                    <th>Tempat, Tanggal Lahir</th>
-                    <th>Hubungan Keluarga</th>
-                    <th>Pekerjaan</th>
-                    <th>Pendidikan</th>
-                    <th>No. KK</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredCitizens.map((cit, idx) => (
-                    <tr key={cit.id || idx}>
-                      <td style={{ fontWeight: 'bold' }}>{idx + 1}</td>
-                      <td>
-                        <span style={{ fontFamily: 'monospace', fontWeight: 800, color: '#064e3b' }}>
-                          {cit.nik}
-                        </span>
-                      </td>
-                      <td><strong>{cit.name}</strong></td>
-                      <td>{cit.gender}</td>
-                      <td>{cit.birthPlace}, {cit.birthDate}</td>
-                      <td>
-                        <span className="badge badge-info" style={{ fontSize: '0.725rem' }}>
-                          {cit.relation}
-                        </span>
-                      </td>
-                      <td>{cit.occupation}</td>
-                      <td>{cit.education}</td>
-                      <td style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{cit.noKk}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
-      </div>
-
-      {/* MODAL 1: UPDATE KLASIFIKASI BPS / DTKS */}
-      {editClassificationModal && (
-        <div className="modal-backdrop" onClick={() => setEditClassificationModal(null)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '640px' }}>
-            <div className="modal-header">
-              <div>
-                <h3 className="modal-title" style={{ fontSize: '1.15rem' }}>
-                  Update Klasifikasi Kesejahteraan BPS / DTKS
-                </h3>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                  No. KK: <strong>{editClassificationModal.noKk}</strong> - Kepala: {editClassificationModal.headName}
+      {/* =========================================================================
+          SUBTAB 1: KLASIFIKASI WILAYAH BERDASARKAN 3 DUSUN, 10 RW, 20 RT
+          ========================================================================= */}
+      {activeSubTab === 'area-classification' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          
+          {/* Territory Summary Hero Card */}
+          <div style={{
+            background: 'linear-gradient(135deg, #064e3b, #0f172a)',
+            color: '#ffffff',
+            borderRadius: 'var(--radius-lg)',
+            padding: '1.5rem',
+            boxShadow: 'var(--shadow-md)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '1rem'
+          }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
+                <span className="badge" style={{ background: 'rgba(255,255,255,0.2)', color: '#6ee7b7' }}>
+                  Struktur Teritorial Desa
+                </span>
+                <span style={{ fontSize: '0.8rem', color: '#a7f3d0' }}>
+                  Total 3 Dusun • 10 RW • 20 RT
                 </span>
               </div>
-              <button className="modal-close" onClick={() => setEditClassificationModal(null)}><X size={20} /></button>
+              <h2 style={{ fontSize: '1.35rem', fontWeight: 800, margin: 0, color: '#ffffff' }}>
+                Klasifikasi Kependudukan Berdasarkan RT & RW
+              </h2>
+              <p style={{ fontSize: '0.875rem', color: '#cbd5e1', margin: '0.35rem 0 0 0', maxWidth: '680px' }}>
+                Pantau sebaran Kartu Keluarga, total jiwa penduduk, perbandingan gender, dan penerima DTKS secara presisi di setiap rukun tetangga.
+              </p>
             </div>
 
-            <form onSubmit={handleSaveClassification}>
-              <div className="modal-body">
-                <div className="form-group">
-                  <label className="form-label">Klasifikasi Status Sosial Ekonomi BPS / DTKS *</label>
-                  <select
-                    className="form-control"
-                    value={classificationForm.economicStatus}
-                    onChange={(e) => setClassificationForm({ ...classificationForm, economicStatus: e.target.value })}
-                    style={{ fontWeight: 800, color: '#064e3b' }}
-                  >
-                    {bpsClassifications.map(c => (
-                      <option key={c.id} value={c.name}>
-                        {c.name}
-                      </option>
-                    ))}
-                  </select>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>
-                    {bpsClassifications.find(c => c.name === classificationForm.economicStatus)?.desc}
+            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+              <div style={{ background: 'rgba(255,255,255,0.1)', padding: '0.65rem 1rem', borderRadius: '10px', textAlign: 'center', minWidth: '90px' }}>
+                <span style={{ fontSize: '0.725rem', color: '#a7f3d0', display: 'block' }}>Total KK</span>
+                <strong style={{ fontSize: '1.4rem', color: '#ffffff' }}>{familiesList.length}</strong>
+              </div>
+              <div style={{ background: 'rgba(255,255,255,0.1)', padding: '0.65rem 1rem', borderRadius: '10px', textAlign: 'center', minWidth: '90px' }}>
+                <span style={{ fontSize: '0.725rem', color: '#a7f3d0', display: 'block' }}>Total Jiwa</span>
+                <strong style={{ fontSize: '1.4rem', color: '#ffffff' }}>{allCitizens.length}</strong>
+              </div>
+            </div>
+          </div>
+
+          {/* Iteration Over 3 Dusun */}
+          {villageTerritoryStructure.map((dusun, dIdx) => {
+            const dStats = getDusunStats(dusun.dusunShort);
+            return (
+              <div 
+                key={dIdx}
+                style={{
+                  background: 'var(--light-surface)',
+                  borderRadius: 'var(--radius-xl)',
+                  border: '1px solid var(--light-border)',
+                  padding: '1.5rem',
+                  boxShadow: 'var(--shadow-card)'
+                }}
+              >
+                {/* Dusun Header Bar */}
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  paddingBottom: '1rem',
+                  marginBottom: '1.25rem',
+                  borderBottom: '1px solid var(--light-border)',
+                  flexWrap: 'wrap',
+                  gap: '0.75rem'
+                }}>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span className="badge badge-success" style={{ fontSize: '0.75rem' }}>
+                        Dusun {dIdx + 1}
+                      </span>
+                      <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
+                        {dusun.dusunName}
+                      </h3>
+                    </div>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                      {dusun.description}
+                    </span>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                    <span className="badge badge-neutral" style={{ fontSize: '0.8rem', padding: '0.35rem 0.65rem' }}>
+                      <strong>{dStats.kkCount} KK</strong> • {dStats.totalSouls} Jiwa
+                    </span>
+                    <button
+                      className="btn btn-secondary btn-sm"
+                      onClick={() => {
+                        setBulkDeleteTarget({ dusun: dusun.dusunShort, rw: 'Semua', rt: 'Semua' });
+                        setBulkDeleteModalOpen(true);
+                      }}
+                      style={{ color: '#dc2626', borderColor: '#fca5a5', fontSize: '0.75rem', padding: '0.3rem 0.6rem' }}
+                      title={`Hapus seluruh KK di ${dusun.dusunName}`}
+                    >
+                      <Trash2 size={12} /> Hapus Dusun
+                    </button>
+                  </div>
+                </div>
+
+                {/* RW Blocks within Dusun */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                  {dusun.rws.map((rwObj) => {
+                    const rwStats = getRwStats(rwObj.rw);
+                    return (
+                      <div
+                        key={rwObj.rw}
+                        style={{
+                          background: 'var(--light-bg)',
+                          borderRadius: 'var(--radius-lg)',
+                          padding: '1.15rem',
+                          border: '1px solid var(--light-border)'
+                        }}
+                      >
+                        {/* RW Header Row */}
+                        <div style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          marginBottom: '1rem',
+                          flexWrap: 'wrap',
+                          gap: '0.5rem'
+                        }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                            <span style={{
+                              background: 'var(--primary)',
+                              color: '#ffffff',
+                              fontWeight: 900,
+                              fontSize: '0.85rem',
+                              padding: '0.25rem 0.65rem',
+                              borderRadius: '6px'
+                            }}>
+                              RW {rwObj.rw}
+                            </span>
+                            <strong style={{ fontSize: '1rem', color: 'var(--text-main)' }}>
+                              {rwObj.rwName}
+                            </strong>
+                            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                              (Ketua: {rwObj.chief})
+                            </span>
+                          </div>
+
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <span style={{ fontSize: '0.775rem', color: 'var(--text-muted)' }}>
+                              Total RW {rwObj.rw}: <strong style={{ color: 'var(--text-main)' }}>{rwStats.kkCount} KK</strong> ({rwStats.totalSouls} Jiwa)
+                            </span>
+                            <button
+                              className="btn btn-secondary btn-sm"
+                              onClick={() => {
+                                setBulkDeleteTarget({ dusun: dusun.dusunShort, rw: rwObj.rw, rt: 'Semua' });
+                                setBulkDeleteModalOpen(true);
+                              }}
+                              style={{ color: '#dc2626', borderColor: '#fca5a5', fontSize: '0.725rem', padding: '0.25rem 0.5rem' }}
+                              title={`Hapus seluruh warga di RW ${rwObj.rw}`}
+                            >
+                              <Trash2 size={11} /> Hapus RW {rwObj.rw}
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* RT Grid Cards */}
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '0.85rem' }}>
+                          {rwObj.rts.map((rtObj) => {
+                            const rtStats = getRtStats(rwObj.rw, rtObj.rt);
+                            return (
+                              <div
+                                key={rtObj.rt}
+                                style={{
+                                  background: 'var(--light-surface)',
+                                  borderRadius: 'var(--radius-md)',
+                                  padding: '1rem',
+                                  border: '1px solid var(--light-border)',
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  justifyContent: 'space-between',
+                                  gap: '0.75rem',
+                                  transition: 'var(--transition)'
+                                }}
+                              >
+                                <div>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.4rem' }}>
+                                    <span style={{
+                                      background: 'rgba(5, 150, 105, 0.12)',
+                                      color: 'var(--primary)',
+                                      fontWeight: 800,
+                                      fontSize: '0.8rem',
+                                      padding: '0.15rem 0.5rem',
+                                      borderRadius: '4px',
+                                      border: '1px solid rgba(5, 150, 105, 0.25)'
+                                    }}>
+                                      RT {rtObj.rt}
+                                    </span>
+                                    <span style={{ fontSize: '0.725rem', color: 'var(--text-muted)' }}>
+                                      Ketua: {rtObj.chief}
+                                    </span>
+                                  </div>
+
+                                  {/* RT Data Counters */}
+                                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', margin: '0.65rem 0' }}>
+                                    <div style={{ background: 'var(--light-bg)', padding: '0.45rem 0.65rem', borderRadius: '6px' }}>
+                                      <span style={{ fontSize: '0.675rem', color: 'var(--text-muted)', display: 'block' }}>Kartu Keluarga</span>
+                                      <strong style={{ fontSize: '1.1rem', color: 'var(--text-main)' }}>{rtStats.kkCount}</strong>
+                                    </div>
+                                    <div style={{ background: 'var(--light-bg)', padding: '0.45rem 0.65rem', borderRadius: '6px' }}>
+                                      <span style={{ fontSize: '0.675rem', color: 'var(--text-muted)', display: 'block' }}>Total Jiwa</span>
+                                      <strong style={{ fontSize: '1.1rem', color: 'var(--primary)' }}>{rtStats.totalSouls}</strong>
+                                    </div>
+                                  </div>
+
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.725rem', color: 'var(--text-muted)' }}>
+                                    <span>Laki: <strong>{rtStats.maleCount}</strong> • Pr: <strong>{rtStats.femaleCount}</strong></span>
+                                    <span>DTKS: <strong style={{ color: '#d97706' }}>{rtStats.dtksCount} KK</strong></span>
+                                  </div>
+                                </div>
+
+                                {/* Action Buttons */}
+                                <div style={{
+                                  display: 'flex',
+                                  gap: '0.4rem',
+                                  paddingTop: '0.65rem',
+                                  borderTop: '1px solid var(--light-border)'
+                                }}>
+                                  <button
+                                    className="btn btn-secondary btn-sm"
+                                    onClick={() => {
+                                      setFilterDusun('Semua');
+                                      setFilterRw(rwObj.rw);
+                                      setFilterRt(rtObj.rt);
+                                      setActiveSubTab('citizens-list');
+                                    }}
+                                    style={{ flex: 1, fontSize: '0.75rem', padding: '0.3rem 0.5rem', justifyContent: 'center' }}
+                                    title={`Lihat warga di RT ${rtObj.rt} / RW ${rwObj.rw}`}
+                                  >
+                                    <Users size={12} /> Warga ({rtStats.totalSouls})
+                                  </button>
+                                  <button
+                                    className="btn btn-secondary btn-sm"
+                                    onClick={() => {
+                                      setBulkDeleteTarget({ dusun: dusun.dusunShort, rw: rwObj.rw, rt: rtObj.rt });
+                                      setBulkDeleteModalOpen(true);
+                                    }}
+                                    style={{ color: '#dc2626', borderColor: '#fca5a5', padding: '0.3rem 0.55rem' }}
+                                    title={`Hapus seluruh warga di RT ${rtObj.rt}`}
+                                  >
+                                    <Trash2 size={12} />
+                                  </button>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+              </div>
+            );
+          })}
+
+        </div>
+      )}
+
+      {/* =========================================================================
+          SUBTAB 2: KLASIFIKASI SOSIAL EKONOMI BPS & DTKS
+          ========================================================================= */}
+      {activeSubTab === 'bps-classification' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          
+          {/* STATISTIK DISTRIBUSI STATUS EKONOMI BPS (5 DESIL) */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 210px), 1fr))', gap: '1rem' }}>
+            {statsByBps.map((cat) => (
+              <div
+                key={cat.id}
+                onClick={() => setFilterEconomic(cat.id === filterEconomic ? 'Semua' : cat.id)}
+                style={{
+                  background: 'var(--light-surface)',
+                  border: filterEconomic === cat.id ? `2px solid ${cat.color}` : '1px solid var(--light-border)',
+                  borderRadius: 'var(--radius-lg)',
+                  padding: '1.15rem',
+                  boxShadow: filterEconomic === cat.id ? '0 10px 20px -5px rgba(0,0,0,0.1)' : 'var(--shadow-sm)',
+                  cursor: 'pointer',
+                  transition: 'var(--transition)',
+                  position: 'relative',
+                  overflow: 'hidden'
+                }}
+              >
+                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: cat.color }}></div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 800, color: cat.color, textTransform: 'uppercase' }}>
+                    {cat.label.split('/')[0]}
+                  </span>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 800, background: cat.bg, color: cat.color, padding: '0.15rem 0.45rem', borderRadius: '999px' }}>
+                    {cat.percentage}%
                   </span>
                 </div>
 
-                <div className="form-row">
-                  <div className="form-group">
-                    <label className="form-label">Status Kepemilikan Rumah</label>
-                    <select
-                      className="form-control"
-                      value={classificationForm.houseOwnership}
-                      onChange={(e) => setClassificationForm({ ...classificationForm, houseOwnership: e.target.value })}
-                    >
-                      <option value="Milik Sendiri">Milik Sendiri</option>
-                      <option value="Sewa / Kontrak">Sewa / Kontrak</option>
-                      <option value="Menumpang / Rumah Keluarga">Menumpang / Rumah Keluarga</option>
-                    </select>
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Daya Listrik Terpasang</label>
-                    <select
-                      className="form-control"
-                      value={classificationForm.electricity}
-                      onChange={(e) => setClassificationForm({ ...classificationForm, electricity: e.target.value })}
-                    >
-                      <option value="450 VA (Subsidi)">450 VA (Subsidi Pemerintah)</option>
-                      <option value="900 VA (Subsidi/Non)">900 VA</option>
-                      <option value="1300 VA (Non Subsidi)">1300 VA (Non Subsidi)</option>
-                      <option value="2200 VA+">2200 VA ke atas</option>
-                      <option value="Tidak Berlistrik / Numpang">Tidak Berlistrik / Numpang Tetangga</option>
-                    </select>
-                  </div>
+                <div style={{ fontSize: '1.6rem', fontWeight: 900, color: 'var(--text-main)' }}>
+                  {cat.kkCount} <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)' }}>KK</span>
                 </div>
 
-                <div className="form-row">
-                  <div className="form-group">
-                    <label className="form-label">Jaminan Kesehatan (BPJS / KIS)</label>
-                    <select
-                      className="form-control"
-                      value={classificationForm.bpjsStatus}
-                      onChange={(e) => setClassificationForm({ ...classificationForm, bpjsStatus: e.target.value })}
-                    >
-                      <option value="Aktif (PBI Pemerintah / KIS)">Aktif (PBI Pemerintah / KIS)</option>
-                      <option value="Aktif (Mandiri Kelas 1/2/3)">Aktif (Mandiri Kelas 1/2/3)</option>
-                      <option value="Aktif (Pekerja / Perusahaan)">Aktif (Pekerja / Perusahaan)</option>
-                      <option value="Belum Memiliki BPJS">Belum Memiliki BPJS</option>
-                    </select>
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Fasilitas Sanitasi / Jamban</label>
-                    <select
-                      className="form-control"
-                      value={classificationForm.sanitation}
-                      onChange={(e) => setClassificationForm({ ...classificationForm, sanitation: e.target.value })}
-                    >
-                      <option value="Jamban Sehat Pribadi (Septic Tank)">Jamban Sehat Pribadi (Septic Tank)</option>
-                      <option value="MCK Umum / Bersama">MCK Umum / Bersama</option>
-                      <option value="Non-Jamban">Non-Jamban</option>
-                    </select>
-                  </div>
+                <div style={{ fontSize: '0.775rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+                  Populasi: <strong>{cat.soulsCount} Jiwa</strong>
                 </div>
               </div>
-
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setEditClassificationModal(null)}>Batal</button>
-                <button type="submit" className="btn btn-primary">Simpan Klasifikasi BPS</button>
-              </div>
-            </form>
+            ))}
           </div>
+
         </div>
       )}
 
-      {/* MODAL 2: DETAIL KARTU KELUARGA (FORMAT DISDUKCAPIL) */}
-      {viewFamilyDetail && (
-        <div className="modal-backdrop" onClick={() => setViewFamilyDetail(null)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '920px', width: '96%' }}>
-            <div className="modal-header hide-on-print">
-              <div>
-                <h3 className="modal-title">Format Resmi Kartu Keluarga Republik Indonesia</h3>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Nomor KK: <strong>{viewFamilyDetail.noKk}</strong></span>
+      {/* FILTER TOOLBAR FOR FAMILIES, CITIZENS & BPS TABLES */}
+      {activeSubTab !== 'area-classification' && (
+        <div style={{
+          background: 'var(--light-surface)',
+          padding: '1rem 1.25rem',
+          borderRadius: 'var(--radius-lg)',
+          border: '1px solid var(--light-border)',
+          boxShadow: 'var(--shadow-sm)',
+          display: 'flex',
+          gap: '0.75rem',
+          flexWrap: 'wrap',
+          alignItems: 'center'
+        }}>
+          {/* Search Input */}
+          <div style={{ position: 'relative', flex: 1, minWidth: '200px' }}>
+            <Search size={16} style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+            <input
+              type="text"
+              placeholder="Cari Nomor KK, NIK, Nama Warga, atau Alamat..."
+              className="form-control"
+              style={{ paddingLeft: '2.4rem', height: '40px', fontSize: '0.875rem' }}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
+          {/* Filter Dusun */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>Dusun:</span>
+            <select
+              className="form-control"
+              style={{ height: '40px', fontSize: '0.825rem', minWidth: '130px' }}
+              value={filterDusun}
+              onChange={(e) => setFilterDusun(e.target.value)}
+            >
+              <option value="Semua">Semua Dusun</option>
+              <option value="Pasirjati">Dusun 1 Pasirjati</option>
+              <option value="Sukamukti">Dusun 2 Sukamukti</option>
+              <option value="Mekarwangi">Dusun 3 Mekarwangi</option>
+            </select>
+          </div>
+
+          {/* Filter RW */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>RW:</span>
+            <select
+              className="form-control"
+              style={{ height: '40px', fontSize: '0.825rem', minWidth: '100px' }}
+              value={filterRw}
+              onChange={(e) => setFilterRw(e.target.value)}
+            >
+              <option value="Semua">Semua RW</option>
+              {[...Array(10)].map((_, i) => {
+                const rwNum = String(i + 1).padStart(2, '0');
+                return <option key={rwNum} value={rwNum}>RW {rwNum}</option>;
+              })}
+            </select>
+          </div>
+
+          {/* Filter RT */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>RT:</span>
+            <select
+              className="form-control"
+              style={{ height: '40px', fontSize: '0.825rem', minWidth: '100px' }}
+              value={filterRt}
+              onChange={(e) => setFilterRt(e.target.value)}
+            >
+              <option value="Semua">Semua RT</option>
+              {[...Array(20)].map((_, i) => {
+                const rtNum = String(i + 1).padStart(3, '0');
+                return <option key={rtNum} value={rtNum}>RT {String(i + 1).padStart(2, '0')}</option>;
+              })}
+            </select>
+          </div>
+
+          {/* Filter Klasifikasi BPS */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>BPS:</span>
+            <select
+              className="form-control"
+              style={{ height: '40px', fontSize: '0.825rem', minWidth: '150px' }}
+              value={filterEconomic}
+              onChange={(e) => setFilterEconomic(e.target.value)}
+            >
+              <option value="Semua">Semua Status</option>
+              {bpsClassifications.map(c => (
+                <option key={c.id} value={c.id}>{c.label.split('/')[0]}</option>
+              ))}
+            </select>
+          </div>
+
+          {(filterEconomic !== 'Semua' || filterDusun !== 'Semua' || filterRw !== 'Semua' || filterRt !== 'Semua' || searchQuery) && (
+            <button
+              className="btn btn-secondary btn-sm"
+              onClick={() => {
+                setFilterEconomic('Semua');
+                setFilterDusun('Semua');
+                setFilterRw('Semua');
+                setFilterRt('Semua');
+                setSearchQuery('');
+              }}
+              style={{ height: '38px', fontSize: '0.75rem' }}
+            >
+              Reset Filter
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* =========================================================================
+          MAIN DATA TABLE (BERDASARKAN TAB AKTIF)
+          ========================================================================= */}
+      {activeSubTab !== 'area-classification' && (
+        <div className="table-wrapper" style={{ padding: '1.25rem', background: 'var(--light-surface)', borderRadius: 'var(--radius-xl)', border: '1px solid var(--light-border)' }}>
+          
+          {/* VIEW: KLASIFIKASI BPS / DTKS */}
+          {activeSubTab === 'bps-classification' && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
+                  Data Penerima Manfaat & Status Kesejahteraan Warga (Standar BPS & DTKS)
+                </h3>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                  Menampilkan <strong>{filteredFamilies.length}</strong> Kartu Keluarga
+                </span>
               </div>
-              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                <button className="btn btn-primary btn-sm" onClick={() => window.print()}>
-                  <Printer size={15} /> Cetak KK
-                </button>
-                <button className="modal-close" onClick={() => setViewFamilyDetail(null)}><X size={20} /></button>
+
+              <div style={{ overflowX: 'auto' }}>
+                <table className="table">
+                  <thead>
+                    <tr>
+                      <th>No</th>
+                      <th>Nomor KK & Kepala Keluarga</th>
+                      <th>Alamat & RT/RW</th>
+                      <th>Klasifikasi BPS / DTKS</th>
+                      <th>Kondisi Rumah & Listrik</th>
+                      <th>Jaminan BPJS</th>
+                      <th>Anggota Jiwa</th>
+                      <th style={{ textAlign: 'center' }}>Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredFamilies.length === 0 ? (
+                      <tr>
+                        <td colSpan={8} style={{ textAlign: 'center', padding: '2.5rem', color: 'var(--text-muted)' }}>
+                          Tidak ditemukan data keluarga dengan filter yang dipilih.
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredFamilies.map((kk, idx) => (
+                        <tr key={kk.id}>
+                          <td style={{ fontWeight: 'bold' }}>{idx + 1}</td>
+                          <td>
+                            <span style={{ fontFamily: 'monospace', fontWeight: 800, color: 'var(--primary)', display: 'block' }}>
+                              {kk.noKk}
+                            </span>
+                            <strong style={{ fontSize: '0.95rem', color: 'var(--text-main)' }}>{kk.headName}</strong>
+                          </td>
+                          <td>
+                            <span style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-main)' }}>{kk.address}</span>
+                            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                              RT {kk.rt} / RW {kk.rw} • {kk.dusun}
+                            </span>
+                          </td>
+                          <td>
+                            <span className={`badge ${
+                              kk.economicStatus?.includes('Desil 1') ? 'badge-danger' :
+                              kk.economicStatus?.includes('Desil 2') ? 'badge-warning' :
+                              kk.economicStatus?.includes('Desil 3') ? 'badge-info' :
+                              kk.economicStatus?.includes('Desil 4') ? 'badge-neutral' : 'badge-success'
+                            }`} style={{ fontSize: '0.775rem' }}>
+                              {kk.economicStatus || 'Menengah'}
+                            </span>
+                            {kk.bansosTypes && kk.bansosTypes.length > 0 && (
+                              <div style={{ display: 'flex', gap: '0.25rem', marginTop: '0.35rem', flexWrap: 'wrap' }}>
+                                {kk.bansosTypes.map((b, bIdx) => (
+                                  <span key={bIdx} style={{ fontSize: '0.65rem', background: '#dcfce7', color: '#166534', padding: '0.1rem 0.35rem', borderRadius: '3px', fontWeight: 700 }}>
+                                    {b}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </td>
+                          <td style={{ fontSize: '0.8rem', color: 'var(--text-body)' }}>
+                            <div>🏠 {kk.houseOwnership || 'Milik Sendiri'}</div>
+                            <div>⚡ {kk.electricity || '450 VA (Subsidi)'}</div>
+                          </td>
+                          <td>
+                            <span className="badge badge-success" style={{ fontSize: '0.725rem' }}>
+                              {kk.bpjsStatus || 'PBI Pemerintah'}
+                            </span>
+                          </td>
+                          <td>
+                            <button
+                              className="btn btn-secondary btn-sm"
+                              style={{ fontSize: '0.75rem', padding: '0.2rem 0.55rem' }}
+                              onClick={() => setViewFamilyDetail(kk)}
+                            >
+                              <Users size={12} /> {kk.members ? kk.members.length : 0} Jiwa
+                            </button>
+                          </td>
+                          <td style={{ textAlign: 'center' }}>
+                            <div style={{ display: 'flex', gap: '0.35rem', justifyContent: 'center' }}>
+                              <button
+                                className="btn btn-secondary btn-sm"
+                                onClick={() => handleOpenEditClassification(kk)}
+                                title="Ubah Status Kesejahteraan / Desil"
+                                style={{ padding: '0.35rem', color: 'var(--primary)' }}
+                              >
+                                <Edit size={13} />
+                              </button>
+                              <button
+                                className="btn btn-secondary btn-sm"
+                                onClick={() => {
+                                  if (window.confirm(`Hapus data Kartu Keluarga ${kk.headName} (${kk.noKk})?`)) {
+                                    onDeleteFamily(kk.id);
+                                  }
+                                }}
+                                title="Hapus KK"
+                                style={{ padding: '0.35rem', color: '#dc2626' }}
+                              >
+                                <Trash2 size={13} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
               </div>
             </div>
+          )}
 
-            <div className="modal-body" style={{ background: '#f8fafc', padding: '1.5rem', overflowY: 'auto' }}>
-              <div style={{ background: '#fff', padding: '2rem', borderRadius: '8px', border: '1px solid #cbd5e1', boxShadow: '0 4px 15px rgba(0,0,0,0.05)', color: '#000', fontFamily: 'Arial, sans-serif' }}>
-                
-                {/* Header KK */}
-                <div style={{ textAlign: 'center', borderBottom: '2px solid #000', paddingBottom: '0.75rem', marginBottom: '1.25rem' }}>
-                  <h2 style={{ fontSize: '16pt', fontWeight: 'bold', margin: 0, letterSpacing: '1px' }}>KARTU KELUARGA</h2>
-                  <h3 style={{ fontSize: '13pt', fontWeight: 'bold', margin: '4px 0 0 0', letterSpacing: '2px' }}>No. {viewFamilyDetail.noKk}</h3>
-                </div>
+          {/* VIEW: DAFTAR KARTU KELUARGA (KK) */}
+          {activeSubTab === 'families-list' && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
+                  Daftar Kartu Keluarga (KK) Terdaftar di Desa
+                </h3>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                  Total <strong>{filteredFamilies.length}</strong> KK
+                </span>
+              </div>
 
-                {/* Atribut Header */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '1rem', fontSize: '9pt', marginBottom: '1rem' }}>
-                  <div>
-                    <div><strong>Nama Kepala Keluarga:</strong> {viewFamilyDetail.headName}</div>
-                    <div><strong>Alamat:</strong> {viewFamilyDetail.address}</div>
-                    <div><strong>RT / RW:</strong> {viewFamilyDetail.rt} / {viewFamilyDetail.rw}</div>
-                    <div><strong>Desa / Kelurahan:</strong> Sukamaju Mandiri</div>
-                  </div>
-                  <div>
-                    <div><strong>Kecamatan:</strong> Harapan Makmur</div>
-                    <div><strong>Kabupaten / Kota:</strong> Kabupaten Nusantara</div>
-                    <div><strong>Kode Pos:</strong> {viewFamilyDetail.postalCode || '40375'}</div>
-                    <div><strong>Provinsi:</strong> Jawa Barat</div>
-                  </div>
-                </div>
-
-                {/* TABEL I: ANGGOTA KELUARGA */}
-                <h4 style={{ fontSize: '9.5pt', fontWeight: 'bold', margin: '1rem 0 0.4rem 0' }}>I. DATA ANGGOTA KELUARGA</h4>
-                <div style={{ overflowX: 'auto', marginBottom: '1rem' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '8.5pt', border: '1px solid #000' }}>
-                    <thead>
-                      <tr style={{ background: '#e2e8f0', textAlign: 'center' }}>
-                        <th style={{ border: '1px solid #000', padding: '4px' }}>No</th>
-                        <th style={{ border: '1px solid #000', padding: '4px' }}>Nama Lengkap</th>
-                        <th style={{ border: '1px solid #000', padding: '4px' }}>NIK</th>
-                        <th style={{ border: '1px solid #000', padding: '4px' }}>Jenis Kelamin</th>
-                        <th style={{ border: '1px solid #000', padding: '4px' }}>Tempat Lahir</th>
-                        <th style={{ border: '1px solid #000', padding: '4px' }}>Tanggal Lahir</th>
-                        <th style={{ border: '1px solid #000', padding: '4px' }}>Agama</th>
-                        <th style={{ border: '1px solid #000', padding: '4px' }}>Pendidikan</th>
-                        <th style={{ border: '1px solid #000', padding: '4px' }}>Jenis Pekerjaan</th>
+              <div style={{ overflowX: 'auto' }}>
+                <table className="table">
+                  <thead>
+                    <tr>
+                      <th>No</th>
+                      <th>Nomor KK</th>
+                      <th>Kepala Keluarga</th>
+                      <th>Alamat & RT/RW</th>
+                      <th>Dusun</th>
+                      <th>Status Ekonomi</th>
+                      <th>Anggota Keluarga</th>
+                      <th style={{ textAlign: 'center' }}>Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredFamilies.length === 0 ? (
+                      <tr>
+                        <td colSpan={8} style={{ textAlign: 'center', padding: '2.5rem', color: 'var(--text-muted)' }}>
+                          Tidak ditemukan data Kartu Keluarga.
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {viewFamilyDetail.members?.map((m, mIdx) => (
-                        <tr key={m.id || mIdx}>
-                          <td style={{ border: '1px solid #000', padding: '4px', textAlign: 'center' }}>{mIdx + 1}</td>
-                          <td style={{ border: '1px solid #000', padding: '4px', fontWeight: 'bold' }}>{m.name}</td>
-                          <td style={{ border: '1px solid #000', padding: '4px', fontFamily: 'monospace' }}>{m.nik}</td>
-                          <td style={{ border: '1px solid #000', padding: '4px' }}>{m.gender}</td>
-                          <td style={{ border: '1px solid #000', padding: '4px' }}>{m.birthPlace}</td>
-                          <td style={{ border: '1px solid #000', padding: '4px' }}>{m.birthDate}</td>
-                          <td style={{ border: '1px solid #000', padding: '4px' }}>{m.religion}</td>
-                          <td style={{ border: '1px solid #000', padding: '4px' }}>{m.education}</td>
-                          <td style={{ border: '1px solid #000', padding: '4px' }}>{m.occupation}</td>
+                    ) : (
+                      filteredFamilies.map((kk, idx) => (
+                        <tr key={kk.id}>
+                          <td style={{ fontWeight: 'bold' }}>{idx + 1}</td>
+                          <td>
+                            <strong style={{ fontFamily: 'monospace', color: 'var(--primary)' }}>
+                              {kk.noKk}
+                            </strong>
+                          </td>
+                          <td>
+                            <strong style={{ color: 'var(--text-main)' }}>{kk.headName}</strong>
+                          </td>
+                          <td style={{ fontSize: '0.85rem' }}>
+                            <div>{kk.address}</div>
+                            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                              RT {kk.rt} / RW {kk.rw}
+                            </span>
+                          </td>
+                          <td>
+                            <span className="badge badge-neutral" style={{ fontSize: '0.725rem' }}>
+                              {kk.dusun}
+                            </span>
+                          </td>
+                          <td>
+                            <span className="badge badge-success" style={{ fontSize: '0.725rem' }}>
+                              {kk.economicStatus || 'Menengah'}
+                            </span>
+                          </td>
+                          <td>
+                            <button
+                              className="btn btn-secondary btn-sm"
+                              onClick={() => setViewFamilyDetail(kk)}
+                              style={{ fontSize: '0.775rem' }}
+                            >
+                              <Eye size={12} /> {kk.members ? kk.members.length : 0} Jiwa
+                            </button>
+                          </td>
+                          <td style={{ textAlign: 'center' }}>
+                            <div style={{ display: 'flex', gap: '0.35rem', justifyContent: 'center' }}>
+                              <button
+                                className="btn btn-secondary btn-sm"
+                                onClick={() => setAddMemberModalKk(kk)}
+                                title="Tambah Anggota Keluarga"
+                                style={{ padding: '0.35rem', color: '#059669' }}
+                              >
+                                <Plus size={13} />
+                              </button>
+                              <button
+                                className="btn btn-secondary btn-sm"
+                                onClick={() => {
+                                  if (window.confirm(`Hapus KK ${kk.headName}?`)) {
+                                    onDeleteFamily(kk.id);
+                                  }
+                                }}
+                                title="Hapus KK"
+                                style={{ padding: '0.35rem', color: '#dc2626' }}
+                              >
+                                <Trash2 size={13} />
+                              </button>
+                            </div>
+                          </td>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
 
-                {/* TABEL II: STATUS HUBUNGAN & ORANG TUA */}
-                <h4 style={{ fontSize: '9.5pt', fontWeight: 'bold', margin: '1rem 0 0.4rem 0' }}>II. STATUS PERKAWINAN & HUBUNGAN DALAM KELUARGA</h4>
-                <div style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '8.5pt', border: '1px solid #000' }}>
-                    <thead>
-                      <tr style={{ background: '#e2e8f0', textAlign: 'center' }}>
-                        <th style={{ border: '1px solid #000', padding: '4px' }}>No</th>
-                        <th style={{ border: '1px solid #000', padding: '4px' }}>Status Perkawinan</th>
-                        <th style={{ border: '1px solid #000', padding: '4px' }}>Status Hubungan</th>
-                        <th style={{ border: '1px solid #000', padding: '4px' }}>Gol. Darah</th>
-                        <th style={{ border: '1px solid #000', padding: '4px' }}>Nama Ayah</th>
-                        <th style={{ border: '1px solid #000', padding: '4px' }}>Nama Ibu</th>
+          {/* VIEW: DAFTAR SELURUH JIWA WARGA */}
+          {activeSubTab === 'citizens-list' && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
+                  Daftar Seluruh Jiwa Penduduk Terdata
+                </h3>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                  Total <strong>{filteredCitizens.length}</strong> Jiwa
+                </span>
+              </div>
+
+              <div style={{ overflowX: 'auto' }}>
+                <table className="table">
+                  <thead>
+                    <tr>
+                      <th>No</th>
+                      <th>NIK & Nama Lengkap</th>
+                      <th>Gender</th>
+                      <th>Tempat, Tanggal Lahir</th>
+                      <th>Hubungan KK</th>
+                      <th>Pendidikan & Pekerjaan</th>
+                      <th>RT / RW</th>
+                      <th>No. KK Terkait</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredCitizens.length === 0 ? (
+                      <tr>
+                        <td colSpan={8} style={{ textAlign: 'center', padding: '2.5rem', color: 'var(--text-muted)' }}>
+                          Tidak ditemukan data warga.
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {viewFamilyDetail.members?.map((m, mIdx) => (
-                        <tr key={m.id || mIdx}>
-                          <td style={{ border: '1px solid #000', padding: '4px', textAlign: 'center' }}>{mIdx + 1}</td>
-                          <td style={{ border: '1px solid #000', padding: '4px' }}>{m.maritalStatus}</td>
-                          <td style={{ border: '1px solid #000', padding: '4px', fontWeight: 'bold' }}>{m.relation}</td>
-                          <td style={{ border: '1px solid #000', padding: '4px', textAlign: 'center' }}>{m.bloodType || 'O'}</td>
-                          <td style={{ border: '1px solid #000', padding: '4px' }}>{m.fatherName || '-'}</td>
-                          <td style={{ border: '1px solid #000', padding: '4px' }}>{m.motherName || '-'}</td>
+                    ) : (
+                      filteredCitizens.map((cit, idx) => (
+                        <tr key={cit.id || idx}>
+                          <td style={{ fontWeight: 'bold' }}>{idx + 1}</td>
+                          <td>
+                            <span style={{ fontFamily: 'monospace', fontWeight: 800, color: 'var(--primary)', display: 'block', fontSize: '0.825rem' }}>
+                              {cit.nik}
+                            </span>
+                            <strong style={{ fontSize: '0.95rem', color: 'var(--text-main)' }}>{cit.name}</strong>
+                          </td>
+                          <td>
+                            <span className={`badge ${cit.gender === 'Laki-Laki' ? 'badge-info' : 'badge-warning'}`} style={{ fontSize: '0.725rem' }}>
+                              {cit.gender}
+                            </span>
+                          </td>
+                          <td style={{ fontSize: '0.825rem', color: 'var(--text-body)' }}>
+                            {cit.birthPlace ? `${cit.birthPlace}, ` : ''}{cit.birthDate || '-'}
+                          </td>
+                          <td>
+                            <span className={`badge ${cit.relation === 'Kepala Keluarga' ? 'badge-success' : 'badge-neutral'}`} style={{ fontSize: '0.725rem' }}>
+                              {cit.relation}
+                            </span>
+                          </td>
+                          <td style={{ fontSize: '0.825rem', color: 'var(--text-body)' }}>
+                            <div>{cit.education || '-'}</div>
+                            <span style={{ fontSize: '0.725rem', color: 'var(--text-muted)' }}>{cit.occupation || '-'}</span>
+                          </td>
+                          <td>
+                            <span className="badge badge-neutral" style={{ fontSize: '0.725rem' }}>
+                              RT {cit.rt} / RW {cit.rw}
+                            </span>
+                          </td>
+                          <td>
+                            <span style={{ fontFamily: 'monospace', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                              {cit.noKk}
+                            </span>
+                          </td>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
 
-                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
-                  <button
-                    type="button"
-                    className="btn btn-sm btn-primary hide-on-print"
-                    onClick={() => {
-                      setAddMemberModalKk(viewFamilyDetail);
-                    }}
+        </div>
+      )}
+
+      {/* =========================================================================
+          MODALS
+          ========================================================================= */}
+
+      {/* MODAL 1: HAPUS MASSAL PER RT / RW */}
+      {bulkDeleteModalOpen && (
+        <div className="modal-backdrop">
+          <div className="modal-content" style={{ maxWidth: '520px' }}>
+            <div className="modal-header" style={{ background: '#fef2f2', borderBottom: '1px solid #fecaca' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#dc2626' }}>
+                <UserX size={20} />
+                <h3 className="modal-title" style={{ color: '#991b1b', fontSize: '1.05rem' }}>
+                  Hapus Massal Seluruh Warga per RT / RW
+                </h3>
+              </div>
+              <button className="modal-close" onClick={() => setBulkDeleteModalOpen(false)}>
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '1.15rem' }}>
+              <div style={{ background: '#fef2f2', padding: '0.85rem 1rem', borderRadius: '8px', border: '1px solid #fecaca', fontSize: '0.825rem', color: '#991b1b', lineHeight: 1.5 }}>
+                ⚠️ <strong>Perhatian:</strong> Fitur ini akan menghapus seluruh data Kartu Keluarga beserta anggota jiwa warga yang berdomisili di RT / RW yang Anda pilih.
+              </div>
+
+              <div className="form-group">
+                <label className="form-label" style={{ fontWeight: 800 }}>1. Pilih Wilayah Dusun</label>
+                <select
+                  className="form-control"
+                  value={bulkDeleteTarget.dusun}
+                  onChange={(e) => setBulkDeleteTarget({ ...bulkDeleteTarget, dusun: e.target.value })}
+                >
+                  <option value="Semua">Semua Dusun</option>
+                  <option value="Pasirjati">Dusun 1 (Pasirjati)</option>
+                  <option value="Sukamukti">Dusun 2 (Sukamukti)</option>
+                  <option value="Mekarwangi">Dusun 3 (Mekarwangi)</option>
+                </select>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label" style={{ fontWeight: 800 }}>2. Pilih RW Target</label>
+                  <select
+                    className="form-control"
+                    value={bulkDeleteTarget.rw}
+                    onChange={(e) => setBulkDeleteTarget({ ...bulkDeleteTarget, rw: e.target.value })}
                   >
-                    <Plus size={14} /> Tambah Anggota Keluarga Baru
-                  </button>
+                    <option value="Semua">Semua RW</option>
+                    {[...Array(10)].map((_, i) => {
+                      const rwNum = String(i + 1).padStart(2, '0');
+                      return <option key={rwNum} value={rwNum}>RW {rwNum}</option>;
+                    })}
+                  </select>
                 </div>
 
+                <div className="form-group">
+                  <label className="form-label" style={{ fontWeight: 800 }}>3. Pilih RT Target</label>
+                  <select
+                    className="form-control"
+                    value={bulkDeleteTarget.rt}
+                    onChange={(e) => setBulkDeleteTarget({ ...bulkDeleteTarget, rt: e.target.value })}
+                  >
+                    <option value="Semua">Semua RT di RW ini</option>
+                    {[...Array(20)].map((_, i) => {
+                      const rtNum = String(i + 1).padStart(3, '0');
+                      return <option key={rtNum} value={rtNum}>RT {String(i + 1).padStart(2, '0')}</option>;
+                    })}
+                  </select>
+                </div>
               </div>
+
+              {/* Real-time Calculation Box */}
+              <div style={{
+                background: 'var(--light-bg)',
+                padding: '1rem',
+                borderRadius: '8px',
+                border: '1px solid var(--light-border)',
+                textAlign: 'center'
+              }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block' }}>
+                  Target Data yang Ditemukan:
+                </span>
+                <div style={{ fontSize: '1.35rem', fontWeight: 900, color: matchingDeleteList.length > 0 ? '#dc2626' : 'var(--text-main)', margin: '0.25rem 0' }}>
+                  {matchingDeleteList.length} Kartu Keluarga <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>({matchingDeleteSouls} Jiwa)</span>
+                </div>
+                <span style={{ fontSize: '0.725rem', color: 'var(--text-muted)' }}>
+                  Filter: Dusun {bulkDeleteTarget.dusun} • RW {bulkDeleteTarget.rw} • RT {bulkDeleteTarget.rt}
+                </span>
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button type="button" className="btn btn-secondary" onClick={() => setBulkDeleteModalOpen(false)}>
+                Batal
+              </button>
+              <button 
+                type="button" 
+                className="btn btn-danger" 
+                onClick={handleConfirmBulkDelete}
+                disabled={matchingDeleteList.length === 0}
+              >
+                <Trash2 size={14} /> Hapus {matchingDeleteList.length} KK Sekarang
+              </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* MODAL 3: TAMBAH KK BARU */}
+      {/* MODAL 2: TAMBAH KK BARU */}
       {addFamilyModal && (
-        <div className="modal-backdrop" onClick={() => setAddFamilyModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '600px' }}>
+        <div className="modal-backdrop">
+          <div className="modal-content" style={{ maxWidth: '650px' }}>
             <div className="modal-header">
-              <h3 className="modal-title">Tambah Data Kartu Keluarga Baru</h3>
-              <button className="modal-close" onClick={() => setAddFamilyModal(false)}><X size={20} /></button>
+              <h3 className="modal-title">Tambah Kartu Keluarga (KK) Baru</h3>
+              <button className="modal-close" onClick={() => setAddFamilyModal(false)}>
+                <X size={18} />
+              </button>
             </div>
-
+            
             <form onSubmit={handleAddFamilySubmit}>
-              <div className="modal-body">
+              <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <div className="form-row">
                   <div className="form-group">
                     <label className="form-label">Nomor Kartu Keluarga (16 Digit) *</label>
                     <input
                       type="text"
                       required
-                      placeholder="320415..."
+                      maxLength={16}
                       className="form-control"
                       value={familyForm.noKk}
                       onChange={(e) => setFamilyForm({ ...familyForm, noKk: e.target.value })}
+                      placeholder="3204150801120001"
                     />
                   </div>
                   <div className="form-group">
-                    <label className="form-label">Nama Kepala Keluarga *</label>
+                    <label className="form-label">Nama Lengkap Kepala Keluarga *</label>
                     <input
                       type="text"
                       required
-                      placeholder="Nama lengkap..."
                       className="form-control"
                       value={familyForm.headName}
                       onChange={(e) => setFamilyForm({ ...familyForm, headName: e.target.value })}
+                      placeholder="Bambang Sudrajat"
                     />
                   </div>
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Alamat Rumah *</label>
+                  <label className="form-label">Alamat Domisili</label>
                   <input
                     type="text"
-                    required
-                    placeholder="Contoh: Kp. Pasir Salam No. 14"
                     className="form-control"
                     value={familyForm.address}
                     onChange={(e) => setFamilyForm({ ...familyForm, address: e.target.value })}
+                    placeholder="Kp. Pasirjati No. 12"
                   />
                 </div>
 
                 <div className="form-row">
                   <div className="form-group">
-                    <label className="form-label">RT</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={familyForm.rt}
-                      onChange={(e) => setFamilyForm({ ...familyForm, rt: e.target.value })}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">RW</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={familyForm.rw}
-                      onChange={(e) => setFamilyForm({ ...familyForm, rw: e.target.value })}
-                    />
-                  </div>
-                  <div className="form-group">
                     <label className="form-label">Dusun</label>
-                    <input
-                      type="text"
+                    <select
                       className="form-control"
                       value={familyForm.dusun}
                       onChange={(e) => setFamilyForm({ ...familyForm, dusun: e.target.value })}
-                    />
+                    >
+                      <option value="Dusun Pasirjati">Dusun 1 Pasirjati</option>
+                      <option value="Dusun Sukamukti">Dusun 2 Sukamukti</option>
+                      <option value="Dusun Mekarwangi">Dusun 3 Mekarwangi</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">RW</label>
+                    <select
+                      className="form-control"
+                      value={familyForm.rw}
+                      onChange={(e) => setFamilyForm({ ...familyForm, rw: e.target.value })}
+                    >
+                      {[...Array(10)].map((_, i) => {
+                        const rwNum = String(i + 1).padStart(2, '0');
+                        return <option key={rwNum} value={rwNum}>RW {rwNum}</option>;
+                      })}
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">RT</label>
+                    <select
+                      className="form-control"
+                      value={familyForm.rt}
+                      onChange={(e) => setFamilyForm({ ...familyForm, rt: e.target.value })}
+                    >
+                      {[...Array(20)].map((_, i) => {
+                        const rtNum = String(i + 1).padStart(3, '0');
+                        return <option key={rtNum} value={rtNum}>RT {String(i + 1).padStart(2, '0')}</option>;
+                      })}
+                    </select>
                   </div>
                 </div>
 
-                <div className="form-group">
-                  <label className="form-label">Klasifikasi Status Ekonomi BPS *</label>
-                  <select
-                    className="form-control"
-                    value={familyForm.economicStatus}
-                    onChange={(e) => setFamilyForm({ ...familyForm, economicStatus: e.target.value })}
-                  >
-                    {bpsClassifications.map(c => (
-                      <option key={c.id} value={c.name}>{c.label}</option>
-                    ))}
-                  </select>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label">Status Kesejahteraan (BPS / DTKS)</label>
+                    <select
+                      className="form-control"
+                      value={familyForm.economicStatus}
+                      onChange={(e) => setFamilyForm({ ...familyForm, economicStatus: e.target.value })}
+                    >
+                      {bpsClassifications.map(c => (
+                        <option key={c.id} value={c.id}>{c.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Status BPJS Kesehatan</label>
+                    <select
+                      className="form-control"
+                      value={familyForm.bpjsStatus}
+                      onChange={(e) => setFamilyForm({ ...familyForm, bpjsStatus: e.target.value })}
+                    >
+                      <option value="Aktif (PBI Pemerintah)">Aktif (PBI Pemerintah)</option>
+                      <option value="Aktif (Mandiri)">Aktif (Mandiri)</option>
+                      <option value="Aktif (Pekerja / Perusahaan)">Aktif (Pekerja / Perusahaan)</option>
+                      <option value="Tidak Memiliki BPJS">Tidak Memiliki BPJS</option>
+                    </select>
+                  </div>
                 </div>
               </div>
 
@@ -1071,27 +1637,146 @@ export default function AdminCitizens({
         </div>
       )}
 
-      {/* MODAL 4: TAMBAH ANGGOTA KELUARGA BARU */}
-      {addMemberModalKk && (
-        <div className="modal-backdrop" onClick={() => setAddMemberModalKk(null)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '600px' }}>
+      {/* MODAL 3: DETAIL ANGGOTA KK */}
+      {viewFamilyDetail && (
+        <div className="modal-backdrop">
+          <div className="modal-content" style={{ maxWidth: '800px' }}>
             <div className="modal-header">
-              <h3 className="modal-title">Tambah Anggota ke KK: {addMemberModalKk.noKk}</h3>
-              <button className="modal-close" onClick={() => setAddMemberModalKk(null)}><X size={20} /></button>
+              <div>
+                <h3 className="modal-title">Kartu Keluarga: {viewFamilyDetail.headName}</h3>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                  No. KK: <strong>{viewFamilyDetail.noKk}</strong> • RT {viewFamilyDetail.rt} / RW {viewFamilyDetail.rw} • {viewFamilyDetail.dusun}
+                </span>
+              </div>
+              <button className="modal-close" onClick={() => setViewFamilyDetail(null)}>
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h4 style={{ fontSize: '1rem', fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>
+                  Daftar Anggota Keluarga ({viewFamilyDetail.members?.length || 0} Jiwa)
+                </h4>
+                <button
+                  className="btn btn-primary btn-sm"
+                  onClick={() => {
+                    setAddMemberModalKk(viewFamilyDetail);
+                    setMemberForm({
+                      nik: '',
+                      name: '',
+                      gender: 'Laki-Laki',
+                      birthPlace: '',
+                      birthDate: '',
+                      religion: 'Islam',
+                      education: 'SMA / Sederajat',
+                      occupation: 'Wiraswasta',
+                      maritalStatus: 'Kawin',
+                      relation: 'Istri',
+                      bloodType: 'O',
+                      fatherName: '',
+                      motherName: '',
+                      phone: ''
+                    });
+                  }}
+                >
+                  <Plus size={13} /> Tambah Anggota
+                </button>
+              </div>
+
+              <div style={{ overflowX: 'auto' }}>
+                <table className="table" style={{ fontSize: '0.85rem' }}>
+                  <thead>
+                    <tr>
+                      <th>No</th>
+                      <th>NIK</th>
+                      <th>Nama Lengkap</th>
+                      <th>Gender</th>
+                      <th>Hubungan</th>
+                      <th>Tempat, Tanggal Lahir</th>
+                      <th>Pendidikan & Pekerjaan</th>
+                      <th>Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {!viewFamilyDetail.members || viewFamilyDetail.members.length === 0 ? (
+                      <tr>
+                        <td colSpan={8} style={{ textAlign: 'center', padding: '1.5rem', color: 'var(--text-muted)' }}>
+                          Belum ada anggota terdaftar di KK ini.
+                        </td>
+                      </tr>
+                    ) : (
+                      viewFamilyDetail.members.map((m, idx) => (
+                        <tr key={m.id || idx}>
+                          <td>{idx + 1}</td>
+                          <td style={{ fontFamily: 'monospace', fontWeight: 700, color: 'var(--primary)' }}>{m.nik}</td>
+                          <td><strong>{m.name}</strong></td>
+                          <td>{m.gender}</td>
+                          <td>
+                            <span className="badge badge-neutral" style={{ fontSize: '0.7rem' }}>
+                              {m.relation}
+                            </span>
+                          </td>
+                          <td>{m.birthPlace ? `${m.birthPlace}, ` : ''}{m.birthDate}</td>
+                          <td>{m.education || '-'} • {m.occupation || '-'}</td>
+                          <td>
+                            <button
+                              className="btn btn-secondary btn-sm"
+                              style={{ color: '#dc2626', padding: '0.2rem 0.4rem' }}
+                              onClick={() => {
+                                if (window.confirm(`Hapus anggota ${m.name}?`)) {
+                                  onDeleteMember(viewFamilyDetail.id, m.id);
+                                  setViewFamilyDetail(prev => ({
+                                    ...prev,
+                                    members: prev.members.filter(mem => mem.id !== m.id)
+                                  }));
+                                }
+                              }}
+                            >
+                              <Trash2 size={12} />
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button type="button" className="btn btn-secondary" onClick={() => setViewFamilyDetail(null)}>
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 4: TAMBAH ANGGOTA KELUARGA KE KK */}
+      {addMemberModalKk && (
+        <div className="modal-backdrop">
+          <div className="modal-content" style={{ maxWidth: '600px' }}>
+            <div className="modal-header">
+              <h3 className="modal-title">Tambah Anggota ke KK: {addMemberModalKk.headName}</h3>
+              <button className="modal-close" onClick={() => setAddMemberModalKk(null)}>
+                <X size={18} />
+              </button>
             </div>
 
             <form onSubmit={handleAddMemberSubmit}>
-              <div className="modal-body">
+              <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <div className="form-row">
                   <div className="form-group">
                     <label className="form-label">NIK (16 Digit) *</label>
                     <input
                       type="text"
                       required
-                      placeholder="320415..."
+                      maxLength={16}
                       className="form-control"
                       value={memberForm.nik}
                       onChange={(e) => setMemberForm({ ...memberForm, nik: e.target.value })}
+                      placeholder="320415..."
                     />
                   </div>
                   <div className="form-group">

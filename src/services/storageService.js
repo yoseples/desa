@@ -196,6 +196,33 @@ export const StorageService = {
     this.saveFamilies(updated);
     return updated;
   },
+  bulkDeleteFamiliesByArea({ dusun, rw, rt }) {
+    const list = this.getFamilies();
+    const normalize = (val) => {
+      if (!val) return '';
+      return String(val).replace(/\D/g, '').padStart(3, '0');
+    };
+
+    const remaining = list.filter(kk => {
+      const matchDusun = !dusun || dusun === 'Semua' || kk.dusun === dusun;
+      const matchRw = !rw || rw === 'Semua' || normalize(kk.rw) === normalize(rw);
+      const matchRt = !rt || rt === 'Semua' || normalize(kk.rt) === normalize(rt);
+
+      // If it matches all criteria, mark for deletion (return false)
+      if (matchDusun && matchRw && matchRt) {
+        return false;
+      }
+      return true;
+    });
+
+    const deletedCount = list.length - remaining.length;
+    this.saveFamilies(remaining);
+    return { remaining, deletedCount };
+  },
+  resetSampleFamilies() {
+    this.saveFamilies(initialFamiliesList);
+    return initialFamiliesList;
+  },
   addFamilyMember(kkId, memberData) {
     const list = this.getFamilies();
     const newMember = {
