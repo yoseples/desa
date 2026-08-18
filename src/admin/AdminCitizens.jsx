@@ -10,13 +10,13 @@ import {
   Printer, 
   X, 
   UserPlus, 
-  Layers, 
-  ShieldCheck, 
+  FileUp,
+  Download,
   HeartHandshake, 
-  FileSpreadsheet,
   CheckCircle2
 } from 'lucide-react';
 import { StorageService } from '../services/storageService';
+import AdminImportKKModal from './AdminImportKKModal';
 
 export default function AdminCitizens({ 
   familiesList, 
@@ -25,6 +25,7 @@ export default function AdminCitizens({
   onDeleteFamily, 
   onAddMember, 
   onDeleteMember,
+  onBatchImport,
   profile 
 }) {
   const [viewMode, setViewMode] = useState('families'); // 'families' or 'citizens'
@@ -38,6 +39,7 @@ export default function AdminCitizens({
   const [formKkModal, setFormKkModal] = useState(false);
   const [editingKkId, setEditingKkId] = useState(null);
   const [formMemberModal, setFormMemberModal] = useState(null); // holds kkId
+  const [importModalOpen, setImportModalOpen] = useState(false);
 
   // KK Form State
   const [kkFormData, setKkFormData] = useState({
@@ -186,7 +188,6 @@ export default function AdminCitizens({
 
     onAddMember(formMemberModal.id, memberFormData);
     setFormMemberModal(null);
-    // update detail modal if open
     if (detailKkModal) {
       const updatedList = StorageService.getFamilies();
       const updatedTarget = updatedList.find(k => k.id === detailKkModal.id);
@@ -211,6 +212,13 @@ export default function AdminCitizens({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      {/* IMPORT MODAL */}
+      <AdminImportKKModal
+        isOpen={importModalOpen}
+        onClose={() => setImportModalOpen(false)}
+        onImportSuccess={onBatchImport}
+      />
+
       {/* 1. TOP STATS BAR */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
         <div className="stat-box" style={{ padding: '1.25rem' }}>
@@ -274,9 +282,17 @@ export default function AdminCitizens({
           </div>
 
           <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            <button
+              className="btn btn-secondary btn-sm"
+              onClick={() => setImportModalOpen(true)}
+              style={{ color: '#059669', borderColor: '#86efac', fontWeight: 700 }}
+            >
+              <FileUp size={15} /> Import Data KK (CSV / JSON)
+            </button>
+
             {viewMode === 'families' && (
               <button className="btn btn-primary btn-sm" onClick={handleOpenAddKk}>
-                <Plus size={15} /> Tambah Kartu Keluarga
+                <Plus size={15} /> Tambah KK Baru
               </button>
             )}
           </div>
@@ -307,6 +323,7 @@ export default function AdminCitizens({
             <option value="002">RT 002</option>
             <option value="003">RT 003</option>
             <option value="004">RT 004</option>
+            <option value="005">RT 005</option>
           </select>
 
           {viewMode === 'families' ? (

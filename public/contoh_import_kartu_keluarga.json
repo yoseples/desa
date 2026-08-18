@@ -1,0 +1,110 @@
+[
+  {
+    "noKk": "3204152809180005",
+    "headName": "Ahmad Sanusi",
+    "address": "Dusun Mekar RT 02 RW 05",
+    "rt": "002",
+    "rw": "005",
+    "dusun": "Dusun Mekar",
+    "postalCode": "40375",
+    "economicStatus": "Sejahtera",
+    "bpjsStatus": "Aktif (Mandiri)",
+    "issueDate": "18 September 2021",
+    "members": [
+      {
+        "nik": "3204151406800001",
+        "name": "Ahmad Sanusi",
+        "gender": "Laki-Laki",
+        "birthPlace": "Bandung",
+        "birthDate": "14-06-1980",
+        "religion": "Islam",
+        "education": "Sarjana (S1)",
+        "occupation": "Guru / Tenaga Pendidik",
+        "maritalStatus": "Kawin",
+        "relation": "Kepala Keluarga",
+        "bloodType": "A",
+        "fatherName": "Sanusi",
+        "motherName": "Khadijah",
+        "phone": "081233445566"
+      },
+      {
+        "nik": "3204155507840002",
+        "name": "Eneng Ratnasari",
+        "gender": "Perempuan",
+        "birthPlace": "Garut",
+        "birthDate": "15-07-1984",
+        "religion": "Islam",
+        "education": "Sarjana (S1)",
+        "occupation": "Bidan / Tenaga Medis",
+        "maritalStatus": "Kawin",
+        "relation": "Istri",
+        "bloodType": "B",
+        "fatherName": "Umar",
+        "motherName": "Suminah",
+        "phone": "081233445567"
+      },
+      {
+        "nik": "3204152010100003",
+        "name": "Farhan Sanusi",
+        "gender": "Laki-Laki",
+        "birthPlace": "Bandung",
+        "birthDate": "20-10-2010",
+        "religion": "Islam",
+        "education": "SMP / Sederajat",
+        "occupation": "Pelajar",
+        "maritalStatus": "Belum Kawin",
+        "relation": "Anak",
+        "bloodType": "A",
+        "fatherName": "Ahmad Sanusi",
+        "motherName": "Eneng Ratnasari",
+        "phone": "-"
+      }
+    ]
+  },
+  {
+    "noKk": "3204151111190006",
+    "headName": "Dedi Mulyadi",
+    "address": "Dusun Pasirjati Blok C No. 21",
+    "rt": "003",
+    "rw": "004",
+    "dusun": "Dusun Pasirjati",
+    "postalCode": "40375",
+    "economicStatus": "Prasejahtera (DTKS)",
+    "bpjsStatus": "Aktif (PBI APBN)",
+    "issueDate": "11 November 2022",
+    "members": [
+      {
+        "nik": "3204150802770001",
+        "name": "Dedi Mulyadi",
+        "gender": "Laki-Laki",
+        "birthPlace": "Sumedang",
+        "birthDate": "08-02-1977",
+        "religion": "Islam",
+        "education": "SD / Sederajat",
+        "occupation": "Buruh Tani Harian",
+        "maritalStatus": "Kawin",
+        "relation": "Kepala Keluarga",
+        "bloodType": "O",
+        "fatherName": "Mulyadi",
+        "motherName": "Karsih",
+        "phone": "085299887766"
+      },
+      {
+        "nik": "3204154408800002",
+        "name": "Karmilah",
+        "gender": "Perempuan",
+        "birthPlace": "Bandung",
+        "birthDate": "04-08-1980",
+        "religion": "Islam",
+        "education": "SD / Sederajat",
+        "occupation": "Ibu Rumah Tangga",
+        "maritalStatus": "Kawin",
+        "relation": "Istri",
+        "bloodType": "O",
+        "fatherName": "Sahroni",
+        "motherName": "Acih",
+        "phone": "-"
+      }
+    ]
+  }
+]

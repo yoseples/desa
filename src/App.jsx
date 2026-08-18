@@ -132,6 +132,11 @@ export default function App() {
     addToast('Anggota keluarga berhasil dihapus!', 'info');
   };
 
+  const handleBatchImportFamilies = (importedList, mode) => {
+    StorageService.batchImportFamilies(importedList, mode);
+    addToast(`Berhasil mengimpor ${importedList.length} data Kartu Keluarga!`, 'success');
+  };
+
   // Handlers for public letter submission
   const handleOpenServiceModal = (type = 'SKU') => {
     setSelectedLetterType(type);
@@ -302,6 +307,7 @@ export default function App() {
                 onDeleteFamily={handleDeleteFamily}
                 onAddMember={handleAddMember}
                 onDeleteMember={handleDeleteMember}
+                onBatchImport={handleBatchImportFamilies}
                 profile={profile}
               />
             )}

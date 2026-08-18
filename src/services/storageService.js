@@ -72,6 +72,22 @@ export const StorageService = {
     this.saveFamilies(updated);
     return newFamily;
   },
+  batchImportFamilies(newFamilies, mode = 'append') {
+    if (mode === 'replace') {
+      this.saveFamilies(newFamilies);
+      return newFamilies;
+    } else {
+      const existing = this.getFamilies();
+      const existingMap = new Map(existing.map(f => [f.noKk, f]));
+      // merge or add
+      newFamilies.forEach(nf => {
+        existingMap.set(nf.noKk, nf);
+      });
+      const updated = Array.from(existingMap.values());
+      this.saveFamilies(updated);
+      return updated;
+    }
+  },
   updateFamily(id, updatedFields) {
     const list = this.getFamilies();
     const updated = list.map(item => item.id === id ? { ...item, ...updatedFields } : item);
