@@ -1952,22 +1952,30 @@ export default function AdminCitizens({
                 
                 {/* 1. KOP KARTU KELUARGA: GARUDA, JUDUL & REGISTER CODE */}
                 <div style={{ display: 'grid', gridTemplateColumns: '60px 1fr 140px', alignItems: 'center', marginBottom: '0.2rem' }}>
-                  {/* Garuda Pancasila Emblem */}
+                  {/* Garuda Pancasila Emblem or Custom Uploaded Logo */}
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
-                    <svg width="52" height="52" viewBox="0 0 100 100">
-                      <g fill="#d97706" stroke="#b45309" strokeWidth="0.8">
-                        <path d="M50,12 C54,8 64,10 67,16 C71,23 77,33 87,36 C79,40 74,48 71,58 C67,53 61,50 57,53 C53,56 49,63 49,73 C49,63 45,56 41,53 C37,50 31,53 27,58 C24,48 19,40 11,36 C21,33 27,23 31,16 C34,10 44,8 48,12 Z" fill="#eab308" />
-                        <path d="M49,10 L51,10 L52,14 L50,17 L48,14 Z" fill="#ca8a04" />
-                        <path d="M38,32 L62,32 L60,56 L50,64 L40,56 Z" fill="#ffffff" stroke="#000000" strokeWidth="1.2" />
-                        <path d="M38,32 L50,32 L50,46 L38,46 Z" fill="#dc2626" />
-                        <path d="M50,32 L62,32 L62,46 L50,46 Z" fill="#ffffff" />
-                        <path d="M38,46 L50,46 L50,59 L40,56 Z" fill="#ffffff" />
-                        <path d="M50,46 L62,46 L60,56 L50,59 Z" fill="#dc2626" />
-                        <circle cx="50" cy="45" r="3.5" fill="#facc15" stroke="#000" strokeWidth="0.5" />
-                        <rect x="22" y="75" width="56" height="8" rx="1.5" fill="#ffffff" stroke="#000000" strokeWidth="0.8" />
-                        <text x="50" y="81" fontSize="4.2" fontWeight="bold" textAnchor="middle" fill="#000000">BHINNEKA TUNGGAL IKA</text>
-                      </g>
-                    </svg>
+                    {profile?.kkLogo ? (
+                      <img 
+                        src={profile.kkLogo} 
+                        alt="Logo KK" 
+                        style={{ width: '52px', height: '52px', objectFit: 'contain' }} 
+                      />
+                    ) : (
+                      <svg width="52" height="52" viewBox="0 0 100 100">
+                        <g fill="#d97706" stroke="#b45309" strokeWidth="0.8">
+                          <path d="M50,12 C54,8 64,10 67,16 C71,23 77,33 87,36 C79,40 74,48 71,58 C67,53 61,50 57,53 C53,56 49,63 49,73 C49,63 45,56 41,53 C37,50 31,53 27,58 C24,48 19,40 11,36 C21,33 27,23 31,16 C34,10 44,8 48,12 Z" fill="#eab308" />
+                          <path d="M49,10 L51,10 L52,14 L50,17 L48,14 Z" fill="#ca8a04" />
+                          <path d="M38,32 L62,32 L60,56 L50,64 L40,56 Z" fill="#ffffff" stroke="#000000" strokeWidth="1.2" />
+                          <path d="M38,32 L50,32 L50,46 L38,46 Z" fill="#dc2626" />
+                          <path d="M50,32 L62,32 L62,46 L50,46 Z" fill="#ffffff" />
+                          <path d="M38,46 L50,46 L50,59 L40,56 Z" fill="#ffffff" />
+                          <path d="M50,46 L62,46 L60,56 L50,59 Z" fill="#dc2626" />
+                          <circle cx="50" cy="45" r="3.5" fill="#facc15" stroke="#000" strokeWidth="0.5" />
+                          <rect x="22" y="75" width="56" height="8" rx="1.5" fill="#ffffff" stroke="#000000" strokeWidth="0.8" />
+                          <text x="50" y="81" fontSize="4.2" fontWeight="bold" textAnchor="middle" fill="#000000">BHINNEKA TUNGGAL IKA</text>
+                        </g>
+                      </svg>
+                    )}
                   </div>
 
                   {/* Header Title */}

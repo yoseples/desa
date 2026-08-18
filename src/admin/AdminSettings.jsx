@@ -88,6 +88,8 @@ export default function AdminSettings({ profile, onUpdateProfile }) {
         setFormData(prev => ({ ...prev, officePhoto: base64 }));
       } else if (fieldPath === 'favicon') {
         setFormData(prev => ({ ...prev, favicon: base64 }));
+      } else if (fieldPath === 'kkLogo') {
+        setFormData(prev => ({ ...prev, kkLogo: base64 }));
       } else if (fieldPath === 'ogImage') {
         setFormData(prev => ({
           ...prev,
@@ -331,6 +333,38 @@ export default function AdminSettings({ profile, onUpdateProfile }) {
                     <Upload size={13} /> Ganti Foto Kades
                     <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handleImageFileChange(e, 'headPhoto')} />
                   </label>
+                </div>
+
+                {/* Logo Kartu Keluarga (KK) */}
+                <div style={{ background: '#ffffff', padding: '1rem', borderRadius: '10px', border: '1px solid var(--light-border)', textAlign: 'center' }}>
+                  <label className="form-label">Logo Dokumen KK</label>
+                  <div style={{ height: '70px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '0.75rem' }}>
+                    {formData.kkLogo ? (
+                      <img src={formData.kkLogo} alt="Logo KK" style={{ maxHeight: '65px', objectFit: 'contain' }} />
+                    ) : (
+                      <div style={{ textAlign: 'center' }}>
+                        <span style={{ fontSize: '0.8rem', color: '#059669', fontWeight: 700, display: 'block' }}>🦅 Garuda Pancasila</span>
+                        <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Standar Blangko Resmi</span>
+                      </div>
+                    )}
+                  </div>
+                  <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap' }}>
+                    <label className="btn btn-secondary btn-sm" style={{ flex: 1, cursor: 'pointer', fontSize: '0.75rem' }}>
+                      <Upload size={12} /> Ganti Logo KK
+                      <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handleImageFileChange(e, 'kkLogo')} />
+                    </label>
+                    {formData.kkLogo && (
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        style={{ color: '#dc2626', fontSize: '0.75rem', padding: '0.3rem 0.5rem' }}
+                        onClick={() => setFormData(prev => ({ ...prev, kkLogo: '' }))}
+                        title="Kembalikan ke Garuda Pancasila"
+                      >
+                        Reset Garuda
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
