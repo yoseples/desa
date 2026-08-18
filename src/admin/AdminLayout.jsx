@@ -54,10 +54,10 @@ export default function AdminLayout({
     {
       title: 'Publikasi & Potensi',
       items: [
-        { id: 'news', label: 'Kelola Berita Desa', icon: Newspaper },
-        { id: 'umkm', label: 'Kelola Produk UMKM', icon: ShoppingBag },
-        { id: 'tourism', label: 'Kelola Wisata Desa', icon: Palmtree },
-        { id: 'gallery', label: 'Kelola Galeri Foto', icon: Image },
+        { id: 'news', label: 'Berita Desa', icon: Newspaper },
+        { id: 'umkm', label: 'Produk UMKM', icon: ShoppingBag },
+        { id: 'tourism', label: 'Wisata Desa', icon: Palmtree },
+        { id: 'gallery', label: 'Galeri Foto', icon: Image },
       ]
     },
     {

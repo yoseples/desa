@@ -80,10 +80,10 @@ export default function AdminDashboard({
             <Sparkles size={12} /> Dashboard Administrasi Terpadu
           </div>
           <h2 style={{ fontSize: '1.4rem', fontWeight: 800, margin: '0 0 0.35rem 0', color: '#ffffff' }}>
-            Pusat Kendali & Tata Kelola Digital {profile?.name || 'Desa Sukamaju'}
+            Pusat Kendali & Layanan Digital {profile?.name || 'Desa Sukamaju'}
           </h2>
           <p style={{ fontSize: '0.85rem', color: '#94a3b8', margin: 0, lineHeight: 1.5 }}>
-            Kelola data kependudukan, validasi permohonan surat warga secara real-time, pantau transparansi APBDes, dan integrasi BUMDes.
+            Data kependudukan terpadu, validasi permohonan surat warga secara real-time, transparansi APBDes, dan integrasi BUMDes.
           </p>
         </div>
 
@@ -250,7 +250,7 @@ export default function AdminDashboard({
               <FileText size={16} color="#2563eb" /> Antrean Permohonan Surat Online
             </h3>
             <button className="btn btn-secondary btn-sm" onClick={() => setActiveTab('services')} style={{ fontSize: '0.75rem' }}>
-              Kelola Semua ({requestsList.length})
+              Lihat Semua ({requestsList.length})
             </button>
           </div>
 
