@@ -35,6 +35,7 @@ import AdminComplaints from './admin/AdminComplaints';
 import AdminSettings from './admin/AdminSettings';
 
 import { StorageService } from './services/storageService';
+import { applyThemeToDocument } from './services/themeHelper';
 
 // Helper function to resolve page from pathname
 const getPageFromPath = (path) => {
@@ -135,36 +136,9 @@ export default function App() {
 
   // Dynamic Theme & CSS Variables Application
   useEffect(() => {
-    const theme = profile?.theme;
-    if (!theme) return;
-
-    const root = document.documentElement;
-
-    // 1. Primary & Theme Colors
-    if (theme.primaryColor) {
-      root.style.setProperty('--primary', theme.primaryColor);
-      root.style.setProperty('--primary-hover', theme.primaryColor);
-      root.style.setProperty('--primary-light', `${theme.primaryColor}18`);
-      root.style.setProperty('--primary-border', `${theme.primaryColor}35`);
+    if (profile?.theme) {
+      applyThemeToDocument(profile.theme);
     }
-
-    // 2. Typography
-    if (theme.fontFamily) {
-      root.style.setProperty('--font-main', theme.fontFamily);
-    }
-    if (theme.baseFontSize) {
-      root.style.fontSize = theme.baseFontSize;
-    }
-    if (theme.letterSpacing) {
-      root.style.letterSpacing = theme.letterSpacing;
-    }
-
-    // 3. Layout & Radius
-    if (theme.borderRadius) {
-      root.style.setProperty('--radius-md', theme.borderRadius);
-      root.style.setProperty('--radius-lg', `calc(${theme.borderRadius} * 1.3)`);
-    }
-
   }, [profile?.theme]);
 
   // Modals

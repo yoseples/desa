@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Building, 
   Layout, 
@@ -19,6 +19,7 @@ import {
   Image as ImageIcon
 } from 'lucide-react';
 import { defaultThemeSettings } from '../services/initialData';
+import { applyThemeToDocument } from '../services/themeHelper';
 
 export default function AdminSettings({ profile, onUpdateProfile }) {
   const [activeTab, setActiveTab] = useState('general'); // 'general', 'layout', 'styling', 'typography'
@@ -32,6 +33,13 @@ export default function AdminSettings({ profile, onUpdateProfile }) {
       }
     };
   });
+
+  // Live real-time preview of changes
+  useEffect(() => {
+    if (formData?.theme) {
+      applyThemeToDocument(formData.theme);
+    }
+  }, [formData?.theme]);
 
   const [savedNotice, setSavedNotice] = useState(false);
 
