@@ -46,7 +46,7 @@ export default function AdminLayout({
     {
       title: 'Pelayanan & Aspirasi',
       items: [
-        { id: 'services', label: 'Permohonan Masuk', icon: FileText, badge: pendingCount, badgeColor: '#2563eb' },
+        { id: 'services', label: 'Permohonan', icon: FileText, badge: pendingCount, badgeColor: '#2563eb' },
         { id: 'letter-templates', label: 'Template Surat', icon: Printer },
         { id: 'complaints', label: 'Pengaduan', icon: MessageSquare, badge: complaintCount, badgeColor: '#dc2626' },
       ]
