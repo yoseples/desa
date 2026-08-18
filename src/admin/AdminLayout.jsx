@@ -40,7 +40,7 @@ export default function AdminLayout({
       items: [
         { id: 'dashboard', label: 'Ringkasan & Statistik', icon: LayoutDashboard },
         { id: 'programs', label: 'Program Kerja & APBDes', icon: Briefcase, badge: programCount, badgeColor: '#059669' },
-        { id: 'citizens', label: 'Database KK & Warga', icon: Users, badge: familyCount, badgeColor: '#0d9488' },
+        { id: 'citizens', label: 'Database', icon: Users, badge: familyCount, badgeColor: '#0d9488' },
       ]
     },
     {
