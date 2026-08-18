@@ -33,6 +33,26 @@ export const officialLetterTemplates = [
     closingText: "Demikian Surat Keterangan Usaha ini kami buat dengan sebenarnya agar dapat dipergunakan sebagai persyaratan pengajuan bantuan permodalan / perbankan sebagaimana mestinya."
   },
   {
+    id: "SURAT_UNDANGAN",
+    code: "005/UND-DESA",
+    name: "Surat Undangan Resmi Musyawarah Desa / Rapat",
+    category: "Pemerintahan & Partisipasi",
+    description: "Surat undangan resmi rapat pleno, musyawarah pembangunan desa (Musrenbangdes), atau pertemuan kelembagaan ber-Kop Pemdes.",
+    fields: [
+      { key: "meetingSubject", label: "Perihal / Hal Undangan", placeholder: "Undangan Musyawarah Rencana Kerja Pemerintah Desa (Musrenbangdes) T.A. 2027" },
+      { key: "meetingNature", label: "Sifat Surat", placeholder: "Penting / Undangan Resmi" },
+      { key: "meetingAttachment", label: "Lampiran Berkas", placeholder: "1 (Satu) Lembar Susunan Acara" },
+      { key: "meetingRecipient", label: "Kepada Yth. (Tujuan Undangan)", placeholder: "Ketua BPD, Ketua LPMD, Seluruh Ketua RW (01 s.d. 10), Seluruh Ketua RT (01 s.d. 20), dan Tokoh Masyarakat" },
+      { key: "meetingDateTime", label: "Hari, Tanggal & Pukul", placeholder: "Senin, 25 Agustus 2026 Pukul 08.30 WIB s.d. Selesai" },
+      { key: "meetingLocation", label: "Tempat / Lokasi Acara", placeholder: "Aula Balai Desa Sukamaju Mandiri" },
+      { key: "meetingAgenda", label: "Agenda Utama Musyawarah", placeholder: "Pembahasan Prioritas Dana Desa 2027 & Penetapan Program Ketahanan Pangan" },
+      { key: "meetingNotes", label: "Catatan / Pakaian", placeholder: "Pakaian Batik / Rapi, dimohon hadir 15 menit sebelum acara dimulai" }
+    ],
+    openingText: "Dengan hormat, sehubungan dengan agenda tahunan perencanaan pembangunan partisipatif masyarakat desa, Pemerintah Desa Sukamaju Mandiri mengundang kehadiran Bapak/Ibu/Saudara pada:",
+    bodyParagraph: "Mengingat arti penting dan strategisnya agenda musyawarah ini bagi kemajuan pembangunan desa kita, kami sangat mengharapkan kehadiran Bapak/Ibu tepat pada waktunya.",
+    closingText: "Demikian surat undangan ini kami sampaikan. Atas perhatian, kehadiran, dan kerjasamanya kami ucapkan terima kasih."
+  },
+  {
     id: "SKTM",
     code: "400/SKTM",
     name: "Surat Keterangan Tidak Mampu (SKTM)",
@@ -167,21 +187,5 @@ export const officialLetterTemplates = [
     openingText: "Kepala Desa Sukamaju Mandiri dengan ini MENUGASKAN kepada:",
     bodyParagraph: "Untuk melaksanakan tugas kedinasan sebagaimana tercantum di atas dengan penuh tanggung jawab dan melaporkan hasil pelaksanaannya kepada Kepala Desa.",
     closingText: "Surat perintah tugas ini diberikan agar dilaksanakan dengan sebaik-baiknya."
-  },
-  {
-    id: "SURAT_UNDANGAN",
-    code: "005/UND-DESA",
-    name: "Surat Undangan Musyawarah Desa (Musrenbangdes)",
-    category: "Pemerintahan & Partisipasi",
-    description: "Surat undangan resmi rapat pleno, musyawarah pembangunan desa, atau pertemuan warga ber-Kop Pemdes.",
-    fields: [
-      { key: "meetingAgenda", label: "Agenda Musyawarah", placeholder: "Musyawarah Rencana Kerja Pemerintah Desa (RKPDes) Tahun Anggaran 2027" },
-      { key: "meetingDateTime", label: "Hari, Tanggal & Waktu", placeholder: "Sabtu, 30 Agustus 2026 Pukul 09.00 WIB s.d. Selesai" },
-      { key: "meetingLocation", label: "Tempat Acara", placeholder: "Aula Balai Desa Sukamaju Mandiri" },
-      { key: "meetingAttendees", label: "Pihak yang Diundang", placeholder: "Ketua BPD, Ketua LPMD, Seluruh Ketua RW & RT, Tokoh Agama & Masyarakat" }
-    ],
-    openingText: "Sehubungan dengan pelaksanaan agenda pembangunan desa, kami mengundang Bapak/Ibu untuk hadir pada:",
-    bodyParagraph: "Mengingat pentingnya agenda musyawarah tersebut, kami memohon kehadiran Bapak/Ibu tepat pada waktu yang telah ditentukan.",
-    closingText: "Demikian undangan ini kami sampaikan, atas perhatian dan kerjasamanya kami ucapkan terima kasih."
   }
 ];

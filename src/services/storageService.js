@@ -17,8 +17,88 @@ const STORAGE_KEYS = {
   TOURISM: 'desa_tourism_data',
   GALLERY: 'desa_gallery_data',
   REQUESTS: 'desa_requests_data',
-  COMPLAINTS: 'desa_complaints_data'
+  COMPLAINTS: 'desa_complaints_data',
+  OUTGOING_LETTERS: 'desa_outgoing_letters_data',
+  INCOMING_LETTERS: 'desa_incoming_letters_data'
 };
+
+const initialOutgoingLetters = [
+  {
+    id: "OUT-001",
+    letterNumber: "500/014/DS-SKM/VIII/2026",
+    letterType: "SKU",
+    letterName: "Surat Keterangan Usaha (SKU)",
+    recipientName: "Bambang Sudrajat",
+    recipientNik: "3204151208850002",
+    date: "17 Agustus 2026",
+    purpose: "Persyaratan Pengajuan KUR Bank BRI",
+    signer: "H. Budi Santoso, S.AP"
+  },
+  {
+    id: "OUT-002",
+    letterNumber: "400/008/DS-SKM/VIII/2026",
+    letterType: "SKTM",
+    letterName: "Surat Keterangan Tidak Mampu (SKTM)",
+    recipientName: "Iis Aisyah",
+    recipientNik: "3204155503920001",
+    date: "18 Agustus 2026",
+    purpose: "Keringanan SPP Kuliah PTN",
+    signer: "H. Budi Santoso, S.AP"
+  },
+  {
+    id: "OUT-003",
+    letterNumber: "005/022/UND-DESA/VIII/2026",
+    letterType: "SURAT_UNDANGAN",
+    letterName: "Surat Undangan Musyawarah Desa (Musrenbangdes)",
+    recipientName: "Ketua BPD, LPMD, Seluruh Ketua RW & RT",
+    recipientNik: "-",
+    date: "18 Agustus 2026",
+    purpose: "Penyusunan RKPDes Tahun Anggaran 2027",
+    signer: "H. Budi Santoso, S.AP"
+  }
+];
+
+const initialIncomingLetters = [
+  {
+    id: "INC-001",
+    agendaNumber: "AG-2026-042",
+    letterNumber: "005/312/KEC/VIII/2026",
+    letterDate: "15 Agustus 2026",
+    receivedDate: "16 Agustus 2026",
+    sender: "Kantor Kecamatan Harapan Makmur",
+    subject: "Undangan Rapat Koordinasi Evaluasi Penyaluran Dana Desa Triwulan II",
+    disposition: "Sekdes & Kasi Pelayanan agar hadir mewakili Kepala Desa dan membawa laporan realisasi SPJ.",
+    dispositionTo: "Sekretaris Desa",
+    status: "SELESAI",
+    scanFile: "https://images.unsplash.com/photo-1568667256549-094345857637?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    id: "INC-002",
+    agendaNumber: "AG-2026-043",
+    letterNumber: "440/128/PKM-HM/VIII/2026",
+    letterDate: "16 Agustus 2026",
+    receivedDate: "17 Agustus 2026",
+    sender: "UPTD Puskesmas Harapan Makmur",
+    subject: "Pemberitahuan Pelaksanaan Bulan Imunisasi Anak Sekolah (BIAS) & Skrining Gigi",
+    disposition: "Koordinasikan dengan kader Posyandu, Bidan Desa, dan seluruh Kepala Dusun.",
+    dispositionTo: "Kasi Kesejahteraan (Kesra)",
+    status: "PROSES",
+    scanFile: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    id: "INC-003",
+    agendaNumber: "AG-2026-044",
+    letterNumber: "410/580/DPMD/VIII/2026",
+    letterDate: "17 Agustus 2026",
+    receivedDate: "18 Agustus 2026",
+    sender: "Dinas Pemberdayaan Masyarakat dan Desa (DPMD) Kabupaten Nusantara",
+    subject: "Sosialisasi Lomba Inovasi Teknologi Tepat Guna (TTG) dan Digitalisasi Desa Tingkat Kabupaten",
+    disposition: "Kaur Perencanaan dan Pengelola BUMDes segera menyusun proposal inovasi Smart Village.",
+    dispositionTo: "Kaur Perencanaan & BUMDes",
+    status: "MENUNGGU",
+    scanFile: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=800&q=80"
+  }
+];
 
 function getFromStorage(key, fallback) {
   try {
@@ -27,13 +107,7 @@ function getFromStorage(key, fallback) {
       localStorage.setItem(key, JSON.stringify(fallback));
       return fallback;
     }
-    const parsed = JSON.parse(item);
-    // If profile and apparatus count is smaller than initial, update with enriched list
-    if (key === STORAGE_KEYS.PROFILE && parsed.apparatus && parsed.apparatus.length < 15 && fallback.apparatus) {
-      parsed.apparatus = fallback.apparatus;
-      localStorage.setItem(key, JSON.stringify(parsed));
-    }
-    return parsed;
+    return JSON.parse(item);
   } catch (e) {
     console.error('Storage error:', e);
     return fallback;
@@ -163,6 +237,68 @@ export const StorageService = {
     if (!nik) return null;
     const citizens = this.getAllCitizens();
     return citizens.find(c => c.nik === nik.trim()) || null;
+  },
+
+  // Outgoing Letters Archive (Buku Agenda Surat Keluar)
+  getOutgoingLetters() {
+    return getFromStorage(STORAGE_KEYS.OUTGOING_LETTERS, initialOutgoingLetters);
+  },
+  saveOutgoingLetters(list) {
+    saveToStorage(STORAGE_KEYS.OUTGOING_LETTERS, list);
+    return list;
+  },
+  addOutgoingLetter(letterData) {
+    const list = this.getOutgoingLetters();
+    const now = new Date();
+    const formattedDate = `${now.getDate()} ${now.toLocaleString('id-ID', { month: 'long' })} ${now.getFullYear()}`;
+    const newLetter = {
+      ...letterData,
+      id: `OUT-${Date.now()}`,
+      date: letterData.date || formattedDate
+    };
+    const updated = [newLetter, ...list];
+    this.saveOutgoingLetters(updated);
+    return newLetter;
+  },
+  deleteOutgoingLetter(id) {
+    const list = this.getOutgoingLetters();
+    const updated = list.filter(l => l.id !== id);
+    this.saveOutgoingLetters(updated);
+    return updated;
+  },
+
+  // Incoming Letters Archive (Buku Agenda Surat Masuk & Scan)
+  getIncomingLetters() {
+    return getFromStorage(STORAGE_KEYS.INCOMING_LETTERS, initialIncomingLetters);
+  },
+  saveIncomingLetters(list) {
+    saveToStorage(STORAGE_KEYS.INCOMING_LETTERS, list);
+    return list;
+  },
+  addIncomingLetter(item) {
+    const list = this.getIncomingLetters();
+    const randomAg = Math.floor(100 + Math.random() * 899);
+    const newDoc = {
+      ...item,
+      id: `INC-${Date.now()}`,
+      agendaNumber: item.agendaNumber || `AG-2026-${randomAg}`,
+      status: item.status || 'MENUNGGU'
+    };
+    const updated = [newDoc, ...list];
+    this.saveIncomingLetters(updated);
+    return newDoc;
+  },
+  updateIncomingLetter(id, updatedFields) {
+    const list = this.getIncomingLetters();
+    const updated = list.map(item => item.id === id ? { ...item, ...updatedFields } : item);
+    this.saveIncomingLetters(updated);
+    return updated;
+  },
+  deleteIncomingLetter(id) {
+    const list = this.getIncomingLetters();
+    const updated = list.filter(l => l.id !== id);
+    this.saveIncomingLetters(updated);
+    return updated;
   },
 
   // News
@@ -381,14 +517,7 @@ export const StorageService = {
 
   // Reset to initial
   resetToDefaults() {
-    localStorage.removeItem(STORAGE_KEYS.PROFILE);
-    localStorage.removeItem(STORAGE_KEYS.FAMILIES);
-    localStorage.removeItem(STORAGE_KEYS.NEWS);
-    localStorage.removeItem(STORAGE_KEYS.UMKM);
-    localStorage.removeItem(STORAGE_KEYS.TOURISM);
-    localStorage.removeItem(STORAGE_KEYS.GALLERY);
-    localStorage.removeItem(STORAGE_KEYS.REQUESTS);
-    localStorage.removeItem(STORAGE_KEYS.COMPLAINTS);
+    localStorage.clear();
     window.location.reload();
   }
 };

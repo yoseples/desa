@@ -15,18 +15,33 @@ import {
   Plus, 
   Download,
   ExternalLink,
-  ChevronRight
+  ChevronRight,
+  Inbox,
+  Send,
+  Upload,
+  Trash2,
+  Calendar,
+  X,
+  FileDown
 } from 'lucide-react';
 import { officialLetterTemplates, defaultLetterheadConfig } from '../services/letterTemplatesData';
 import { StorageService } from '../services/storageService';
 
 export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
-  const [activeTab, setActiveTab] = useState('generator'); // 'generator', 'letterhead', 'catalog'
+  const [activeTab, setActiveTab] = useState('generator'); // 'generator', 'outgoing', 'incoming', 'letterhead', 'catalog'
 
   // Letterhead Configuration State
   const [letterhead, setLetterhead] = useState(() => {
     return profile?.letterhead || defaultLetterheadConfig;
   });
+
+  // Outgoing and Incoming Letters state from StorageService
+  const [outgoingLetters, setOutgoingLetters] = useState(() => StorageService.getOutgoingLetters());
+  const [incomingLetters, setIncomingLetters] = useState(() => StorageService.getIncomingLetters());
+
+  // Search and Filters
+  const [outgoingSearch, setOutgoingSearch] = useState('');
+  const [incomingSearch, setIncomingSearch] = useState('');
 
   // Generator State
   const [selectedTemplateId, setSelectedTemplateId] = useState('SKU');
@@ -44,11 +59,37 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
     businessType: 'Kuliner & Warung Kopi',
     businessAddress: 'Jl. Raya Desa Sukamaju No. 45',
     businessDuration: 'Sejak Tahun 2019',
-    purpose: 'Persyaratan Pengajuan KUR Bank BRI'
+    purpose: 'Persyaratan Pengajuan KUR Bank BRI',
+    meetingSubject: 'Undangan Musyawarah Rencana Kerja Pemerintah Desa (Musrenbangdes) T.A. 2027',
+    meetingNature: 'Penting / Undangan Resmi',
+    meetingAttachment: '1 (Satu) Lembar Susunan Acara',
+    meetingRecipient: 'Ketua BPD, Ketua LPMD, Seluruh Ketua RW (01 s.d. 10), Seluruh Ketua RT (01 s.d. 20)',
+    meetingDateTime: 'Senin, 25 Agustus 2026 Pukul 08.30 WIB s.d. Selesai',
+    meetingLocation: 'Aula Balai Desa Sukamaju Mandiri',
+    meetingAgenda: 'Pembahasan Prioritas Dana Desa 2027 & Penetapan Program Ketahanan Pangan',
+    meetingNotes: 'Pakaian Batik / Rapi, dimohon hadir 15 menit sebelum acara dimulai'
   });
 
   const [autofillSuccess, setAutofillSuccess] = useState(false);
-  const [previewModal, setPreviewModal] = useState(false);
+  const [saveArchiveNotice, setSaveArchiveNotice] = useState(false);
+
+  // Incoming Letter Modal State
+  const [incomingModal, setIncomingModal] = useState(false);
+  const [incomingForm, setIncomingForm] = useState({
+    agendaNumber: '',
+    letterNumber: '',
+    letterDate: '',
+    receivedDate: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
+    sender: '',
+    subject: '',
+    disposition: '',
+    dispositionTo: 'Sekretaris Desa',
+    status: 'MENUNGGU',
+    scanFile: ''
+  });
+
+  // Modal View Scan File
+  const [viewScanModal, setViewScanModal] = useState(null);
 
   const currentTemplate = officialLetterTemplates.find(t => t.id === selectedTemplateId) || officialLetterTemplates[0];
 
@@ -78,8 +119,73 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
     alert('Pengaturan Kop Surat & Template Berhasil Disimpan!');
   };
 
+  // Print & Auto-Archive to Outgoing Letters Registry
   const handlePrintDocument = () => {
+    // 1. Save to Outgoing Archive
+    const recipient = selectedTemplateId === 'SURAT_UNDANGAN' 
+      ? (dynamicFieldValues.meetingRecipient || 'Tokoh & Lembaga Desa')
+      : (citizenName || 'Warga Desa');
+
+    const created = StorageService.addOutgoingLetter({
+      letterNumber,
+      letterType: selectedTemplateId,
+      letterName: currentTemplate.name,
+      recipientName: recipient,
+      recipientNik: citizenNik || '-',
+      purpose: dynamicFieldValues.purpose || dynamicFieldValues.meetingSubject || 'Pelayanan Desa',
+      signer: letterhead.signatoryName
+    });
+
+    setOutgoingLetters(StorageService.getOutgoingLetters());
+    setSaveArchiveNotice(true);
+    setTimeout(() => setSaveArchiveNotice(false), 4000);
+
+    // 2. Trigger Print Dialog
     window.print();
+  };
+
+  // Incoming Letter Scan Upload Handler
+  const handleScanFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Ukuran file scan maksimal 5 MB!');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setIncomingForm(prev => ({ ...prev, scanFile: event.target.result }));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSaveIncomingLetter = (e) => {
+    e.preventDefault();
+    if (!incomingForm.letterNumber || !incomingForm.sender) {
+      alert('Nomor Surat dan Asal Instansi Pengirim wajib diisi!');
+      return;
+    }
+
+    StorageService.addIncomingLetter(incomingForm);
+    setIncomingLetters(StorageService.getIncomingLetters());
+    setIncomingModal(false);
+    alert('Surat Masuk & Hasil Scan Berhasil Diarsipkan!');
+  };
+
+  const handleDeleteIncoming = (id) => {
+    if (window.confirm('Hapus arsip surat masuk ini?')) {
+      const updated = StorageService.deleteIncomingLetter(id);
+      setIncomingLetters(updated);
+    }
+  };
+
+  const handleDeleteOutgoing = (id) => {
+    if (window.confirm('Hapus arsip surat keluar ini?')) {
+      const updated = StorageService.deleteOutgoingLetter(id);
+      setOutgoingLetters(updated);
+    }
   };
 
   const currentDate = new Date().toLocaleDateString('id-ID', {
@@ -87,6 +193,18 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
     month: 'long',
     year: 'numeric'
   });
+
+  const filteredOutgoing = outgoingLetters.filter(l => 
+    l.letterNumber.toLowerCase().includes(outgoingSearch.toLowerCase()) ||
+    l.recipientName.toLowerCase().includes(outgoingSearch.toLowerCase()) ||
+    l.letterName.toLowerCase().includes(outgoingSearch.toLowerCase())
+  );
+
+  const filteredIncoming = incomingLetters.filter(l => 
+    l.letterNumber.toLowerCase().includes(incomingSearch.toLowerCase()) ||
+    l.sender.toLowerCase().includes(incomingSearch.toLowerCase()) ||
+    l.subject.toLowerCase().includes(incomingSearch.toLowerCase())
+  );
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -108,6 +226,18 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
           <FileText size={15} /> Buat & Cetak Surat Cepat
         </button>
         <button
+          className={`btn btn-sm ${activeTab === 'outgoing' ? 'btn-primary' : 'btn-secondary'}`}
+          onClick={() => setActiveTab('outgoing')}
+        >
+          <Send size={15} /> 📤 Arsip Surat Keluar ({outgoingLetters.length})
+        </button>
+        <button
+          className={`btn btn-sm ${activeTab === 'incoming' ? 'btn-primary' : 'btn-secondary'}`}
+          onClick={() => setActiveTab('incoming')}
+        >
+          <Inbox size={15} /> 📥 Arsip Surat Masuk & Scan ({incomingLetters.length})
+        </button>
+        <button
           className={`btn btn-sm ${activeTab === 'letterhead' ? 'btn-primary' : 'btn-secondary'}`}
           onClick={() => setActiveTab('letterhead')}
         >
@@ -117,9 +247,26 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
           className={`btn btn-sm ${activeTab === 'catalog' ? 'btn-primary' : 'btn-secondary'}`}
           onClick={() => setActiveTab('catalog')}
         >
-          <Layers size={15} /> Katalog 11 Template Resmi Desa
+          <Layers size={15} /> Katalog Template Resmi
         </button>
       </div>
+
+      {saveArchiveNotice && (
+        <div style={{
+          background: '#dcfce7',
+          border: '1px solid #86efac',
+          borderRadius: 'var(--radius-md)',
+          padding: '0.75rem 1.25rem',
+          color: '#166534',
+          fontWeight: 700,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem'
+        }}>
+          <CheckCircle2 size={18} color="#16a34a" />
+          Surat berhasil dicetak dan otomatis tercatat di <strong>Buku Agenda Arsip Surat Keluar</strong>!
+        </div>
+      )}
 
       {/* 2. TAB 1: GENERATOR & CETAK SURAT */}
       {activeTab === 'generator' && (
@@ -128,7 +275,7 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
           {/* Left Form: Inputs */}
           <div className="table-wrapper" style={{ padding: '1.5rem' }}>
             <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <FileText size={20} color="#059669" /> Formulir Generator Surat
+              <FileText size={20} color="#059669" /> Formulir Generator Dokumen Desa
             </h3>
 
             {/* Template Selector */}
@@ -167,83 +314,86 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
               />
             </div>
 
-            {/* NIK Auto-Fill from Village DB */}
-            <div className="form-group" style={{ background: '#f8fafc', padding: '1rem', borderRadius: '10px', border: '1px solid var(--light-border)' }}>
-              <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>Cari Warga dari Database Desa:</span>
-                <span style={{ fontSize: '0.75rem', color: '#059669', fontWeight: 700 }}>Otomatis Terisi</span>
-              </label>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <input
-                  type="text"
-                  placeholder="Ketik NIK 16 Digit..."
-                  className="form-control"
-                  value={citizenNik}
-                  onChange={(e) => setCitizenNik(e.target.value)}
-                />
-                <button
-                  type="button"
-                  className="btn btn-secondary btn-sm"
-                  onClick={() => handleLookupCitizen(citizenNik)}
-                  style={{ flexShrink: 0 }}
-                >
-                  <Search size={14} /> Cek NIK
-                </button>
-              </div>
-              {autofillSuccess && (
-                <span style={{ fontSize: '0.75rem', color: '#16a34a', fontWeight: 700, display: 'block', marginTop: '4px' }}>
-                  ✓ Data warga berhasil ditemukan dan disalin!
-                </span>
-              )}
-            </div>
+            {/* If NOT Surat Undangan, show Citizen Lookup */}
+            {selectedTemplateId !== 'SURAT_UNDANGAN' && (
+              <>
+                <div className="form-group" style={{ background: '#f8fafc', padding: '1rem', borderRadius: '10px', border: '1px solid var(--light-border)' }}>
+                  <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span>Cari Warga dari Database Desa:</span>
+                    <span style={{ fontSize: '0.75rem', color: '#059669', fontWeight: 700 }}>Otomatis Terisi</span>
+                  </label>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <input
+                      type="text"
+                      placeholder="Ketik NIK 16 Digit..."
+                      className="form-control"
+                      value={citizenNik}
+                      onChange={(e) => setCitizenNik(e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-secondary btn-sm"
+                      onClick={() => handleLookupCitizen(citizenNik)}
+                      style={{ flexShrink: 0 }}
+                    >
+                      <Search size={14} /> Cek NIK
+                    </button>
+                  </div>
+                  {autofillSuccess && (
+                    <span style={{ fontSize: '0.75rem', color: '#16a34a', fontWeight: 700, display: 'block', marginTop: '4px' }}>
+                      ✓ Data warga berhasil ditemukan dan disalin!
+                    </span>
+                  )}
+                </div>
 
-            {/* Citizen Data Inputs */}
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Nama Pemohon *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Contoh: Bambang Sudrajat"
-                  className="form-control"
-                  value={citizenName}
-                  onChange={(e) => setCitizenName(e.target.value)}
-                />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Pekerjaan</label>
-                <input
-                  type="text"
-                  placeholder="Wiraswasta"
-                  className="form-control"
-                  value={citizenJob}
-                  onChange={(e) => setCitizenJob(e.target.value)}
-                />
-              </div>
-            </div>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label">Nama Pemohon *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Contoh: Bambang Sudrajat"
+                      className="form-control"
+                      value={citizenName}
+                      onChange={(e) => setCitizenName(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Pekerjaan</label>
+                    <input
+                      type="text"
+                      placeholder="Wiraswasta"
+                      className="form-control"
+                      value={citizenJob}
+                      onChange={(e) => setCitizenJob(e.target.value)}
+                    />
+                  </div>
+                </div>
 
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">RT / RW</label>
-                <input
-                  type="text"
-                  placeholder="RT 02 / RW 03"
-                  className="form-control"
-                  value={citizenRtRw}
-                  onChange={(e) => setCitizenRtRw(e.target.value)}
-                />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Alamat Rumah</label>
-                <input
-                  type="text"
-                  placeholder="Kp. Pasir Salam No. 14"
-                  className="form-control"
-                  value={citizenAddress}
-                  onChange={(e) => setCitizenAddress(e.target.value)}
-                />
-              </div>
-            </div>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label">RT / RW</label>
+                    <input
+                      type="text"
+                      placeholder="RT 02 / RW 03"
+                      className="form-control"
+                      value={citizenRtRw}
+                      onChange={(e) => setCitizenRtRw(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Alamat Rumah</label>
+                    <input
+                      type="text"
+                      placeholder="Kp. Pasir Salam No. 14"
+                      className="form-control"
+                      value={citizenAddress}
+                      onChange={(e) => setCitizenAddress(e.target.value)}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
 
             {/* Dynamic Specific Fields */}
             <div style={{ borderTop: '1px solid var(--light-border)', paddingTop: '1rem', marginTop: '0.5rem' }}>
@@ -266,19 +416,21 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
                 </div>
               ))}
 
-              <div className="form-group">
-                <label className="form-label">Keperluan / Keterangan Tambahan *</label>
-                <textarea
-                  rows={2}
-                  className="form-control"
-                  placeholder="Jelaskan tujuan penerbitan surat..."
-                  value={dynamicFieldValues.purpose || ''}
-                  onChange={(e) => setDynamicFieldValues({
-                    ...dynamicFieldValues,
-                    purpose: e.target.value
-                  })}
-                />
-              </div>
+              {selectedTemplateId !== 'SURAT_UNDANGAN' && (
+                <div className="form-group">
+                  <label className="form-label">Keperluan / Keterangan Tambahan *</label>
+                  <textarea
+                    rows={2}
+                    className="form-control"
+                    placeholder="Jelaskan tujuan penerbitan surat..."
+                    value={dynamicFieldValues.purpose || ''}
+                    onChange={(e) => setDynamicFieldValues({
+                      ...dynamicFieldValues,
+                      purpose: e.target.value
+                    })}
+                  />
+                </div>
+              )}
             </div>
 
             <button
@@ -287,7 +439,7 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
               style={{ width: '100%', marginTop: '0.5rem' }}
               onClick={handlePrintDocument}
             >
-              <Printer size={16} /> Cetak / Unduh Dokumen Resmi (PDF)
+              <Printer size={16} /> Cetak & Arsipkan Surat Keluar (PDF)
             </button>
           </div>
 
@@ -341,48 +493,93 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
                 </div>
               </div>
 
-              {/* JUDUL & NOMOR SURAT */}
-              <div style={{ textAlign: 'center', marginBottom: '1.25rem' }}>
-                <h3 style={{ fontSize: '12.5pt', fontWeight: 'bold', textTransform: 'uppercase', textDecoration: 'underline', margin: 0 }}>
-                  {currentTemplate.name}
-                </h3>
-                <p style={{ fontSize: '10pt', margin: '3px 0 0 0' }}>
-                  Nomor: {letterNumber}
-                </p>
-              </div>
+              {/* FORMAT SURAT UNDANGAN RESMI */}
+              {selectedTemplateId === 'SURAT_UNDANGAN' ? (
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', fontSize: '10.5pt' }}>
+                    <table style={{ width: '58%' }}>
+                      <tbody>
+                        <tr><td style={{ width: '70px' }}>Nomor</td><td style={{ width: '10px' }}>:</td><td>{letterNumber}</td></tr>
+                        <tr><td>Sifat</td><td>:</td><td>{dynamicFieldValues.meetingNature || 'Penting'}</td></tr>
+                        <tr><td>Lampiran</td><td>:</td><td>{dynamicFieldValues.meetingAttachment || '-'}</td></tr>
+                        <tr><td>Perihal</td><td>:</td><td style={{ fontWeight: 'bold' }}>{dynamicFieldValues.meetingSubject || 'Undangan Musyawarah'}</td></tr>
+                      </tbody>
+                    </table>
 
-              {/* ISI DRAF SURAT */}
-              <div style={{ textAlign: 'justify', fontSize: '10.5pt', marginBottom: '1rem' }}>
-                <p style={{ textIndent: '28px', margin: '0 0 0.75rem 0' }}>
-                  {currentTemplate.openingText}
-                </p>
-
-                {/* IDENTITAS WARGA */}
-                <table style={{ width: '100%', marginBottom: '0.75rem', borderCollapse: 'collapse', fontSize: '10.5pt' }}>
-                  <tbody>
-                    <tr><td style={{ width: '180px', padding: '2px 0' }}>Nama Lengkap</td><td style={{ width: '12px' }}>:</td><td style={{ fontWeight: 'bold' }}>{citizenName || '...........................................'}</td></tr>
-                    <tr><td style={{ padding: '2px 0' }}>NIK</td><td>:</td><td>{citizenNik || '...........................................'}</td></tr>
-                    <tr><td style={{ padding: '2px 0' }}>Pekerjaan</td><td>:</td><td>{citizenJob || '...........................................'}</td></tr>
-                    <tr><td style={{ padding: '2px 0' }}>Alamat Domisili</td><td>:</td><td>{citizenAddress || '...........................................'} ({citizenRtRw})</td></tr>
-                    <tr><td style={{ padding: '2px 0' }}>Desa / Kecamatan</td><td>:</td><td>Sukamaju Mandiri / Harapan Makmur</td></tr>
-                  </tbody>
-                </table>
-
-                <p style={{ textIndent: '28px', margin: '0 0 0.5rem 0' }}>
-                  {currentTemplate.bodyParagraph}
-                </p>
-
-                {/* RINCIAN KHUSUS */}
-                {currentTemplate.fields.map(f => (
-                  <div key={f.key} style={{ paddingLeft: '28px', margin: '2px 0' }}>
-                    • <strong>{f.label}:</strong> {dynamicFieldValues[f.key] || '-'}
+                    <div style={{ textAlign: 'left', width: '38%' }}>
+                      <p style={{ margin: 0 }}>Sukamaju, {currentDate}</p>
+                      <p style={{ margin: '4px 0 0 0' }}>Kepada Yth.</p>
+                      <p style={{ margin: 0, fontWeight: 'bold' }}>{dynamicFieldValues.meetingRecipient || 'Bapak/Ibu Tamu Undangan'}</p>
+                      <p style={{ margin: 0 }}>di Tempat</p>
+                    </div>
                   </div>
-                ))}
 
-                <p style={{ textIndent: '28px', marginTop: '0.75rem' }}>
-                  {currentTemplate.closingText}
-                </p>
-              </div>
+                  <p style={{ textIndent: '28px', margin: '0.75rem 0' }}>
+                    {currentTemplate.openingText}
+                  </p>
+
+                  <table style={{ width: '100%', margin: '0.5rem 0 0.75rem 28px', fontSize: '10.5pt' }}>
+                    <tbody>
+                      <tr><td style={{ width: '150px', padding: '2px 0' }}>Hari / Tanggal / Pukul</td><td style={{ width: '10px' }}>:</td><td style={{ fontWeight: 'bold' }}>{dynamicFieldValues.meetingDateTime}</td></tr>
+                      <tr><td style={{ padding: '2px 0' }}>Tempat Acara</td><td>:</td><td>{dynamicFieldValues.meetingLocation}</td></tr>
+                      <tr><td style={{ padding: '2px 0' }}>Agenda Utama</td><td>:</td><td style={{ fontWeight: 'bold' }}>{dynamicFieldValues.meetingAgenda}</td></tr>
+                      {dynamicFieldValues.meetingNotes && (
+                        <tr><td style={{ padding: '2px 0' }}>Catatan Khusus</td><td>:</td><td style={{ fontStyle: 'italic' }}>{dynamicFieldValues.meetingNotes}</td></tr>
+                      )}
+                    </tbody>
+                  </table>
+
+                  <p style={{ textIndent: '28px', margin: '0.5rem 0' }}>
+                    {currentTemplate.bodyParagraph}
+                  </p>
+
+                  <p style={{ textIndent: '28px', margin: '0.5rem 0' }}>
+                    {currentTemplate.closingText}
+                  </p>
+                </div>
+              ) : (
+                /* FORMAT SURAT KETERANGAN RESMI */
+                <div>
+                  <div style={{ textAlign: 'center', marginBottom: '1.25rem' }}>
+                    <h3 style={{ fontSize: '12.5pt', fontWeight: 'bold', textTransform: 'uppercase', textDecoration: 'underline', margin: 0 }}>
+                      {currentTemplate.name}
+                    </h3>
+                    <p style={{ fontSize: '10pt', margin: '3px 0 0 0' }}>
+                      Nomor: {letterNumber}
+                    </p>
+                  </div>
+
+                  <div style={{ textAlign: 'justify', fontSize: '10.5pt', marginBottom: '1rem' }}>
+                    <p style={{ textIndent: '28px', margin: '0 0 0.75rem 0' }}>
+                      {currentTemplate.openingText}
+                    </p>
+
+                    <table style={{ width: '100%', marginBottom: '0.75rem', borderCollapse: 'collapse', fontSize: '10.5pt' }}>
+                      <tbody>
+                        <tr><td style={{ width: '180px', padding: '2px 0' }}>Nama Lengkap</td><td style={{ width: '12px' }}>:</td><td style={{ fontWeight: 'bold' }}>{citizenName || '...........................................'}</td></tr>
+                        <tr><td style={{ padding: '2px 0' }}>NIK</td><td>:</td><td>{citizenNik || '...........................................'}</td></tr>
+                        <tr><td style={{ padding: '2px 0' }}>Pekerjaan</td><td>:</td><td>{citizenJob || '...........................................'}</td></tr>
+                        <tr><td style={{ padding: '2px 0' }}>Alamat Domisili</td><td>:</td><td>{citizenAddress || '...........................................'} ({citizenRtRw})</td></tr>
+                        <tr><td style={{ padding: '2px 0' }}>Desa / Kecamatan</td><td>:</td><td>Sukamaju Mandiri / Harapan Makmur</td></tr>
+                      </tbody>
+                    </table>
+
+                    <p style={{ textIndent: '28px', margin: '0 0 0.5rem 0' }}>
+                      {currentTemplate.bodyParagraph}
+                    </p>
+
+                    {currentTemplate.fields.map(f => (
+                      <div key={f.key} style={{ paddingLeft: '28px', margin: '2px 0' }}>
+                        • <strong>{f.label}:</strong> {dynamicFieldValues[f.key] || '-'}
+                      </div>
+                    ))}
+
+                    <p style={{ textIndent: '28px', marginTop: '0.75rem' }}>
+                      {currentTemplate.closingText}
+                    </p>
+                  </div>
+                </div>
+              )}
 
               {/* TANDA TANGAN & TTE QR */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginTop: '2rem', fontSize: '10pt' }}>
@@ -415,7 +612,227 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
         </div>
       )}
 
-      {/* 3. TAB 2: PENGATURAN KOP SURAT */}
+      {/* 3. TAB 2: ARSIP BUKU AGENDA SURAT KELUAR */}
+      {activeTab === 'outgoing' && (
+        <div className="table-wrapper" style={{ padding: '1.5rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '1rem' }}>
+            <div>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
+                📤 Buku Agenda Arsip Surat Keluar Desa
+              </h3>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: '0.25rem 0 0 0' }}>
+                Seluruh surat dinas & permohonan warga yang telah dicetak otomatis tercatat dalam basis data arsip desa.
+              </p>
+            </div>
+
+            <div style={{ position: 'relative', width: '280px' }}>
+              <Search size={15} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+              <input
+                type="text"
+                placeholder="Cari nomor surat, penerima..."
+                className="form-control"
+                style={{ paddingLeft: '2.25rem', height: '38px', fontSize: '0.85rem' }}
+                value={outgoingSearch}
+                onChange={(e) => setOutgoingSearch(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div style={{ overflowX: 'auto' }}>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>Nomor Surat Keluar</th>
+                  <th>Jenis Dokumen</th>
+                  <th>Nama Penerima / Pemohon</th>
+                  <th>Tanggal Terbit</th>
+                  <th>Keperluan / Perihal</th>
+                  <th>Penandatangan</th>
+                  <th style={{ textAlign: 'center' }}>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredOutgoing.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+                      Belum ada riwayat surat keluar yang tersimpan.
+                    </td>
+                  </tr>
+                ) : (
+                  filteredOutgoing.map((out, idx) => (
+                    <tr key={out.id}>
+                      <td style={{ fontWeight: 'bold' }}>{idx + 1}</td>
+                      <td>
+                        <span style={{ fontFamily: 'monospace', fontWeight: 700, color: '#064e3b' }}>
+                          {out.letterNumber}
+                        </span>
+                      </td>
+                      <td>
+                        <span className="badge badge-success" style={{ fontSize: '0.75rem' }}>
+                          {out.letterType}
+                        </span>
+                      </td>
+                      <td>
+                        <strong>{out.recipientName}</strong>
+                        {out.recipientNik !== '-' && (
+                          <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                            NIK: {out.recipientNik}
+                          </span>
+                        )}
+                      </td>
+                      <td>{out.date}</td>
+                      <td style={{ maxWidth: '240px' }}>{out.purpose}</td>
+                      <td>{out.signer}</td>
+                      <td style={{ textAlign: 'center' }}>
+                        <button
+                          className="btn btn-sm btn-danger"
+                          style={{ padding: '0.25rem 0.5rem' }}
+                          onClick={() => handleDeleteOutgoing(out.id)}
+                          title="Hapus Arsip"
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* 4. TAB 3: ARSIP BUKU AGENDA SURAT MASUK (DENGAN HASIL SCAN & DISPOSISI) */}
+      {activeTab === 'incoming' && (
+        <div className="table-wrapper" style={{ padding: '1.5rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '1rem' }}>
+            <div>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
+                📥 Buku Agenda Surat Masuk & Berkas Scan
+              </h3>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: '0.25rem 0 0 0' }}>
+                Pencatatan surat resmi masuk dari Kementerian, Dinas, Kecamatan, Puskesmas, dan Kepolisian beserta file scan dan lembar disposisi Kades.
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+              <div style={{ position: 'relative', width: '240px' }}>
+                <Search size={15} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                <input
+                  type="text"
+                  placeholder="Cari instansi, perihal..."
+                  className="form-control"
+                  style={{ paddingLeft: '2.25rem', height: '38px', fontSize: '0.85rem' }}
+                  value={incomingSearch}
+                  onChange={(e) => setIncomingSearch(e.target.value)}
+                />
+              </div>
+
+              <button
+                className="btn btn-primary btn-sm"
+                onClick={() => {
+                  setIncomingForm({
+                    agendaNumber: `AG-2026-${Math.floor(100 + Math.random() * 899)}`,
+                    letterNumber: '',
+                    letterDate: '',
+                    receivedDate: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
+                    sender: '',
+                    subject: '',
+                    disposition: '',
+                    dispositionTo: 'Sekretaris Desa',
+                    status: 'MENUNGGU',
+                    scanFile: ''
+                  });
+                  setIncomingModal(true);
+                }}
+              >
+                <Plus size={15} /> Catat Surat Masuk & Upload Scan
+              </button>
+            </div>
+          </div>
+
+          <div style={{ overflowX: 'auto' }}>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>No. Agenda</th>
+                  <th>Nomor & Tanggal Surat</th>
+                  <th>Instansi Pengirim</th>
+                  <th>Perihal / Ringkasan Isi</th>
+                  <th>Tgl Diterima</th>
+                  <th>Disposisi & Arahan Kades</th>
+                  <th>Berkas Scan</th>
+                  <th>Status</th>
+                  <th style={{ textAlign: 'center' }}>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredIncoming.length === 0 ? (
+                  <tr>
+                    <td colSpan={9} style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+                      Belum ada data surat masuk tercatat.
+                    </td>
+                  </tr>
+                ) : (
+                  filteredIncoming.map((inc) => (
+                    <tr key={inc.id}>
+                      <td style={{ fontWeight: 800, color: '#059669' }}>{inc.agendaNumber}</td>
+                      <td>
+                        <strong>{inc.letterNumber}</strong>
+                        <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                          Tgl Surat: {inc.letterDate}
+                        </span>
+                      </td>
+                      <td>
+                        <span style={{ fontWeight: 700, color: 'var(--text-main)' }}>{inc.sender}</span>
+                      </td>
+                      <td style={{ maxWidth: '240px' }}>{inc.subject}</td>
+                      <td>{inc.receivedDate}</td>
+                      <td style={{ maxWidth: '240px', fontSize: '0.8rem' }}>
+                        <div style={{ background: '#f8fafc', padding: '0.4rem 0.6rem', borderRadius: '6px', border: '1px solid var(--light-border)' }}>
+                          <strong>Kepada:</strong> {inc.dispositionTo}<br />
+                          <strong>Instruksi:</strong> {inc.disposition || 'Tindaklanjuti sesuai tupoksi.'}
+                        </div>
+                      </td>
+                      <td>
+                        {inc.scanFile ? (
+                          <button
+                            className="btn btn-secondary btn-sm"
+                            style={{ fontSize: '0.75rem', padding: '0.2rem 0.5rem', color: '#059669', borderColor: '#86efac' }}
+                            onClick={() => setViewScanModal(inc)}
+                          >
+                            <Eye size={13} /> Lihat Scan
+                          </button>
+                        ) : (
+                          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Tidak ada berkas</span>
+                        )}
+                      </td>
+                      <td>
+                        <span className={`badge ${inc.status === 'SELESAI' ? 'badge-success' : inc.status === 'PROSES' ? 'badge-warning' : 'badge-neutral'}`}>
+                          {inc.status}
+                        </span>
+                      </td>
+                      <td style={{ textAlign: 'center' }}>
+                        <button
+                          className="btn btn-sm btn-danger"
+                          style={{ padding: '0.25rem 0.5rem' }}
+                          onClick={() => handleDeleteIncoming(inc.id)}
+                          title="Hapus"
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* 5. TAB 4: PENGATURAN KOP SURAT */}
       {activeTab === 'letterhead' && (
         <form onSubmit={handleSaveLetterhead} className="table-wrapper" style={{ padding: '1.75rem' }}>
           <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '0.35rem' }}>
@@ -512,7 +929,7 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
                 <input
                   type="text"
                   required
-                  placeholder="KEPALA DESA SUKAMAJU MANDIRI atau a.n. KEPALA DESA, SEKRETARIS DESA"
+                  placeholder="KEPALA DESA SUKAMAJU MANDIRI"
                   className="form-control"
                   value={letterhead.signatoryRole}
                   onChange={(e) => setLetterhead({ ...letterhead, signatoryRole: e.target.value })}
@@ -549,7 +966,7 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
         </form>
       )}
 
-      {/* 4. TAB 3: KATALOG 11 TEMPLATE RESMI DESA */}
+      {/* 6. TAB 5: KATALOG TEMPLATE RESMI */}
       {activeTab === 'catalog' && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 340px), 1fr))', gap: '1.25rem' }}>
           {officialLetterTemplates.map((template) => (
@@ -591,6 +1008,214 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
           ))}
         </div>
       )}
+
+      {/* MODAL INPUT SURAT MASUK & SCAN */}
+      {incomingModal && (
+        <div className="modal-backdrop" onClick={() => setIncomingModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '640px' }}>
+            <div className="modal-header">
+              <h3 className="modal-title">Catat Surat Masuk & Berkas Scan</h3>
+              <button className="modal-close" onClick={() => setIncomingModal(false)}><X size={20} /></button>
+            </div>
+
+            <form onSubmit={handleSaveIncomingLetter}>
+              <div className="modal-body">
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label">Nomor Agenda Desa *</label>
+                    <input
+                      type="text"
+                      required
+                      className="form-control"
+                      value={incomingForm.agendaNumber}
+                      onChange={(e) => setIncomingForm({ ...incomingForm, agendaNumber: e.target.value })}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Nomor Surat Masuk *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Contoh: 005/312/KEC/2026"
+                      className="form-control"
+                      value={incomingForm.letterNumber}
+                      onChange={(e) => setIncomingForm({ ...incomingForm, letterNumber: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label">Tanggal Surat Masuk</label>
+                    <input
+                      type="text"
+                      placeholder="18 Agustus 2026"
+                      className="form-control"
+                      value={incomingForm.letterDate}
+                      onChange={(e) => setIncomingForm({ ...incomingForm, letterDate: e.target.value })}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Tanggal Diterima</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={incomingForm.receivedDate}
+                      onChange={(e) => setIncomingForm({ ...incomingForm, receivedDate: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Asal Instansi / Pengirim *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Contoh: Kantor Kecamatan Harapan Makmur / Dinas PMD"
+                    className="form-control"
+                    value={incomingForm.sender}
+                    onChange={(e) => setIncomingForm({ ...incomingForm, sender: e.target.value })}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Perihal / Ringkasan Isi Surat *</label>
+                  <textarea
+                    rows={2}
+                    required
+                    placeholder="Contoh: Undangan Rapat Koordinasi Evaluasi Penyaluran Dana Desa..."
+                    className="form-control"
+                    value={incomingForm.subject}
+                    onChange={(e) => setIncomingForm({ ...incomingForm, subject: e.target.value })}
+                  />
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label">Disposisi Diteruskan Kepada</label>
+                    <select
+                      className="form-control"
+                      value={incomingForm.dispositionTo}
+                      onChange={(e) => setIncomingForm({ ...incomingForm, dispositionTo: e.target.value })}
+                    >
+                      <option value="Sekretaris Desa">Sekretaris Desa (Sekdes)</option>
+                      <option value="Kasi Pelayanan & TI">Kasi Pelayanan & TI</option>
+                      <option value="Kasi Kesejahteraan (Kesra)">Kasi Kesejahteraan (Kesra)</option>
+                      <option value="Kaur Perencanaan & Pembangunan">Kaur Perencanaan & Pembangunan</option>
+                      <option value="Kaur Keuangan">Kaur Keuangan</option>
+                      <option value="Seluruh Kepala Dusun">Seluruh Kepala Dusun (Kadus)</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Status Tindak Lanjut</label>
+                    <select
+                      className="form-control"
+                      value={incomingForm.status}
+                      onChange={(e) => setIncomingForm({ ...incomingForm, status: e.target.value })}
+                    >
+                      <option value="MENUNGGU">MENUNGGU</option>
+                      <option value="PROSES">PROSES</option>
+                      <option value="SELESAI">SELESAI</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Instruksi / Catatan Disposisi Kepala Desa</label>
+                  <input
+                    type="text"
+                    placeholder="Contoh: Hadiri dan buatkan laporan hasil rapat."
+                    className="form-control"
+                    value={incomingForm.disposition}
+                    onChange={(e) => setIncomingForm({ ...incomingForm, disposition: e.target.value })}
+                  />
+                </div>
+
+                {/* Upload Scan Document */}
+                <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '10px', border: '1px solid var(--light-border)' }}>
+                  <label className="form-label" style={{ fontWeight: 700 }}>Unggah Berkas Scan Dokumen:</label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <label className="btn btn-primary btn-sm" style={{ cursor: 'pointer' }}>
+                      <Upload size={14} /> Pilih File Gambar / Scan
+                      <input
+                        type="file"
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        onChange={handleScanFileUpload}
+                      />
+                    </label>
+                    {incomingForm.scanFile && (
+                      <span style={{ fontSize: '0.75rem', color: '#16a34a', fontWeight: 700 }}>
+                        ✓ Berkas scan siap diarsipkan
+                      </span>
+                    )}
+                  </div>
+                  <div className="form-group" style={{ marginTop: '0.5rem', marginBottom: 0 }}>
+                    <input
+                      type="url"
+                      placeholder="Atau masukkan URL gambar hasil scan..."
+                      className="form-control"
+                      style={{ fontSize: '0.8rem' }}
+                      value={incomingForm.scanFile}
+                      onChange={(e) => setIncomingForm({ ...incomingForm, scanFile: e.target.value })}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={() => setIncomingModal(false)}>Batal</button>
+                <button type="submit" className="btn btn-primary">Simpan ke Arsip Surat Masuk</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL VIEW SCAN FILE PREVIEW */}
+      {viewScanModal && (
+        <div className="modal-backdrop" onClick={() => setViewScanModal(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '780px' }}>
+            <div className="modal-header">
+              <div>
+                <h3 className="modal-title" style={{ fontSize: '1.15rem' }}>
+                  Berkas Scan Surat Masuk: {viewScanModal.letterNumber}
+                </h3>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                  Pengirim: <strong>{viewScanModal.sender}</strong> ({viewScanModal.receivedDate})
+                </span>
+              </div>
+              <button className="modal-close" onClick={() => setViewScanModal(null)}><X size={20} /></button>
+            </div>
+
+            <div className="modal-body" style={{ background: '#f1f5f9', textAlign: 'center', padding: '1.5rem' }}>
+              <div style={{ maxHeight: '550px', overflowY: 'auto', background: '#fff', padding: '1rem', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
+                <img
+                  src={viewScanModal.scanFile}
+                  alt="Hasil Scan Surat"
+                  style={{ maxWidth: '100%', height: 'auto', borderRadius: '4px' }}
+                />
+              </div>
+
+              <div style={{ marginTop: '1rem', textAlign: 'left', background: '#fff', padding: '1rem', borderRadius: '8px', border: '1px solid var(--light-border)' }}>
+                <h4 style={{ fontSize: '0.9rem', fontWeight: 800, color: '#059669', margin: '0 0 0.5rem 0' }}>
+                  📋 Lembar Disposisi Kepala Desa:
+                </h4>
+                <div style={{ fontSize: '0.85rem', color: 'var(--text-main)', lineHeight: 1.5 }}>
+                  • <strong>Diteruskan Kepada:</strong> {viewScanModal.dispositionTo}<br />
+                  • <strong>Instruksi / Arahan:</strong> {viewScanModal.disposition || 'Tindaklanjuti sesuai prosedur.'}
+                </div>
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button className="btn btn-secondary" onClick={() => setViewScanModal(null)}>Tutup Pratinjau</button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
