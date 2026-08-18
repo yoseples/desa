@@ -4,17 +4,8 @@ import {
   Menu, 
   X, 
   Search, 
-  FileText, 
-  User, 
-  Image, 
-  Newspaper, 
-  ShoppingBag, 
-  Palmtree, 
-  Phone, 
-  ShieldCheck, 
   LogIn,
-  Layers,
-  Sparkles
+  ChevronDown
 } from 'lucide-react';
 
 export default function Navbar({ activePage, setActivePage, onOpenTracking, profile }) {
@@ -22,13 +13,13 @@ export default function Navbar({ activePage, setActivePage, onOpenTracking, prof
 
   const navLinks = [
     { id: 'home', label: 'Beranda' },
-    { id: 'profile', label: 'Profil Desa' },
-    { id: 'news', label: 'Kabar Desa' },
-    { id: 'umkm', label: 'Produk UMKM' },
+    { id: 'profile', label: 'Profil' },
+    { id: 'news', label: 'Berita' },
+    { id: 'umkm', label: 'UMKM' },
     { id: 'tourism', label: 'Wisata' },
     { id: 'gallery', label: 'Galeri' },
-    { id: 'services', label: 'Layanan Mandiri' },
-    { id: 'contact', label: 'Kontak & Bantuan' },
+    { id: 'services', label: 'Layanan' },
+    { id: 'contact', label: 'Kontak' },
   ];
 
   const handleNavClick = (id) => {
@@ -38,40 +29,34 @@ export default function Navbar({ activePage, setActivePage, onOpenTracking, prof
   };
 
   return (
-    <nav className="navbar">
+    <header className="navbar">
       <div className="navbar-container">
         
-        {/* Brand Logo & Name */}
+        {/* 1. Brand Logo & Name (Compact & Crisp) */}
         <div 
           className="navbar-brand" 
           onClick={() => handleNavClick('home')}
-          style={{ cursor: 'pointer' }}
+          title="Ke Beranda Utama"
         >
           {profile?.logo ? (
             <img 
               src={profile.logo} 
               alt="Logo Desa" 
-              style={{
-                width: '38px',
-                height: '38px',
-                borderRadius: '8px',
-                objectFit: 'contain',
-                flexShrink: 0
-              }} 
+              className="navbar-logo-img"
             />
           ) : (
             <div className="navbar-logo-icon">
-              <Building2 size={24} color="#ffffff" />
+              <Building2 size={18} color="#ffffff" />
             </div>
           )}
           <div className="navbar-brand-text">
             <span className="navbar-title">{profile?.name || 'Desa Pintar'}</span>
-            <span className="navbar-subtitle">{profile?.subtitle || 'Kabupaten Nusantara'}</span>
+            <span className="navbar-subtitle">{profile?.district || 'Kabupaten Nusantara'}</span>
           </div>
         </div>
 
-        {/* Desktop Navigation Links */}
-        <div className="navbar-links">
+        {/* 2. Desktop Navigation Links (Balanced & Symmetrical) */}
+        <nav className="navbar-links" aria-label="Navigasi Utama">
           {navLinks.map((link) => (
             <button
               key={link.id}
@@ -81,25 +66,25 @@ export default function Navbar({ activePage, setActivePage, onOpenTracking, prof
               {link.label}
             </button>
           ))}
-        </div>
+        </nav>
 
-        {/* Action Buttons: Tracking & Admin Login */}
+        {/* 3. Action Buttons (Compact & Aligned) */}
         <div className="navbar-actions">
           <button 
-            className="btn btn-secondary btn-sm"
+            className="navbar-btn-secondary"
             onClick={onOpenTracking}
             title="Lacak Pengajuan Surat Berdasarkan Nomor Resi"
           >
-            <Search size={14} />
-            <span>Lacak Resi</span>
+            <Search size={13} />
+            <span>Lacak</span>
           </button>
 
           <button 
-            className="btn btn-primary btn-sm"
+            className="navbar-btn-primary"
             onClick={() => handleNavClick('login')}
             title="Masuk ke Panel Pengelolaan Desa"
           >
-            <LogIn size={14} />
+            <LogIn size={13} />
             <span>Admin</span>
           </button>
 
@@ -107,9 +92,9 @@ export default function Navbar({ activePage, setActivePage, onOpenTracking, prof
           <button 
             className="mobile-toggle"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle menu"
+            aria-label="Toggle Menu Navigasi"
           >
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
 
@@ -118,36 +103,39 @@ export default function Navbar({ activePage, setActivePage, onOpenTracking, prof
       {/* Mobile Drawer Navigation Menu */}
       {mobileMenuOpen && (
         <div className="mobile-menu">
-          {navLinks.map((link) => (
-            <button
-              key={link.id}
-              className={`mobile-link ${activePage === link.id ? 'active' : ''}`}
-              onClick={() => handleNavClick(link.id)}
-            >
-              {link.label}
-            </button>
-          ))}
-          <div style={{ padding: '0.75rem 0', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <div className="mobile-links-grid">
+            {navLinks.map((link) => (
+              <button
+                key={link.id}
+                className={`mobile-link ${activePage === link.id ? 'active' : ''}`}
+                onClick={() => handleNavClick(link.id)}
+              >
+                {link.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="mobile-actions-row">
             <button 
-              className="btn btn-secondary btn-sm"
-              style={{ width: '100%', justifyContent: 'center' }}
+              className="navbar-btn-secondary"
+              style={{ flex: 1, justifyContent: 'center' }}
               onClick={() => {
                 onOpenTracking();
                 setMobileMenuOpen(false);
               }}
             >
-              <Search size={14} /> Lacak Status Surat (Resi)
+              <Search size={14} /> Lacak Resi
             </button>
             <button 
-              className="btn btn-primary btn-sm"
-              style={{ width: '100%', justifyContent: 'center' }}
+              className="navbar-btn-primary"
+              style={{ flex: 1, justifyContent: 'center' }}
               onClick={() => handleNavClick('login')}
             >
-              <LogIn size={14} /> Masuk Panel Admin (/login)
+              <LogIn size={14} /> Login Admin
             </button>
           </div>
         </div>
       )}
-    </nav>
+    </header>
   );
 }
