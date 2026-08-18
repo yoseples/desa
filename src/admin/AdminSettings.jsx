@@ -13,7 +13,12 @@ import {
   X, 
   Sparkles,
   Layers,
-  Camera
+  Camera,
+  Plus,
+  Trash2,
+  Edit,
+  Search,
+  Filter
 } from 'lucide-react';
 import { StorageService } from '../services/storageService';
 
@@ -22,14 +27,30 @@ export default function AdminSettings({ profile, onUpdateProfile }) {
   const [activeSettingsTab, setActiveSettingsTab] = useState('branding'); // branding, general, vision, apparatus, contact
   const [savedNotice, setSavedNotice] = useState(false);
 
+  // Apparatus Filter & Search
+  const [appCategoryFilter, setAppCategoryFilter] = useState('Semua');
+  const [appSearch, setAppSearch] = useState('');
+
+  // Modal Tambah / Edit Aparatur
+  const [apparatusModal, setApparatusModal] = useState(false);
+  const [editingAppIndex, setEditingAppIndex] = useState(null);
+  const [appForm, setAppForm] = useState({
+    category: 'Pemerintah Desa',
+    name: '',
+    position: '',
+    nip: '',
+    phone: '',
+    photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+    area: ''
+  });
+
   // File Upload Handlers (converts local image files to base64 DataURL for instant local preview and persistence)
   const handleImageFileChange = (e, fieldPath) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Check size limit (max ~3MB)
     if (file.size > 3.5 * 1024 * 1024) {
-      alert('Ukuran file terlalu besar! Silakan gunakan gambar berukuran di bawah 3 MB.');
+      alert('Ukuran file terlalu besar! Silakan gunakan gambar berukuran di bawah 3.5 MB.');
       return;
     }
 
@@ -52,18 +73,81 @@ export default function AdminSettings({ profile, onUpdateProfile }) {
     reader.readAsDataURL(file);
   };
 
-  const handleApparatusPhotoChange = (e, index) => {
+  const handleAppModalPhotoChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
     reader.onload = (event) => {
-      const base64 = event.target.result;
-      const updatedApp = [...formData.apparatus];
-      updatedApp[index].photo = base64;
-      setFormData(prev => ({ ...prev, apparatus: updatedApp }));
+      setAppForm(prev => ({ ...prev, photo: event.target.result }));
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleOpenAddApparatus = () => {
+    setEditingAppIndex(null);
+    setAppForm({
+      category: appCategoryFilter !== 'Semua' ? appCategoryFilter : 'Pemerintah Desa',
+      name: '',
+      position: '',
+      nip: '',
+      phone: '',
+      photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+      area: ''
+    });
+    setApparatusModal(true);
+  };
+
+  const handleOpenEditApparatus = (app, originalIndex) => {
+    setEditingAppIndex(originalIndex);
+    setAppForm({
+      category: app.category || 'Pemerintah Desa',
+      name: app.name || '',
+      position: app.position || '',
+      nip: app.nip || '',
+      phone: app.phone || '',
+      photo: app.photo || '',
+      area: app.area || ''
+    });
+    setApparatusModal(true);
+  };
+
+  const handleSaveApparatus = (e) => {
+    e.preventDefault();
+    if (!appForm.name || !appForm.position) {
+      alert('Nama dan Jabatan wajib diisi!');
+      return;
+    }
+
+    const currentList = [...(formData.apparatus || [])];
+    if (editingAppIndex !== null) {
+      currentList[editingAppIndex] = {
+        ...currentList[editingAppIndex],
+        ...appForm
+      };
+    } else {
+      currentList.push({
+        id: `app-${Date.now()}`,
+        ...appForm
+      });
+    }
+
+    const updated = { ...formData, apparatus: currentList };
+    setFormData(updated);
+    onUpdateProfile(updated);
+    setApparatusModal(false);
+    setSavedNotice(true);
+    setTimeout(() => setSavedNotice(false), 3000);
+  };
+
+  const handleDeleteApparatus = (originalIndex, name) => {
+    if (window.confirm(`Apakah Anda yakin ingin menghapus data pengurus/aparatur "${name}"?`)) {
+      const currentList = [...(formData.apparatus || [])];
+      currentList.splice(originalIndex, 1);
+      const updated = { ...formData, apparatus: currentList };
+      setFormData(updated);
+      onUpdateProfile(updated);
+    }
   };
 
   const handleSubmit = (e) => {
@@ -78,6 +162,16 @@ export default function AdminSettings({ profile, onUpdateProfile }) {
       StorageService.resetToDefaults();
     }
   };
+
+  // Filtered apparatus list with preserved original indexes
+  const apparatusWithIndex = (formData.apparatus || []).map((app, idx) => ({ ...app, originalIndex: idx }));
+  const filteredApparatus = apparatusWithIndex.filter((app) => {
+    const matchesCategory = appCategoryFilter === 'Semua' || app.category === appCategoryFilter;
+    const matchesSearch = app.name.toLowerCase().includes(appSearch.toLowerCase()) ||
+                          app.position.toLowerCase().includes(appSearch.toLowerCase()) ||
+                          (app.area && app.area.toLowerCase().includes(appSearch.toLowerCase()));
+    return matchesCategory && matchesSearch;
+  });
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -94,30 +188,35 @@ export default function AdminSettings({ profile, onUpdateProfile }) {
         flexWrap: 'wrap'
       }}>
         <button
+          type="button"
           className={`btn btn-sm ${activeSettingsTab === 'branding' ? 'btn-primary' : 'btn-secondary'}`}
           onClick={() => setActiveSettingsTab('branding')}
         >
           <Camera size={15} /> Upload Logo & Foto Desa
         </button>
         <button
+          type="button"
+          className={`btn btn-sm ${activeSettingsTab === 'apparatus' ? 'btn-primary' : 'btn-secondary'}`}
+          onClick={() => setActiveSettingsTab('apparatus')}
+        >
+          <User size={15} /> Struktur Aparatur, RW & RT ({formData.apparatus?.length || 0})
+        </button>
+        <button
+          type="button"
           className={`btn btn-sm ${activeSettingsTab === 'general' ? 'btn-primary' : 'btn-secondary'}`}
           onClick={() => setActiveSettingsTab('general')}
         >
           <Building size={15} /> Identitas & Sambutan Kades
         </button>
         <button
+          type="button"
           className={`btn btn-sm ${activeSettingsTab === 'vision' ? 'btn-primary' : 'btn-secondary'}`}
           onClick={() => setActiveSettingsTab('vision')}
         >
           <Sparkles size={15} /> Visi, Misi & Sejarah
         </button>
         <button
-          className={`btn btn-sm ${activeSettingsTab === 'apparatus' ? 'btn-primary' : 'btn-secondary'}`}
-          onClick={() => setActiveSettingsTab('apparatus')}
-        >
-          <User size={15} /> Struktur Aparatur
-        </button>
-        <button
+          type="button"
           className={`btn btn-sm ${activeSettingsTab === 'contact' ? 'btn-primary' : 'btn-secondary'}`}
           onClick={() => setActiveSettingsTab('contact')}
         >
@@ -139,7 +238,7 @@ export default function AdminSettings({ profile, onUpdateProfile }) {
           gap: '0.65rem'
         }}>
           <CheckCircle2 size={20} color="#16a34a" />
-          Perubahan profil, logo, dan foto desa berhasil disimpan secara permanen!
+          Perubahan profil, struktur aparatur, dan media desa berhasil disimpan secara permanen!
         </div>
       )}
 
@@ -328,18 +427,6 @@ export default function AdminSettings({ profile, onUpdateProfile }) {
                     />
                   </label>
                 </div>
-
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label" style={{ fontSize: '0.8rem' }}>URL Gambar Banner:</label>
-                  <input
-                    type="url"
-                    placeholder="https://..."
-                    className="form-control"
-                    style={{ fontSize: '0.85rem' }}
-                    value={formData.bannerImage || ''}
-                    onChange={(e) => setFormData({ ...formData, bannerImage: e.target.value })}
-                  />
-                </div>
               </div>
 
               {/* Box 4: FOTO KANTOR / BALAI DESA */}
@@ -354,7 +441,7 @@ export default function AdminSettings({ profile, onUpdateProfile }) {
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <h4 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <Building size={18} color="#059669" /> Foto Gedung Kantor Balai Desa
+                    <Building size={18} color="#059669" /> Foto Gedung Balai Desa
                   </h4>
                   <span className="badge badge-neutral">Tampak Depan</span>
                 </div>
@@ -378,25 +465,144 @@ export default function AdminSettings({ profile, onUpdateProfile }) {
                     />
                   </label>
                 </div>
-
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label" style={{ fontSize: '0.8rem' }}>URL Foto Kantor:</label>
-                  <input
-                    type="url"
-                    placeholder="https://..."
-                    className="form-control"
-                    style={{ fontSize: '0.85rem' }}
-                    value={formData.officePhoto || ''}
-                    onChange={(e) => setFormData({ ...formData, officePhoto: e.target.value })}
-                  />
-                </div>
               </div>
 
             </div>
           </div>
         )}
 
-        {/* 2. GENERAL & SPEECH TAB */}
+        {/* 2. APPARATUS STRUCTURE MANAGEMENT TAB (DESA, KADUS, RW, RT) */}
+        {activeSettingsTab === 'apparatus' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+              <div>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
+                  Kelola Struktur Aparatur, Kepala Dusun, RW, & RT
+                </h3>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: '0.25rem 0 0 0' }}>
+                  Total terdata: {formData.apparatus?.length || 0} Pengurus & Aparatur (Termasuk 10 RW & 20 RT)
+                </p>
+              </div>
+
+              <button
+                type="button"
+                className="btn btn-primary btn-sm"
+                onClick={handleOpenAddApparatus}
+              >
+                <Plus size={15} /> Tambah Pengurus / Aparatur Baru
+              </button>
+            </div>
+
+            {/* Filter Toolbar */}
+            <div style={{
+              background: '#f8fafc',
+              padding: '0.85rem 1rem',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--light-border)',
+              display: 'flex',
+              gap: '1rem',
+              flexWrap: 'wrap',
+              alignItems: 'center'
+            }}>
+              <div style={{ position: 'relative', flex: '1', minWidth: '220px' }}>
+                <Search size={15} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                <input
+                  type="text"
+                  placeholder="Cari nama, jabatan (cth: RW 05, RT 12, Sekdes)..."
+                  className="form-control"
+                  style={{ paddingLeft: '2.25rem', height: '36px', fontSize: '0.85rem' }}
+                  value={appSearch}
+                  onChange={(e) => setAppSearch(e.target.value)}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap' }}>
+                {['Semua', 'Pemerintah Desa', 'Kepala Dusun (Kadus)', 'Rukun Warga (RW)', 'Rukun Tetangga (RT)'].map((cat) => (
+                  <button
+                    key={cat}
+                    type="button"
+                    className={`btn btn-sm ${appCategoryFilter === cat ? 'btn-primary' : 'btn-secondary'}`}
+                    style={{ fontSize: '0.75rem', padding: '0.3rem 0.65rem' }}
+                    onClick={() => setAppCategoryFilter(cat)}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Grid of Apparatus Cards */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: '1.25rem' }}>
+              {filteredApparatus.map((app) => (
+                <div
+                  key={app.id || app.originalIndex}
+                  style={{
+                    background: '#f8fafc',
+                    border: '1px solid var(--light-border)',
+                    borderRadius: 'var(--radius-md)',
+                    padding: '1.15rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    gap: '0.75rem',
+                    boxShadow: 'var(--shadow-sm)'
+                  }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', marginBottom: '0.75rem' }}>
+                      <div style={{ width: '54px', height: '54px', borderRadius: '50%', overflow: 'hidden', background: '#e2e8f0', flexShrink: 0, border: '2px solid #059669' }}>
+                        <img src={app.photo} alt={app.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <span className="badge badge-success" style={{ fontSize: '0.7rem', padding: '0.15rem 0.5rem', marginBottom: '0.2rem' }}>
+                          {app.category}
+                        </span>
+                        <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-main)', margin: '0.15rem 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {app.name}
+                        </h4>
+                        <span style={{ fontSize: '0.8rem', color: '#059669', fontWeight: 700 }}>
+                          {app.position}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div style={{ fontSize: '0.775rem', color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                      {app.nip && <div><strong>SK/NIP:</strong> {app.nip}</div>}
+                      {app.area && <div><strong>Wilayah:</strong> {app.area}</div>}
+                      {app.phone && (
+                        <div>
+                          <strong>WhatsApp:</strong> <a href={`https://wa.me/${app.phone.replace(/[^0-9]/g, '')}`} target="_blank" rel="noreferrer" style={{ color: '#059669', fontWeight: 600 }}>{app.phone}</a>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.4rem', borderTop: '1px solid var(--light-border)', paddingTop: '0.65rem' }}>
+                    <button
+                      type="button"
+                      className="btn btn-sm btn-secondary"
+                      style={{ fontSize: '0.75rem', padding: '0.25rem 0.6rem' }}
+                      onClick={() => handleOpenEditApparatus(app, app.originalIndex)}
+                    >
+                      <Edit size={13} /> Edit / Ganti Foto
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-sm btn-danger"
+                      style={{ fontSize: '0.75rem', padding: '0.25rem 0.5rem' }}
+                      onClick={() => handleDeleteApparatus(app.originalIndex, app.name)}
+                      title="Hapus"
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 3. GENERAL & SPEECH TAB */}
         {activeSettingsTab === 'general' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
@@ -504,7 +710,7 @@ export default function AdminSettings({ profile, onUpdateProfile }) {
           </div>
         )}
 
-        {/* 3. VISION, MISSION, HISTORY TAB */}
+        {/* 4. VISION, MISSION, HISTORY TAB */}
         {activeSettingsTab === 'vision' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
@@ -542,108 +748,6 @@ export default function AdminSettings({ profile, onUpdateProfile }) {
                 value={formData.history}
                 onChange={(e) => setFormData({ ...formData, history: e.target.value })}
               />
-            </div>
-          </div>
-        )}
-
-        {/* 4. APPARATUS STRUCTURE TAB */}
-        {activeSettingsTab === 'apparatus' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
-                Daftar & Foto Aparatur Pemerintah Desa
-              </h3>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: '1.25rem' }}>
-              {formData.apparatus?.map((app, idx) => (
-                <div
-                  key={app.id || idx}
-                  style={{
-                    background: '#f8fafc',
-                    border: '1px solid var(--light-border)',
-                    borderRadius: 'var(--radius-md)',
-                    padding: '1.15rem',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '0.75rem'
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-                    <div style={{ width: '56px', height: '56px', borderRadius: '50%', overflow: 'hidden', background: '#e2e8f0', flexShrink: 0 }}>
-                      <img src={app.photo} alt={app.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <label className="btn btn-secondary btn-sm" style={{ cursor: 'pointer', padding: '0.2rem 0.5rem', fontSize: '0.75rem' }}>
-                        <Upload size={12} /> Ganti Foto
-                        <input
-                          type="file"
-                          accept="image/*"
-                          style={{ display: 'none' }}
-                          onChange={(e) => handleApparatusPhotoChange(e, idx)}
-                        />
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="form-group" style={{ marginBottom: '0.5rem' }}>
-                    <label className="form-label" style={{ fontSize: '0.775rem' }}>Nama Lengkap & Gelar</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={app.name}
-                      onChange={(e) => {
-                        const updated = [...formData.apparatus];
-                        updated[idx].name = e.target.value;
-                        setFormData({ ...formData, apparatus: updated });
-                      }}
-                    />
-                  </div>
-
-                  <div className="form-group" style={{ marginBottom: '0.5rem' }}>
-                    <label className="form-label" style={{ fontSize: '0.775rem' }}>Jabatan Pemerintahan</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={app.position}
-                      onChange={(e) => {
-                        const updated = [...formData.apparatus];
-                        updated[idx].position = e.target.value;
-                        setFormData({ ...formData, apparatus: updated });
-                      }}
-                    />
-                  </div>
-
-                  <div className="form-row">
-                    <div className="form-group" style={{ marginBottom: 0 }}>
-                      <label className="form-label" style={{ fontSize: '0.75rem' }}>NIP / NIAP</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        value={app.nip || '-'}
-                        onChange={(e) => {
-                          const updated = [...formData.apparatus];
-                          updated[idx].nip = e.target.value;
-                          setFormData({ ...formData, apparatus: updated });
-                        }}
-                      />
-                    </div>
-                    <div className="form-group" style={{ marginBottom: 0 }}>
-                      <label className="form-label" style={{ fontSize: '0.75rem' }}>No. HP / WA</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        value={app.phone || '-'}
-                        onChange={(e) => {
-                          const updated = [...formData.apparatus];
-                          updated[idx].phone = e.target.value;
-                          setFormData({ ...formData, apparatus: updated });
-                        }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
         )}
@@ -736,6 +840,139 @@ export default function AdminSettings({ profile, onUpdateProfile }) {
         </div>
 
       </form>
+
+      {/* MODAL TAMBAH / EDIT APARATUR / RW / RT */}
+      {apparatusModal && (
+        <div className="modal-backdrop" onClick={() => setApparatusModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3 className="modal-title" style={{ fontSize: '1.15rem' }}>
+                {editingAppIndex !== null ? 'Edit Pengurus / Aparatur' : 'Tambah Pengurus / Aparatur Baru'}
+              </h3>
+              <button className="modal-close" onClick={() => setApparatusModal(false)}>
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveApparatus}>
+              <div className="modal-body">
+                {/* Photo Preview & Upload */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', marginBottom: '1.25rem', background: '#f8fafc', padding: '1rem', borderRadius: '12px', border: '1px solid var(--light-border)' }}>
+                  <div style={{ width: '64px', height: '64px', borderRadius: '50%', overflow: 'hidden', background: '#e2e8f0', flexShrink: 0, border: '2px solid #059669' }}>
+                    <img src={appForm.photo} alt="Foto" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  </div>
+                  <div>
+                    <label className="btn btn-primary btn-sm" style={{ cursor: 'pointer', marginBottom: '0.25rem' }}>
+                      <Upload size={13} /> Unggah Foto dari Komputer
+                      <input
+                        type="file"
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        onChange={handleAppModalPhotoChange}
+                      />
+                    </label>
+                    <span style={{ fontSize: '0.725rem', color: 'var(--text-muted)', display: 'block' }}>Format JPG/PNG portret</span>
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Tingkatan / Kategori Struktur *</label>
+                  <select
+                    className="form-control"
+                    value={appForm.category}
+                    onChange={(e) => setAppForm({ ...appForm, category: e.target.value })}
+                  >
+                    <option value="Pemerintah Desa">Pemerintah Desa (Kades / Sekdes / Kasi / Kaur)</option>
+                    <option value="Kepala Dusun (Kadus)">Kepala Dusun (Kadus)</option>
+                    <option value="Rukun Warga (RW)">Rukun Warga (Ketua RW)</option>
+                    <option value="Rukun Tetangga (RT)">Rukun Tetangga (Ketua RT)</option>
+                  </select>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label">Nama Lengkap & Gelar *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Contoh: Bpk. Dadang Kusnadi"
+                      className="form-control"
+                      value={appForm.name}
+                      onChange={(e) => setAppForm({ ...appForm, name: e.target.value })}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Jabatan Struktural *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Contoh: Ketua RT 01 / Ketua RW 02"
+                      className="form-control"
+                      value={appForm.position}
+                      onChange={(e) => setAppForm({ ...appForm, position: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label">Nomor SK / NIP</label>
+                    <input
+                      type="text"
+                      placeholder="SK. RT 01/2023 atau NIP"
+                      className="form-control"
+                      value={appForm.nip}
+                      onChange={(e) => setAppForm({ ...appForm, nip: e.target.value })}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Nomor WhatsApp Aktif</label>
+                    <input
+                      type="tel"
+                      placeholder="Contoh: 081234567890"
+                      className="form-control"
+                      value={appForm.phone}
+                      onChange={(e) => setAppForm({ ...appForm, phone: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Cakupan Wilayah / Alamat</label>
+                  <input
+                    type="text"
+                    placeholder="Contoh: Dusun Pasirjati (RW 01, RW 02)"
+                    className="form-control"
+                    value={appForm.area}
+                    onChange={(e) => setAppForm({ ...appForm, area: e.target.value })}
+                  />
+                </div>
+
+                <div className="form-group" style={{ marginBottom: 0 }}>
+                  <label className="form-label" style={{ fontSize: '0.8rem' }}>Atau URL Foto Langsung:</label>
+                  <input
+                    type="url"
+                    placeholder="https://..."
+                    className="form-control"
+                    style={{ fontSize: '0.85rem' }}
+                    value={appForm.photo}
+                    onChange={(e) => setAppForm({ ...appForm, photo: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={() => setApparatusModal(false)}>
+                  Batal
+                </button>
+                <button type="submit" className="btn btn-primary">
+                  {editingAppIndex !== null ? 'Simpan Perubahan' : 'Tambah Pengurus'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
