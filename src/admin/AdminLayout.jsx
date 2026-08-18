@@ -7,6 +7,7 @@ import {
   Palmtree, 
   Image, 
   FileText, 
+  Printer,
   MessageSquare, 
   Settings, 
   ExternalLink, 
@@ -32,7 +33,8 @@ export default function AdminLayout({
   const menuItems = [
     { id: 'dashboard', label: 'Ringkasan & Statistik', icon: LayoutDashboard },
     { id: 'citizens', label: 'Database KK & Warga', icon: Users, badge: familyCount },
-    { id: 'services', label: 'Pelayanan Surat Online', icon: FileText, badge: pendingCount },
+    { id: 'services', label: 'Permohonan Masuk', icon: FileText, badge: pendingCount },
+    { id: 'letter-templates', label: 'Template & Cetak Surat', icon: Printer },
     { id: 'complaints', label: 'Aspirasi & Pengaduan', icon: MessageSquare, badge: complaintCount },
     { id: 'news', label: 'Kelola Berita Desa', icon: Newspaper },
     { id: 'umkm', label: 'Kelola Produk UMKM', icon: ShoppingBag },

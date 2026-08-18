@@ -29,6 +29,7 @@ import AdminUmkm from './admin/AdminUmkm';
 import AdminTourism from './admin/AdminTourism';
 import AdminGallery from './admin/AdminGallery';
 import AdminServices from './admin/AdminServices';
+import AdminLetterTemplates from './admin/AdminLetterTemplates';
 import AdminComplaints from './admin/AdminComplaints';
 import AdminSettings from './admin/AdminSettings';
 
@@ -36,7 +37,7 @@ import { StorageService } from './services/storageService';
 
 export default function App() {
   const [activePage, setActivePage] = useState('home'); // home, profile, news, gallery, umkm, tourism, services, contact, admin
-  const [adminTab, setAdminTab] = useState('dashboard'); // dashboard, citizens, services, complaints, news, umkm, tourism, gallery, settings
+  const [adminTab, setAdminTab] = useState('dashboard'); // dashboard, citizens, services, letter-templates, complaints, news, umkm, tourism, gallery, settings
 
   // Admin Auth State
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(() => {
@@ -318,6 +319,13 @@ export default function App() {
                 requestsList={requestsList}
                 onUpdateStatus={handleUpdateRequestStatus}
                 onSelectPrint={(req) => setPrintLetterReq(req)}
+              />
+            )}
+
+            {adminTab === 'letter-templates' && (
+              <AdminLetterTemplates
+                profile={profile}
+                onUpdateProfile={handleUpdateProfile}
               />
             )}
 
