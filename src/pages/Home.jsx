@@ -24,28 +24,28 @@ import { StorageService } from '../services/storageService';
 
 export default function Home({ 
   profile, 
-  newsList, 
-  umkmList, 
-  tourismList, 
-  galleryList, 
+  newsList = [], 
+  umkmList = [], 
+  tourismList = [], 
+  galleryList = [], 
   setActivePage, 
   onOpenServiceModal, 
   onOpenTracking, 
   onSelectNews, 
   onSelectUmkm 
 }) {
-  const featuredNews = newsList.slice(0, 3);
-  const featuredUmkm = umkmList.slice(0, 3);
-  const featuredTourism = tourismList.slice(0, 2);
+  const featuredNews = Array.isArray(newsList) ? newsList.slice(0, 3) : [];
+  const featuredUmkm = Array.isArray(umkmList) ? umkmList.slice(0, 3) : [];
+  const featuredTourism = Array.isArray(tourismList) ? tourismList.slice(0, 2) : [];
 
-  const allCitizens = StorageService.getAllCitizens();
-  const families = StorageService.getFamilies();
+  const allCitizens = StorageService.getAllCitizens() || [];
+  const families = StorageService.getFamilies() || [];
 
-  const totalCitizensCount = allCitizens.length > 0 ? allCitizens.length : profile?.stats?.population;
-  const totalFamiliesCount = families.length > 0 ? families.length : profile?.stats?.households;
+  const totalCitizensCount = allCitizens.length > 0 ? allCitizens.length : (profile?.stats?.population || 4850);
+  const totalFamiliesCount = families.length > 0 ? families.length : (profile?.stats?.households || 1320);
 
   const formatRupiah = (num) => {
-    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
+    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num || 0);
   };
 
   return (
@@ -112,23 +112,23 @@ export default function Home({
                 <div className="head-speech-card">
                   <div className="head-avatar-wrap">
                     <img 
-                      src={profile?.headOfVillage?.photo} 
-                      alt={profile?.headOfVillage?.name} 
+                      src={profile?.headOfVillage?.photo || 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=600&q=80'} 
+                      alt={profile?.headOfVillage?.name || 'Kepala Desa'} 
                       className="head-avatar"
                     />
                     <div className="head-info">
-                      <h3>{profile?.headOfVillage?.name}</h3>
-                      <p>{profile?.headOfVillage?.title} ({profile?.headOfVillage?.period})</p>
+                      <h3>{profile?.headOfVillage?.name || 'H. Budi Santoso, S.AP'}</h3>
+                      <p>{profile?.headOfVillage?.title || 'Kepala Desa'} ({profile?.headOfVillage?.period || '2021 - 2027'})</p>
                     </div>
                   </div>
 
                   <div className="head-quote">
-                    "{profile?.headOfVillage?.welcomeSpeech}"
+                    "{profile?.headOfVillage?.welcomeSpeech || 'Selamat datang di portal pelayanan mandiri Desa Pintar Sukamaju Mandiri.'}"
                   </div>
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '0.25rem' }}>
                     <span style={{ fontSize: '0.75rem', color: '#a7f3d0', fontWeight: 600 }}>
-                      Pemerintah Desa Sukamaju Mandiri
+                      {profile?.name || 'Pemerintah Desa Sukamaju'}
                     </span>
                     <button 
                       className="btn btn-sm btn-secondary"
@@ -155,7 +155,7 @@ export default function Home({
               </div>
               <div className="quick-action-text">
                 <h4>Surat Keterangan</h4>
-                <p>SKU, SKTM, Domisili, dll.</p>
+                <p>SKU, SKTM, Jual Beli, dll.</p>
               </div>
             </div>
 
@@ -231,73 +231,67 @@ export default function Home({
                 <ShoppingBag size={24} />
               </div>
               <div className="stat-data">
-                <h3>{profile?.stats?.umkmActive || 42}</h3>
-                <p>Unit UMKM Binaan</p>
+                <h3>{profile?.stats?.umkmActive || umkmList?.length || 42}+</h3>
+                <p>Pelaku Usaha UMKM</p>
               </div>
             </div>
 
             <div className="stat-box">
-              <div className="stat-icon" style={{ background: '#ccfbf1', color: '#0f766e' }}>
+              <div className="stat-icon" style={{ background: '#fce7f3', color: '#db2777' }}>
                 <Palmtree size={24} />
               </div>
               <div className="stat-data">
-                <h3>{profile?.stats?.tourismSpots || 4}</h3>
-                <p>Destinasi Wisata</p>
+                <h3>{profile?.stats?.tourismSpots || tourismList?.length || 5}</h3>
+                <p>Destinasi Unggulan</p>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 4. BERITA TERBARU DESA */}
+      {/* 4. BERITA & PENGUMUMAN TERKINI */}
       <section className="section">
         <div className="container">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
             <div>
-              <span className="section-badge">
-                <Newspaper size={13} /> Warta Desa
-              </span>
-              <h2 className="section-title" style={{ margin: 0 }}>Kabar & Informasi Terkini</h2>
+              <span className="section-badge">Warta Desa</span>
+              <h2 className="section-title" style={{ margin: '0.25rem 0 0 0' }}>Berita & Transparansi Kegiatan</h2>
             </div>
             <button 
               className="btn btn-secondary btn-sm"
               onClick={() => setActivePage('news')}
             >
-              Lihat Semua Berita <ArrowRight size={15} />
+              Lihat Semua Berita <ArrowRight size={14} />
             </button>
           </div>
 
           <div className="card-grid">
-            {featuredNews.map((article) => (
+            {featuredNews.map((news) => (
               <div 
-                key={article.id} 
-                className="card"
-                onClick={() => onSelectNews(article)}
+                key={news.id} 
+                className="card" 
+                onClick={() => onSelectNews(news)}
                 style={{ cursor: 'pointer' }}
               >
                 <div className="card-img-wrap">
-                  <img src={article.image} alt={article.title} className="card-img" />
-                  <div className="card-badge-top">
-                    <span className="badge badge-success">{article.category}</span>
-                  </div>
+                  <img src={news.image} alt={news.title} />
+                  <span className="badge badge-success" style={{ position: 'absolute', top: '0.75rem', left: '0.75rem' }}>
+                    {news.category}
+                  </span>
                 </div>
-
                 <div className="card-body">
                   <div className="card-meta">
-                    <span>{article.date}</span>
+                    <span>{news.date}</span>
                     <span>•</span>
-                    <span>{article.author}</span>
+                    <span>{news.author}</span>
                   </div>
-                  <h3 className="card-title">{article.title}</h3>
-                  <p className="card-desc">{article.summary}</p>
-                  <div className="card-footer">
-                    <span style={{ fontSize: '0.825rem', color: 'var(--primary)', fontWeight: 700 }}>
-                      Baca Selengkapnya →
-                    </span>
-                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                      👁 {article.views} pembaca
-                    </span>
-                  </div>
+                  <h3 className="card-title">{news.title}</h3>
+                  <p className="card-desc">{news.summary}</p>
+                </div>
+                <div className="card-footer">
+                  <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    Baca Selengkapnya <ArrowRight size={14} />
+                  </span>
                 </div>
               </div>
             ))}
@@ -305,56 +299,133 @@ export default function Home({
         </div>
       </section>
 
-      {/* 5. ETALASE PRODUK UMKM UNGGULAN */}
+      {/* 5. ETALASE PRODUK UMKM DESA */}
       <section className="section" style={{ background: '#ffffff', borderTop: '1px solid var(--light-border)', borderBottom: '1px solid var(--light-border)' }}>
         <div className="container">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
             <div>
-              <span className="section-badge">
-                <ShoppingBag size={13} /> Potensi Ekonomi
-              </span>
-              <h2 className="section-title" style={{ margin: 0 }}>Produk Unggulan UMKM Desa</h2>
+              <span className="section-badge">Ekonomi Kreatif</span>
+              <h2 className="section-title" style={{ margin: '0.25rem 0 0 0' }}>Produk Unggulan UMKM Desa</h2>
             </div>
             <button 
               className="btn btn-secondary btn-sm"
               onClick={() => setActivePage('umkm')}
             >
-              Katalog Lengkap UMKM <ArrowRight size={15} />
+              Lihat Semua Produk <ArrowRight size={14} />
             </button>
           </div>
 
           <div className="card-grid">
-            {featuredUmkm.map((product) => (
+            {featuredUmkm.map((umkm) => (
               <div 
-                key={product.id} 
+                key={umkm.id} 
                 className="card"
-                onClick={() => onSelectUmkm(product)}
+                onClick={() => onSelectUmkm(umkm)}
                 style={{ cursor: 'pointer' }}
               >
                 <div className="card-img-wrap">
-                  <img src={product.image} alt={product.name} className="card-img" />
-                  {product.badge && (
-                    <div className="card-badge-top">
-                      <span className="badge badge-warning">★ {product.badge}</span>
-                    </div>
+                  <img src={umkm.image} alt={umkm.name} />
+                  {umkm.badge && (
+                    <span className="badge badge-warning" style={{ position: 'absolute', top: '0.75rem', left: '0.75rem' }}>
+                      ★ {umkm.badge}
+                    </span>
                   )}
                 </div>
-
                 <div className="card-body">
                   <span className="badge badge-neutral" style={{ alignSelf: 'flex-start', marginBottom: '0.5rem' }}>
-                    {product.category}
+                    {umkm.category}
                   </span>
-                  <h3 className="card-title">{product.name}</h3>
-                  <p className="card-desc">{product.description}</p>
-                  
-                  <div className="card-footer">
-                    <div className="price-tag">
-                      {formatRupiah(product.price)}
-                      <span> / {product.unit}</span>
+                  <h3 className="card-title">{umkm.name}</h3>
+                  <p className="card-desc">{umkm.description}</p>
+                </div>
+                <div className="card-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Harga:</span>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--primary)' }}>
+                      {formatRupiah(umkm.price)}
                     </div>
-                    <span style={{ fontSize: '0.825rem', color: '#059669', fontWeight: 700 }}>
-                      Pesan Sekarang →
-                    </span>
+                  </div>
+                  <button 
+                    className="btn btn-primary btn-sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const text = encodeURIComponent(`Halo, saya tertarik dengan produk ${umkm.name} di website Desa Sukamaju.`);
+                      window.open(`https://wa.me/${umkm.phone}?text=${text}`, '_blank');
+                    }}
+                  >
+                    Beli via WA
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 6. PESONA WISATA DESA */}
+      <section className="section">
+        <div className="container">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
+            <div>
+              <span className="section-badge">Pesona Alam</span>
+              <h2 className="section-title" style={{ margin: '0.25rem 0 0 0' }}>Destinasi Wisata Favorit</h2>
+            </div>
+            <button 
+              className="btn btn-secondary btn-sm"
+              onClick={() => setActivePage('tourism')}
+            >
+              Jelajahi Wisata <ArrowRight size={14} />
+            </button>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 420px), 1fr))', gap: '2rem' }}>
+            {featuredTourism.map((tour) => (
+              <div 
+                key={tour.id} 
+                className="card" 
+                style={{ overflow: 'hidden' }}
+              >
+                <div style={{ height: '260px', overflow: 'hidden', position: 'relative' }}>
+                  <img 
+                    src={tour.image} 
+                    alt={tour.name} 
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                  />
+                  <span className="badge badge-success" style={{ position: 'absolute', top: '1rem', left: '1rem' }}>
+                    {tour.highlight || tour.category}
+                  </span>
+                </div>
+                <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
+                      {tour.name}
+                    </h3>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#d97706', fontWeight: 700 }}>
+                      <Star size={16} fill="#d97706" /> {tour.rating}
+                    </div>
+                  </div>
+
+                  <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', lineHeight: 1.6, margin: 0 }}>
+                    {tour.description}
+                  </p>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', color: '#475569' }}>
+                    <MapPin size={15} color="#059669" /> {tour.location}
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '0.75rem', borderTop: '1px solid var(--light-border)' }}>
+                    <div>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Tiket Masuk:</span>
+                      <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--primary)' }}>
+                        {formatRupiah(tour.ticketPrice)}
+                      </div>
+                    </div>
+                    <button 
+                      className="btn btn-secondary btn-sm"
+                      onClick={() => setActivePage('tourism')}
+                    >
+                      Detail Info Wisata →
+                    </button>
                   </div>
                 </div>
               </div>
@@ -363,67 +434,53 @@ export default function Home({
         </div>
       </section>
 
-      {/* 6. BANNER CALL TO ACTION - PELAYANAN SURAT */}
-      <section className="section" style={{ background: 'linear-gradient(135deg, #044332, #065f46)', color: '#ffffff' }}>
+      {/* 7. CALL TO ACTION / LAYANAN MANDIRI PROMPT */}
+      <section className="section" style={{ padding: '0 0 5rem 0' }}>
         <div className="container">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 360px), 1fr))', gap: '2.5rem', alignItems: 'center' }}>
-            <div>
-              <span style={{ background: 'rgba(255,255,255,0.18)', padding: '0.35rem 0.85rem', borderRadius: 'var(--radius-full)', fontSize: '0.8rem', fontWeight: 700 }}>
-                Pelayanan Mandiri Tanpa Antre
+          <div style={{
+            background: 'linear-gradient(135deg, #064e3b, #047857)',
+            borderRadius: 'var(--radius-xl)',
+            padding: 'clamp(2rem, 5vw, 3.5rem)',
+            color: '#ffffff',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '2rem',
+            boxShadow: 'var(--shadow-xl)'
+          }}>
+            <div style={{ maxWidth: '580px' }}>
+              <span className="badge" style={{ background: 'rgba(255,255,255,0.2)', color: '#a7f3d0', marginBottom: '0.75rem' }}>
+                Layanan Desa Mandiri 24 Jam
               </span>
-              <h2 style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.35rem)', fontWeight: 800, margin: '0.85rem 0 1rem', lineHeight: 1.25 }}>
-                Urus Surat Keterangan Desa Kapan Saja & Di Mana Saja
+              <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.2rem)', fontWeight: 800, margin: '0 0 0.75rem 0', color: '#fff' }}>
+                Butuh Surat Keterangan Tanpa Perlu Antre di Kantor Balai Desa?
               </h2>
-              <p style={{ color: '#d1fae5', fontSize: '1rem', lineHeight: 1.65, marginBottom: '1.75rem' }}>
-                Warga tidak perlu repot mengantre di kantor desa. Cukup isi formulir online, pantau statusnya lewat nomor resi, dan cetak surat resmi ber-Tanda Tangan Elektronik (TTE).
+              <p style={{ fontSize: 'clamp(0.9rem, 1.6vw, 1.05rem)', color: '#cbd5e1', lineHeight: 1.6, margin: 0 }}>
+                Gunakan layanan permohonan surat online mandiri. Cukup siapkan NIK Anda, isi data, dan pantau proses verifikasi dokumen secara langsung dari ponsel Anda.
               </p>
-              <div style={{ display: 'flex', gap: '0.85rem', flexWrap: 'wrap' }}>
-                <button 
-                  className="btn btn-accent btn-lg"
-                  onClick={() => onOpenServiceModal('SKU')}
-                >
-                  <FileText size={18} /> Buat Surat Sekarang
-                </button>
-                <button 
-                  className="btn btn-outline-white btn-lg"
-                  onClick={() => setActivePage('services')}
-                >
-                  Lihat Semua Layanan →
-                </button>
-              </div>
             </div>
 
-            <div style={{ background: 'rgba(255,255,255,0.09)', padding: '2rem', borderRadius: 'var(--radius-xl)', backdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.18)', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}>
-              <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '1.25rem' }}>Langkah Pengajuan Mandiri:</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
-                <div style={{ display: 'flex', gap: '0.85rem', alignItems: 'flex-start' }}>
-                  <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--accent)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.85rem', flexShrink: 0 }}>1</div>
-                  <div>
-                    <h4 style={{ fontSize: '0.95rem', fontWeight: 700, margin: 0 }}>Pilih Jenis Surat</h4>
-                    <p style={{ fontSize: '0.825rem', color: '#d1fae5', margin: 0 }}>Pilih SKU, SKTM, Domisili, SKCK, atau Keterangan lainnya.</p>
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', gap: '0.85rem', alignItems: 'flex-start' }}>
-                  <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--accent)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.85rem', flexShrink: 0 }}>2</div>
-                  <div>
-                    <h4 style={{ fontSize: '0.95rem', fontWeight: 700, margin: 0 }}>Masukkan NIK & Data Diri</h4>
-                    <p style={{ fontSize: '0.825rem', color: '#d1fae5', margin: 0 }}>Ketik NIK untuk auto-fill otomatis data kependudukan Anda.</p>
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', gap: '0.85rem', alignItems: 'flex-start' }}>
-                  <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--accent)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.85rem', flexShrink: 0 }}>3</div>
-                  <div>
-                    <h4 style={{ fontSize: '0.95rem', fontWeight: 700, margin: 0 }}>Dapatkan Resi & Pantau Proses</h4>
-                    <p style={{ fontSize: '0.825rem', color: '#d1fae5', margin: 0 }}>Petugas desa memverifikasi dan menerbitkan surat resmi ber-TTE.</p>
-                  </div>
-                </div>
-              </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: 'min(100%, 260px)' }}>
+              <button 
+                className="btn btn-accent btn-lg"
+                style={{ width: '100%', justifyContent: 'center' }}
+                onClick={() => onOpenServiceModal('SKU')}
+              >
+                Buat Surat Sekarang
+              </button>
+              <button 
+                className="btn btn-outline-white btn-lg"
+                style={{ width: '100%', justifyContent: 'center' }}
+                onClick={onOpenTracking}
+              >
+                Cek Nomor Resi
+              </button>
             </div>
           </div>
         </div>
       </section>
+
     </div>
   );
 }

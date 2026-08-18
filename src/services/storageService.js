@@ -47,13 +47,13 @@ const initialOutgoingLetters = [
   },
   {
     id: "OUT-003",
-    letterNumber: "005/022/UND-DESA/VIII/2026",
-    letterType: "SURAT_UNDANGAN",
-    letterName: "Surat Undangan Musyawarah Desa (Musrenbangdes)",
-    recipientName: "Ketua BPD, LPMD, Seluruh Ketua RW & RT",
-    recipientNik: "-",
+    letterNumber: "593/018/DS-SKM/VIII/2026",
+    letterType: "SK_JUAL_BELI",
+    letterName: "Surat Keterangan Jual Beli (Tanah / Bangunan)",
+    recipientName: "Ujang Suherman & Bambang Sudrajat",
+    recipientNik: "3204151505750001",
     date: "18 Agustus 2026",
-    purpose: "Penyusunan RKPDes Tahun Anggaran 2027",
+    purpose: "Sebidang Tanah Kebun Kopi Blok Sukarame",
     signer: "H. Budi Santoso, S.AP"
   }
 ];
@@ -84,19 +84,6 @@ const initialIncomingLetters = [
     dispositionTo: "Kasi Kesejahteraan (Kesra)",
     status: "PROSES",
     scanFile: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    id: "INC-003",
-    agendaNumber: "AG-2026-044",
-    letterNumber: "410/580/DPMD/VIII/2026",
-    letterDate: "17 Agustus 2026",
-    receivedDate: "18 Agustus 2026",
-    sender: "Dinas Pemberdayaan Masyarakat dan Desa (DPMD) Kabupaten Nusantara",
-    subject: "Sosialisasi Lomba Inovasi Teknologi Tepat Guna (TTG) dan Digitalisasi Desa Tingkat Kabupaten",
-    disposition: "Kaur Perencanaan dan Pengelola BUMDes segera menyusun proposal inovasi Smart Village.",
-    dispositionTo: "Kaur Perencanaan & BUMDes",
-    status: "MENUNGGU",
-    scanFile: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=800&q=80"
   }
 ];
 
@@ -107,7 +94,23 @@ function getFromStorage(key, fallback) {
       localStorage.setItem(key, JSON.stringify(fallback));
       return fallback;
     }
-    return JSON.parse(item);
+    const parsed = JSON.parse(item);
+
+    // If object (like profile), safely merge with fallback so new schema keys are always defined
+    if (typeof fallback === 'object' && !Array.isArray(fallback) && fallback !== null) {
+      const merged = { ...fallback, ...parsed };
+      if (merged.apparatus && Array.isArray(merged.apparatus) && merged.apparatus.length < 15 && fallback.apparatus) {
+        merged.apparatus = fallback.apparatus;
+      }
+      return merged;
+    }
+
+    // If array and empty, use fallback
+    if (Array.isArray(fallback) && (!Array.isArray(parsed) || parsed.length === 0)) {
+      return fallback;
+    }
+
+    return parsed;
   } catch (e) {
     console.error('Storage error:', e);
     return fallback;
@@ -212,10 +215,10 @@ export const StorageService = {
     return updated;
   },
   getAllCitizens() {
-    const families = this.getFamilies();
+    const families = this.getFamilies() || [];
     const all = [];
     families.forEach(kk => {
-      if (kk.members && Array.isArray(kk.members)) {
+      if (kk && kk.members && Array.isArray(kk.members)) {
         kk.members.forEach(member => {
           all.push({
             ...member,
@@ -239,7 +242,7 @@ export const StorageService = {
     return citizens.find(c => c.nik === nik.trim()) || null;
   },
 
-  // Outgoing Letters Archive (Buku Agenda Surat Keluar)
+  // Outgoing Letters Archive
   getOutgoingLetters() {
     return getFromStorage(STORAGE_KEYS.OUTGOING_LETTERS, initialOutgoingLetters);
   },
@@ -267,7 +270,7 @@ export const StorageService = {
     return updated;
   },
 
-  // Incoming Letters Archive (Buku Agenda Surat Masuk & Scan)
+  // Incoming Letters Archive
   getIncomingLetters() {
     return getFromStorage(STORAGE_KEYS.INCOMING_LETTERS, initialIncomingLetters);
   },
@@ -425,7 +428,7 @@ export const StorageService = {
     return updated;
   },
 
-  // Service Requests (Surat Online)
+  // Service Requests
   getRequests() {
     return getFromStorage(STORAGE_KEYS.REQUESTS, initialServiceRequests);
   },
@@ -474,7 +477,7 @@ export const StorageService = {
     return updated;
   },
 
-  // Complaints / Aspirations
+  // Complaints
   getComplaints() {
     return getFromStorage(STORAGE_KEYS.COMPLAINTS, initialComplaints);
   },
