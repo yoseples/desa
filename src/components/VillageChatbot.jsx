@@ -194,11 +194,11 @@ export default function VillageChatbot({ profile, onOpenServiceModal, onOpenTrac
           <div 
             onClick={() => setIsOpen(true)}
             style={{
-              background: '#ffffff',
+              background: 'var(--light-surface)',
               color: 'var(--text-main)',
               padding: '0.5rem 0.9rem',
               borderRadius: 'var(--radius-full)',
-              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)',
+              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.25)',
               border: '1px solid var(--primary-border)',
               fontSize: '0.8rem',
               fontWeight: 700,
@@ -246,9 +246,9 @@ export default function VillageChatbot({ profile, onOpenServiceModal, onOpenTrac
             right: '1.5rem',
             width: 'min(92vw, 390px)',
             height: 'min(82vh, 580px)',
-            background: '#ffffff',
+            background: 'var(--light-surface)',
             borderRadius: 'var(--radius-xl)',
-            boxShadow: '0 20px 45px -10px rgba(15, 23, 42, 0.3), 0 0 0 1px rgba(226, 232, 240, 0.8)',
+            boxShadow: '0 20px 45px -10px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--light-border)',
             zIndex: 1500,
             display: 'flex',
             flexDirection: 'column',
@@ -279,7 +279,7 @@ export default function VillageChatbot({ profile, onOpenServiceModal, onOpenTrac
                 <Bot size={22} color="#a7f3d0" />
               </div>
               <div>
-                <h3 style={{ fontSize: '0.95rem', fontWeight: 800, margin: 0 }}>
+                <h3 style={{ fontSize: '0.95rem', fontWeight: 800, margin: 0, color: '#ffffff' }}>
                   Si Pintar (Asisten Desa)
                 </h3>
                 <span style={{ fontSize: '0.725rem', color: '#a7f3d0', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
@@ -309,7 +309,7 @@ export default function VillageChatbot({ profile, onOpenServiceModal, onOpenTrac
 
           {/* Quick Routing Chips Toolbar */}
           <div style={{
-            background: '#f8fafc',
+            background: 'var(--light-bg)',
             padding: '0.65rem 0.85rem',
             borderBottom: '1px solid var(--light-border)',
             display: 'flex',
@@ -332,7 +332,7 @@ export default function VillageChatbot({ profile, onOpenServiceModal, onOpenTrac
             </button>
             <button
               className="btn btn-secondary btn-sm"
-              style={{ fontSize: '0.75rem', padding: '0.25rem 0.6rem', flexShrink: 0, color: '#059669', borderColor: '#86efac' }}
+              style={{ fontSize: '0.75rem', padding: '0.25rem 0.6rem', flexShrink: 0, color: 'var(--primary)', borderColor: 'var(--primary-border)' }}
               onClick={() => handleQuickAction('kontak')}
             >
               <Phone size={12} /> WA Staf
@@ -354,7 +354,7 @@ export default function VillageChatbot({ profile, onOpenServiceModal, onOpenTrac
             display: 'flex',
             flexDirection: 'column',
             gap: '0.85rem',
-            background: '#f8fafc'
+            background: 'var(--light-bg)'
           }}>
             {messages.map((msg) => (
               <div
@@ -368,14 +368,14 @@ export default function VillageChatbot({ profile, onOpenServiceModal, onOpenTrac
                 }}
               >
                 <div style={{
-                  background: msg.sender === 'user' ? 'linear-gradient(135deg, #059669, #047857)' : '#ffffff',
+                  background: msg.sender === 'user' ? 'linear-gradient(135deg, #059669, #047857)' : 'var(--light-surface)',
                   color: msg.sender === 'user' ? '#ffffff' : 'var(--text-main)',
                   padding: '0.75rem 0.95rem',
                   borderRadius: msg.sender === 'user' ? '14px 14px 2px 14px' : '14px 14px 14px 2px',
-                  boxShadow: '0 2px 6px rgba(0, 0, 0, 0.06)',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
                   border: msg.sender === 'user' ? 'none' : '1px solid var(--light-border)',
                   fontSize: '0.85rem',
-                  lineHeight: 1.5,
+                  lineHeight: 1.55,
                   whiteSpace: 'pre-wrap'
                 }}>
                   {msg.text}
@@ -388,10 +388,10 @@ export default function VillageChatbot({ profile, onOpenServiceModal, onOpenTrac
                           key={aIdx}
                           onClick={act.action}
                           style={{
-                            background: '#ecfdf5',
-                            border: '1px solid #a7f3d0',
-                            color: '#065f46',
-                            padding: '0.4rem 0.75rem',
+                            background: 'rgba(16, 185, 129, 0.12)',
+                            border: '1px solid rgba(16, 185, 129, 0.35)',
+                            color: 'var(--primary)',
+                            padding: '0.45rem 0.75rem',
                             borderRadius: '8px',
                             fontSize: '0.775rem',
                             fontWeight: 700,
@@ -417,7 +417,7 @@ export default function VillageChatbot({ profile, onOpenServiceModal, onOpenTrac
             ))}
 
             {isTyping && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#fff', padding: '0.5rem 0.85rem', borderRadius: '12px', width: 'fit-content', border: '1px solid var(--light-border)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--light-surface)', padding: '0.5rem 0.85rem', borderRadius: '12px', width: 'fit-content', border: '1px solid var(--light-border)' }}>
                 <Bot size={14} color="#059669" />
                 <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>Si Pintar sedang mengetik...</span>
               </div>
@@ -429,7 +429,7 @@ export default function VillageChatbot({ profile, onOpenServiceModal, onOpenTrac
           {/* Chat Input */}
           <form onSubmit={handleSendMessage} style={{
             padding: '0.75rem 1rem',
-            background: '#ffffff',
+            background: 'var(--light-surface)',
             borderTop: '1px solid var(--light-border)',
             display: 'flex',
             gap: '0.5rem',
@@ -440,11 +440,15 @@ export default function VillageChatbot({ profile, onOpenServiceModal, onOpenTrac
               placeholder="Ketik pertanyaan (cth: buat surat, bansos, wa)..."
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              className="form-control"
+              className="form-input"
               style={{
                 fontSize: '0.85rem',
                 padding: '0.55rem 0.85rem',
-                borderRadius: 'var(--radius-full)'
+                borderRadius: 'var(--radius-full)',
+                background: 'var(--light-bg)',
+                color: 'var(--text-main)',
+                border: '1px solid var(--light-border)',
+                flex: 1
               }}
             />
             <button
@@ -454,7 +458,7 @@ export default function VillageChatbot({ profile, onOpenServiceModal, onOpenTrac
                 width: '38px',
                 height: '38px',
                 borderRadius: '50%',
-                background: inputValue.trim() ? '#059669' : '#e2e8f0',
+                background: inputValue.trim() ? '#059669' : 'var(--light-border)',
                 color: '#ffffff',
                 border: 'none',
                 display: 'flex',
