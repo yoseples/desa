@@ -7,6 +7,7 @@ import TrackingModal from './components/TrackingModal';
 import NewsDetailModal from './components/NewsDetailModal';
 import UmkmDetailModal from './components/UmkmDetailModal';
 import LetterPrintModal from './components/LetterPrintModal';
+import VillageChatbot from './components/VillageChatbot';
 
 // Public Pages
 import Home from './pages/Home';
@@ -438,6 +439,13 @@ export default function App() {
               />
             )}
           </main>
+
+          {/* Interactive Village AI Chatbot */}
+          <VillageChatbot
+            profile={profile}
+            onOpenServiceModal={handleOpenServiceModal}
+            onOpenTracking={() => setTrackingModalOpen(true)}
+          />
 
           {/* Public Footer */}
           <Footer
