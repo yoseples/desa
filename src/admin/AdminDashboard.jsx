@@ -100,7 +100,7 @@ export default function AdminDashboard({
             onClick={() => setActiveTab('settings')}
             style={{ background: 'rgba(255,255,255,0.1)', color: '#fff', borderColor: 'rgba(255,255,255,0.2)', fontWeight: 600 }}
           >
-            Pengaturan Profil
+            Pengaturan
           </button>
         </div>
       </div>

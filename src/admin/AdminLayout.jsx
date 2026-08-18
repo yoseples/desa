@@ -63,7 +63,7 @@ export default function AdminLayout({
     {
       title: 'Sistem & Identitas',
       items: [
-        { id: 'settings', label: 'Pengaturan Profil & Logo', icon: Settings },
+        { id: 'settings', label: 'Pengaturan', icon: Settings },
       ]
     }
   ];
