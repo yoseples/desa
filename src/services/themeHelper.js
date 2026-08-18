@@ -160,3 +160,64 @@ export function applyThemeToDocument(theme) {
     }
   }
 }
+
+export function applySeoAndFavicon(profile) {
+  if (!profile || typeof document === 'undefined') return;
+
+  const seo = profile.seo || {};
+  const villageName = profile.name || 'Desa Sukamaju Mandiri';
+
+  // 1. Dynamic Favicon
+  const faviconUrl = profile.favicon || profile.logo;
+  if (faviconUrl) {
+    let faviconLink = document.getElementById('app-favicon');
+    if (!faviconLink) {
+      faviconLink = document.createElement('link');
+      faviconLink.id = 'app-favicon';
+      faviconLink.rel = 'icon';
+      document.head.appendChild(faviconLink);
+    }
+    faviconLink.href = faviconUrl;
+    if (faviconUrl.endsWith('.png')) faviconLink.type = 'image/png';
+    else if (faviconUrl.endsWith('.jpg') || faviconUrl.endsWith('.jpeg')) faviconLink.type = 'image/jpeg';
+    else if (faviconUrl.endsWith('.svg') || faviconUrl.startsWith('data:image/svg+xml')) faviconLink.type = 'image/svg+xml';
+  }
+
+  // 2. Document Title
+  const pageTitle = seo.metaTitle || `${villageName} - Portal Informasi & Layanan Digital Desa`;
+  document.title = pageTitle;
+
+  // Helper to safely update or create meta tag
+  const setMeta = (selector, attribute, attrValue, content) => {
+    if (!content) return;
+    let el = document.querySelector(selector);
+    if (!el) {
+      el = document.createElement('meta');
+      el.setAttribute(attribute, attrValue);
+      document.head.appendChild(el);
+    }
+    el.setAttribute('content', content);
+  };
+
+  // 3. Standard Meta Description, Keywords & Author
+  setMeta('meta[name="description"]', 'name', 'description', seo.metaDescription || profile.tagline || `${villageName} Smart Village`);
+  setMeta('meta[name="keywords"]', 'name', 'keywords', seo.metaKeywords || `desa pintar, smart village, ${villageName.toLowerCase()}, surat online, apbdes`);
+  setMeta('meta[name="author"]', 'name', 'author', seo.author || `Pemerintah ${villageName}`);
+
+  // 4. Open Graph Meta Tags (Facebook, WhatsApp, LinkedIn, Telegram)
+  const ogTitle = seo.ogTitle || pageTitle;
+  const ogDesc = seo.ogDescription || seo.metaDescription || profile.tagline || `Portal Informasi & Layanan Mandiri 24 Jam ${villageName}.`;
+  const ogImg = seo.ogImage || profile.bannerImage || profile.logo || 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=1200&q=80';
+
+  setMeta('meta[property="og:title"]', 'property', 'og:title', ogTitle);
+  setMeta('meta[property="og:description"]', 'property', 'og:description', ogDesc);
+  setMeta('meta[property="og:image"]', 'property', 'og:image', ogImg);
+  setMeta('meta[property="og:site_name"]', 'property', 'og:site_name', villageName);
+  setMeta('meta[property="og:type"]', 'property', 'og:type', seo.ogType || 'website');
+
+  // 5. Twitter / X Cards
+  setMeta('meta[name="twitter:card"]', 'name', 'twitter:card', 'summary_large_image');
+  setMeta('meta[name="twitter:title"]', 'name', 'twitter:title', ogTitle);
+  setMeta('meta[name="twitter:description"]', 'name', 'twitter:description', ogDesc);
+  setMeta('meta[name="twitter:image"]', 'name', 'twitter:image', ogImg);
+}

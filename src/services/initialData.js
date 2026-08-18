@@ -28,10 +28,20 @@ export const initialVillageProfile = {
   district: "Harapan Makmur",
   regency: "Kabupaten Nusantara",
   province: "Jawa Barat",
-  postalCode: "40375",
   logo: "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?auto=format&fit=crop&w=200&q=80",
+  favicon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23059669' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect width='16' height='20' x='4' y='2' rx='2' ry='2'/><path d='M9 22v-4h6v4'/><path d='M8 6h.01'/><path d='M16 6h.01'/><path d='M8 10h.01'/><path d='M16 10h.01'/><path d='M8 14h.01'/><path d='M16 14h.01'/><path d='M8 18h.01'/><path d='M16 18h.01'/></svg>",
   bannerImage: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=1200&q=80",
   officePhoto: "https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=800&q=80",
+  seo: {
+    metaTitle: "Desa Sukamaju Mandiri - Portal Informasi & Layanan Digital Desa",
+    metaDescription: "Portal Resmi Desa Sukamaju Mandiri. Layanan permohonan surat online 24 jam, cek resi, direktori UMKM warga, transparansi APBDes, dan pesona wisata desa.",
+    metaKeywords: "desa pintar, smart village, sukamaju mandiri, surat online, apbdes, umkm desa, wisata desa, transparansi desa",
+    author: "Pemerintah Desa Sukamaju Mandiri",
+    ogTitle: "Portal Resmi Desa Sukamaju Mandiri",
+    ogDescription: "Portal Informasi & Layanan Mandiri 24 Jam Desa Sukamaju Mandiri. Buat surat online, lacak resi, etalase UMKM, transparansi APBDes, dan informasi wisata desa.",
+    ogImage: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=1200&q=80",
+    ogType: "website"
+  },
   theme: defaultThemeSettings,
   headOfVillage: {
     name: "H. Budi Santoso, S.AP",

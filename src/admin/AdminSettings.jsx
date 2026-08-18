@@ -16,17 +16,33 @@ import {
   ShieldCheck,
   Eye,
   Layers,
+  Share2,
+  Globe,
+  Search,
+  FileCode,
   Image as ImageIcon
 } from 'lucide-react';
 import { defaultThemeSettings } from '../services/initialData';
-import { applyThemeToDocument } from '../services/themeHelper';
+import { applyThemeToDocument, applySeoAndFavicon } from '../services/themeHelper';
 
 export default function AdminSettings({ profile, onUpdateProfile }) {
-  const [activeTab, setActiveTab] = useState('general'); // 'general', 'layout', 'styling', 'typography'
+  const [activeTab, setActiveTab] = useState('general'); // 'general', 'seo', 'layout', 'styling', 'typography'
   
   const [formData, setFormData] = useState(() => {
     return {
       ...profile,
+      favicon: profile?.favicon || "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23059669' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect width='16' height='20' x='4' y='2' rx='2' ry='2'/><path d='M9 22v-4h6v4'/><path d='M8 6h.01'/><path d='M16 6h.01'/><path d='M8 10h.01'/><path d='M16 10h.01'/><path d='M8 14h.01'/><path d='M16 14h.01'/><path d='M8 18h.01'/><path d='M16 18h.01'/></svg>",
+      seo: {
+        metaTitle: profile?.seo?.metaTitle || `${profile?.name || 'Desa Sukamaju Mandiri'} - Portal Informasi & Layanan Digital Desa`,
+        metaDescription: profile?.seo?.metaDescription || profile?.tagline || "Portal Resmi Desa Sukamaju Mandiri. Layanan permohonan surat online 24 jam, cek resi, direktori UMKM warga, transparansi APBDes, dan pesona wisata desa.",
+        metaKeywords: profile?.seo?.metaKeywords || "desa pintar, smart village, sukamaju mandiri, surat online, apbdes, umkm desa, wisata desa",
+        author: profile?.seo?.author || `Pemerintah ${profile?.name || 'Desa Sukamaju Mandiri'}`,
+        ogTitle: profile?.seo?.ogTitle || `Portal Resmi ${profile?.name || 'Desa Sukamaju Mandiri'}`,
+        ogDescription: profile?.seo?.ogDescription || profile?.tagline || "Portal Informasi & Layanan Mandiri 24 Jam Desa Sukamaju Mandiri.",
+        ogImage: profile?.seo?.ogImage || profile?.bannerImage || "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=1200&q=80",
+        ogType: profile?.seo?.ogType || "website",
+        ...(profile?.seo || {})
+      },
       theme: {
         ...defaultThemeSettings,
         ...(profile?.theme || {})
@@ -39,7 +55,10 @@ export default function AdminSettings({ profile, onUpdateProfile }) {
     if (formData?.theme) {
       applyThemeToDocument(formData.theme);
     }
-  }, [formData?.theme]);
+    if (formData) {
+      applySeoAndFavicon(formData);
+    }
+  }, [formData]);
 
   const [savedNotice, setSavedNotice] = useState(false);
 
@@ -67,6 +86,13 @@ export default function AdminSettings({ profile, onUpdateProfile }) {
         setFormData(prev => ({ ...prev, bannerImage: base64 }));
       } else if (fieldPath === 'officePhoto') {
         setFormData(prev => ({ ...prev, officePhoto: base64 }));
+      } else if (fieldPath === 'favicon') {
+        setFormData(prev => ({ ...prev, favicon: base64 }));
+      } else if (fieldPath === 'ogImage') {
+        setFormData(prev => ({
+          ...prev,
+          seo: { ...prev.seo, ogImage: base64 }
+        }));
       }
     };
     reader.readAsDataURL(file);
@@ -125,6 +151,12 @@ export default function AdminSettings({ profile, onUpdateProfile }) {
             onClick={() => setActiveTab('general')}
           >
             <Building size={14} /> General (Umum & Media)
+          </button>
+          <button
+            className={`btn btn-sm ${activeTab === 'seo' ? 'btn-primary' : 'btn-secondary'}`}
+            onClick={() => setActiveTab('seo')}
+          >
+            <Share2 size={14} /> SEO, Open Graph & Favicon
           </button>
           <button
             className={`btn btn-sm ${activeTab === 'layout' ? 'btn-primary' : 'btn-secondary'}`}
@@ -382,7 +414,393 @@ export default function AdminSettings({ profile, onUpdateProfile }) {
         )}
 
         {/* ====================================================================
-            TAB 2: LAYOUT (Tata Letak, Kontainer, Header & Spasi)
+            TAB: SEO, OPEN GRAPH & FAVICON
+            ==================================================================== */}
+        {activeTab === 'seo' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <div>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 0.25rem 0' }}>
+                Pengaturan SEO, Open Graph & Favicon
+              </h3>
+              <span style={{ fontSize: '0.825rem', color: 'var(--text-muted)' }}>
+                Kelola favicon ikon tab browser, meta deskripsi mesin pencari, dan pratinjau thumbnail Open Graph saat website dibagikan di WhatsApp, Facebook, dan media sosial.
+              </span>
+            </div>
+
+            {/* 1. FAVICON MANAGEMENT & BROWSER TAB SIMULATOR */}
+            <div style={{ background: 'var(--light-surface)', padding: '1.35rem', borderRadius: 'var(--radius-lg)', border: '1px solid var(--light-border)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                <div style={{ width: '28px', height: '28px', borderRadius: '6px', background: 'var(--primary-light)', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Sparkles size={16} />
+                </div>
+                <div>
+                  <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
+                    1. Favicon Ikon Tab Browser
+                  </h4>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                    Ikon kecil yang muncul di sebelah judul website pada tab browser pengunjung.
+                  </span>
+                </div>
+              </div>
+
+              {/* Browser Tab Simulation Box */}
+              <div style={{
+                background: 'var(--light-bg)',
+                padding: '0.85rem 1rem',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--light-border)',
+                marginBottom: '1.25rem'
+              }}>
+                <span style={{ fontSize: '0.725rem', fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: '0.4rem' }}>
+                  Simulasi Tampilan Tab Browser:
+                </span>
+                <div style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  background: 'var(--light-surface)',
+                  padding: '0.45rem 1rem',
+                  borderRadius: '8px 8px 0 0',
+                  border: '1px solid var(--light-border)',
+                  borderBottom: 'none',
+                  boxShadow: '0 2px 5px rgba(0,0,0,0.05)',
+                  maxWidth: '320px'
+                }}>
+                  <img
+                    src={formData.favicon || formData.logo}
+                    alt="Favicon Preview"
+                    style={{ width: '18px', height: '18px', objectFit: 'contain', flexShrink: 0 }}
+                  />
+                  <span style={{
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    color: 'var(--text-main)',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}>
+                    {formData.seo?.metaTitle || formData.name || 'Desa Sukamaju Mandiri'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Preset Favicon SVGs */}
+              <div style={{ marginBottom: '1.25rem' }}>
+                <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 700 }}>
+                  Pilih Preset Ikon SVG Favicon Cepat:
+                </label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))', gap: '0.65rem' }}>
+                  
+                  {/* Preset 1: Balai Desa */}
+                  <button
+                    type="button"
+                    onClick={() => setFormData({
+                      ...formData,
+                      favicon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23059669' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect width='16' height='20' x='4' y='2' rx='2' ry='2'/><path d='M9 22v-4h6v4'/><path d='M8 6h.01'/><path d='M16 6h.01'/><path d='M8 10h.01'/><path d='M16 10h.01'/><path d='M8 14h.01'/><path d='M16 14h.01'/><path d='M8 18h.01'/><path d='M16 18h.01'/></svg>"
+                    })}
+                    className="btn btn-secondary btn-sm"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.45rem',
+                      justifyContent: 'center',
+                      padding: '0.5rem',
+                      borderColor: formData.favicon?.includes('%23059669') ? 'var(--primary)' : 'var(--light-border)'
+                    }}
+                  >
+                    <Building size={16} color="#059669" /> <span>Balai Desa</span>
+                  </button>
+
+                  {/* Preset 2: Pohon & Alam */}
+                  <button
+                    type="button"
+                    onClick={() => setFormData({
+                      ...formData,
+                      favicon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2310b981' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 10a6 6 0 0 0-6-6H3v2a6 6 0 0 0 6 6h3'/><path d='M12 14a6 6 0 0 1 6-6h3v2a6 6 0 0 1-6 6h-3'/><path d='M12 22V10'/></svg>"
+                    })}
+                    className="btn btn-secondary btn-sm"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.45rem',
+                      justifyContent: 'center',
+                      padding: '0.5rem',
+                      borderColor: formData.favicon?.includes('%2310b981') ? 'var(--primary)' : 'var(--light-border)'
+                    }}
+                  >
+                    <Sparkles size={16} color="#10b981" /> <span>Alam & Hijau</span>
+                  </button>
+
+                  {/* Preset 3: Perisai Mandiri */}
+                  <button
+                    type="button"
+                    onClick={() => setFormData({
+                      ...formData,
+                      favicon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/></svg>"
+                    })}
+                    className="btn btn-secondary btn-sm"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.45rem',
+                      justifyContent: 'center',
+                      padding: '0.5rem',
+                      borderColor: formData.favicon?.includes('%233b82f6') ? 'var(--primary)' : 'var(--light-border)'
+                    }}
+                  >
+                    <ShieldCheck size={16} color="#3b82f6" /> <span>Perisai Biru</span>
+                  </button>
+
+                  {/* Preset 4: Logo Desa */}
+                  <button
+                    type="button"
+                    onClick={() => setFormData({
+                      ...formData,
+                      favicon: formData.logo
+                    })}
+                    className="btn btn-secondary btn-sm"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.45rem',
+                      justifyContent: 'center',
+                      padding: '0.5rem',
+                      borderColor: formData.favicon === formData.logo ? 'var(--primary)' : 'var(--light-border)'
+                    }}
+                  >
+                    <ImageIcon size={16} color="#d97706" /> <span>Logo Desa</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Custom Favicon URL & File Upload */}
+              <div className="form-row" style={{ alignItems: 'flex-end' }}>
+                <div className="form-group" style={{ flex: 1 }}>
+                  <label className="form-label">Favicon Custom URL / Base64</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="https://... atau data:image/..."
+                    value={formData.favicon || ''}
+                    onChange={(e) => setFormData({ ...formData, favicon: e.target.value })}
+                  />
+                </div>
+                <div style={{ marginBottom: '1rem' }}>
+                  <label className="btn btn-primary btn-sm" style={{ cursor: 'pointer', height: '42px', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <Upload size={14} /> Upload Ikon (.ico / .png / .svg)
+                    <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handleImageFileChange(e, 'favicon')} />
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            {/* 2. OPEN GRAPH & SOCIAL MEDIA SHARING */}
+            <div style={{ background: 'var(--light-surface)', padding: '1.35rem', borderRadius: 'var(--radius-lg)', border: '1px solid var(--light-border)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                <div style={{ width: '28px', height: '28px', borderRadius: '6px', background: '#dbeafe', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Share2 size={16} />
+                </div>
+                <div>
+                  <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
+                    2. Open Graph & Banner Berbagi (WhatsApp / Facebook / X)
+                  </h4>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                    Informasi gambar dan ringkasan yang otomatis tampil saat link website dikirimkan via WhatsApp atau media sosial.
+                  </span>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))', gap: '1.5rem', alignItems: 'flex-start' }}>
+                
+                {/* Left: Input Fields */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                  <div className="form-group">
+                    <label className="form-label">Judul Open Graph (og:title) *</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={formData.seo?.ogTitle || ''}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        seo: { ...formData.seo, ogTitle: e.target.value }
+                      })}
+                      placeholder="Portal Resmi Desa Sukamaju Mandiri"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Deskripsi Open Graph (og:description) *</label>
+                    <textarea
+                      rows={3}
+                      className="form-control"
+                      value={formData.seo?.ogDescription || ''}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        seo: { ...formData.seo, ogDescription: e.target.value }
+                      })}
+                      placeholder="Layanan administrasi mandiri 24 jam, cek resi, direktori UMKM, dan transparansi APBDes..."
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Banner Gambar Open Graph (og:image URL)</label>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={formData.seo?.ogImage || ''}
+                        onChange={(e) => setFormData({
+                          ...formData,
+                          seo: { ...formData.seo, ogImage: e.target.value }
+                        })}
+                        placeholder="https://images.unsplash.com/..."
+                      />
+                      <label className="btn btn-secondary btn-sm" style={{ cursor: 'pointer', flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+                        <Upload size={13} /> Upload
+                        <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handleImageFileChange(e, 'ogImage')} />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right: Live Social Share Card Mockup */}
+                <div>
+                  <label className="form-label" style={{ fontWeight: 800, marginBottom: '0.4rem' }}>
+                    📱 Live Preview Kartu Tautan (WhatsApp / Facebook):
+                  </label>
+                  <div style={{
+                    borderRadius: '12px',
+                    overflow: 'hidden',
+                    border: '1px solid var(--light-border)',
+                    background: 'var(--light-bg)',
+                    boxShadow: '0 6px 18px rgba(0, 0, 0, 0.08)'
+                  }}>
+                    <div style={{ height: '170px', background: '#e2e8f0', overflow: 'hidden' }}>
+                      <img
+                        src={formData.seo?.ogImage || formData.bannerImage}
+                        alt="OG Preview"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                    </div>
+                    <div style={{ padding: '0.85rem 1rem' }}>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: '0.2rem' }}>
+                        desa.sukamaju.id
+                      </span>
+                      <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 0.35rem 0', lineHeight: 1.3 }}>
+                        {formData.seo?.ogTitle || formData.name || 'Portal Resmi Desa Sukamaju'}
+                      </h4>
+                      <p style={{ fontSize: '0.775rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                        {formData.seo?.ogDescription || formData.tagline || 'Layanan mandiri surat online 24 jam, transparansi APBDes, dan profil desa.'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            {/* 3. GENERAL SEARCH ENGINE OPTIMIZATION (SEO) */}
+            <div style={{ background: 'var(--light-surface)', padding: '1.35rem', borderRadius: 'var(--radius-lg)', border: '1px solid var(--light-border)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                <div style={{ width: '28px', height: '28px', borderRadius: '6px', background: '#fef3c7', color: '#d97706', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Search size={16} />
+                </div>
+                <div>
+                  <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
+                    3. Meta Tag SEO Mesin Pencari (Google Search Engine)
+                  </h4>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                    Kata kunci dan deskripsi halaman untuk meningkatkan peringkat pencarian website di Google.
+                  </span>
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Meta Page Title Tag (Judul Halaman Web)</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={formData.seo?.metaTitle || ''}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      seo: { ...formData.seo, metaTitle: e.target.value }
+                    })}
+                    placeholder="Desa Sukamaju Mandiri - Portal Informasi & Layanan Digital Desa"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Penulis / Author Meta</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={formData.seo?.author || ''}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      seo: { ...formData.seo, author: e.target.value }
+                    })}
+                    placeholder="Pemerintah Desa Sukamaju Mandiri"
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Meta Description (Ringkasan Cuplikan Pencarian Google)</label>
+                <textarea
+                  rows={2}
+                  className="form-control"
+                  value={formData.seo?.metaDescription || ''}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    seo: { ...formData.seo, metaDescription: e.target.value }
+                  })}
+                  placeholder="Portal Resmi Desa Sukamaju Mandiri. Layanan permohonan surat mandiri 24 jam, transparansi APBDes, direktori produk UMKM, dan pesona wisata desa."
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Meta Keywords (Kata Kunci Pencarian - Pisahkan dengan koma)</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={formData.seo?.metaKeywords || ''}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    seo: { ...formData.seo, metaKeywords: e.target.value }
+                  })}
+                  placeholder="desa pintar, smart village, surat online, apbdes, umkm desa, wisata desa"
+                />
+              </div>
+
+              {/* Google Search Result Preview Simulation */}
+              <div style={{
+                background: 'var(--light-bg)',
+                padding: '1rem',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--light-border)',
+                marginTop: '1rem'
+              }}>
+                <span style={{ fontSize: '0.725rem', fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: '0.5rem' }}>
+                  🔍 Simulasi Hasil Pencarian Google:
+                </span>
+                <div>
+                  <span style={{ fontSize: '0.75rem', color: '#16a34a', display: 'block' }}>https://desa.sukamaju.id › portal</span>
+                  <h4 style={{ fontSize: '1rem', color: '#2563eb', margin: '0.2rem 0', fontWeight: 700, cursor: 'pointer', textDecoration: 'underline' }}>
+                    {formData.seo?.metaTitle || formData.name || 'Desa Sukamaju Mandiri - Portal Informasi & Layanan Digital'}
+                  </h4>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-body)', margin: 0, lineHeight: 1.4 }}>
+                    {formData.seo?.metaDescription || formData.tagline || 'Portal Resmi Desa Sukamaju Mandiri. Layanan permohonan surat mandiri 24 jam, transparansi APBDes, direktori produk UMKM, dan pesona wisata desa.'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        )}
+
+        {/* ====================================================================
+            TAB: LAYOUT (Tata Letak, Kontainer, Header & Spasi)
             ==================================================================== */}
         {activeTab === 'layout' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>

@@ -35,7 +35,7 @@ import AdminComplaints from './admin/AdminComplaints';
 import AdminSettings from './admin/AdminSettings';
 
 import { StorageService } from './services/storageService';
-import { applyThemeToDocument, initColorMode } from './services/themeHelper';
+import { applyThemeToDocument, initColorMode, applySeoAndFavicon } from './services/themeHelper';
 
 // Helper function to resolve page from pathname
 const getPageFromPath = (path) => {
@@ -134,13 +134,16 @@ export default function App() {
   const [requestsList, setRequestsList] = useState(() => StorageService.getRequests());
   const [complaintsList, setComplaintsList] = useState(() => StorageService.getComplaints());
 
-  // Dynamic Theme & CSS Variables Application + Dark/Light Color Mode
+  // Dynamic Theme, Dark/Light Mode & Open Graph / Favicon Metadata
   useEffect(() => {
     initColorMode();
+    if (profile) {
+      applySeoAndFavicon(profile);
+    }
     if (profile?.theme) {
       applyThemeToDocument(profile.theme);
     }
-  }, [profile?.theme]);
+  }, [profile]);
 
   // Modals
   const [serviceModalOpen, setServiceModalOpen] = useState(false);
