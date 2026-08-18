@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   Building2, 
   Users, 
@@ -18,12 +18,18 @@ import {
   MapPin,
   Clock,
   Sun,
-  Activity
+  Activity,
+  Briefcase,
+  DollarSign,
+  Calendar,
+  Layers,
+  AlertCircle
 } from 'lucide-react';
 import { StorageService } from '../services/storageService';
 
 export default function Home({ 
   profile, 
+  workProgramsList = [],
   newsList = [], 
   umkmList = [], 
   tourismList = [], 
@@ -34,6 +40,8 @@ export default function Home({
   onSelectNews, 
   onSelectUmkm 
 }) {
+  const [programFilter, setProgramFilter] = useState('ALL'); // 'ALL', 'PRIORITAS', 'SEDANG_BERJALAN', 'WAKTU_DEKAT', 'RENCANA_SELANJUTNYA'
+
   const featuredNews = Array.isArray(newsList) ? newsList.slice(0, 3) : [];
   const featuredUmkm = Array.isArray(umkmList) ? umkmList.slice(0, 3) : [];
   const featuredTourism = Array.isArray(tourismList) ? tourismList.slice(0, 2) : [];
@@ -46,6 +54,32 @@ export default function Home({
 
   const formatRupiah = (num) => {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num || 0);
+  };
+
+  // Work Programs stats & filters
+  const prioritasCount = workProgramsList.filter(p => p.status === 'PRIORITAS').length;
+  const sedangBerjalanCount = workProgramsList.filter(p => p.status === 'SEDANG_BERJALAN').length;
+  const waktuDekatCount = workProgramsList.filter(p => p.status === 'WAKTU_DEKAT').length;
+  const rencanaNantiCount = workProgramsList.filter(p => p.status === 'RENCANA_SELANJUTNYA').length;
+  const totalBudget = workProgramsList.reduce((acc, p) => acc + (p.budget || 0), 0);
+
+  const filteredPrograms = workProgramsList.filter(p => {
+    if (programFilter === 'ALL') return true;
+    return p.status === programFilter;
+  });
+
+  const getStatusBadge = (status) => {
+    switch (status) {
+      case 'PRIORITAS':
+        return <span className="badge badge-danger">🌟 Prioritas Utama</span>;
+      case 'SEDANG_BERJALAN':
+        return <span className="badge badge-success">⏳ Sedang Dikerjakan</span>;
+      case 'WAKTU_DEKAT':
+        return <span className="badge badge-warning">🗓️ Waktu Dekat</span>;
+      case 'RENCANA_SELANJUTNYA':
+      default:
+        return <span className="badge badge-neutral">📋 Rencana Selanjutnya</span>;
+    }
   };
 
   return (
@@ -101,7 +135,7 @@ export default function Home({
                 </div>
                 <div className="quick-feature-item">
                   <div className="quick-feature-icon">✓</div>
-                  <span>Transparansi Kependudukan</span>
+                  <span>Transparansi Anggaran APBDes</span>
                 </div>
               </div>
             </div>
@@ -192,8 +226,132 @@ export default function Home({
         </div>
       </div>
 
-      {/* 3. DEMOGRAFI & STATISTIK SECTION */}
+      {/* 3. TRANSPARANSI PROGRAM KERJA PEMERINTAH DESA & APBDes */}
       <section className="section" style={{ background: '#ffffff', borderBottom: '1px solid var(--light-border)' }}>
+        <div className="container">
+          
+          <div className="section-title-wrap" style={{ marginBottom: '1.75rem' }}>
+            <span className="section-badge">
+              <Briefcase size={13} /> Transparansi APBDes & Pembangunan
+            </span>
+            <h2 className="section-title">Program Kerja Pemerintah Desa</h2>
+            <p className="section-subtitle">
+              Keterbukaan informasi program prioritas, kegiatan yang sedang berjalan, dan rencana pembangunan desa yang bersumber dari Dana Desa, ADD, dan PADes.
+            </p>
+          </div>
+
+          {/* Filter Status Bar */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: '0.5rem',
+            marginBottom: '2rem',
+            flexWrap: 'wrap'
+          }}>
+            <button
+              className={`btn btn-sm ${programFilter === 'ALL' ? 'btn-primary' : 'btn-secondary'}`}
+              onClick={() => setProgramFilter('ALL')}
+            >
+              Semua Program ({workProgramsList.length})
+            </button>
+            <button
+              className={`btn btn-sm ${programFilter === 'PRIORITAS' ? 'btn-primary' : 'btn-secondary'}`}
+              onClick={() => setProgramFilter('PRIORITAS')}
+            >
+              🌟 Prioritas Utama ({prioritasCount})
+            </button>
+            <button
+              className={`btn btn-sm ${programFilter === 'SEDANG_BERJALAN' ? 'btn-primary' : 'btn-secondary'}`}
+              onClick={() => setProgramFilter('SEDANG_BERJALAN')}
+            >
+              ⏳ Sedang Dikerjakan ({sedangBerjalanCount})
+            </button>
+            <button
+              className={`btn btn-sm ${programFilter === 'WAKTU_DEKAT' ? 'btn-primary' : 'btn-secondary'}`}
+              onClick={() => setProgramFilter('WAKTU_DEKAT')}
+            >
+              🗓️ Waktu Dekat ({waktuDekatCount})
+            </button>
+            <button
+              className={`btn btn-sm ${programFilter === 'RENCANA_SELANJUTNYA' ? 'btn-primary' : 'btn-secondary'}`}
+              onClick={() => setProgramFilter('RENCANA_SELANJUTNYA')}
+            >
+              📋 Rencana Selanjutnya ({rencanaNantiCount})
+            </button>
+          </div>
+
+          {/* Programs Grid Cards */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))', gap: '1.5rem' }}>
+            {filteredPrograms.map((prog) => (
+              <div 
+                key={prog.id} 
+                className="card"
+                style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
+              >
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.65rem' }}>
+                    {getStatusBadge(prog.status)}
+                    <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>
+                      {prog.category}
+                    </span>
+                  </div>
+
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 0.5rem 0', lineHeight: 1.35 }}>
+                    {prog.title}
+                  </h3>
+
+                  <p style={{ fontSize: '0.825rem', color: 'var(--text-muted)', lineHeight: 1.55, marginBottom: '1.25rem' }}>
+                    {prog.description}
+                  </p>
+
+                  <div style={{ background: '#f8fafc', padding: '0.85rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--light-border)', marginBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '0.4rem', fontSize: '0.8rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ color: 'var(--text-muted)' }}>Alokasi Anggaran:</span>
+                      <strong style={{ color: '#064e3b', fontSize: '0.95rem' }}>{formatRupiah(prog.budget)}</strong>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ color: 'var(--text-muted)' }}>Sumber Dana:</span>
+                      <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{prog.fundingSource}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ color: 'var(--text-muted)' }}>Jadwal / Rencana:</span>
+                      <span style={{ fontWeight: 600, color: '#2563eb' }}>{prog.schedule}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ color: 'var(--text-muted)' }}>Lokasi / Dusun:</span>
+                      <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{prog.location}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Progress bar for in-progress or started projects */}
+                <div>
+                  {(prog.status === 'SEDANG_BERJALAN' || prog.progress > 0) && (
+                    <div style={{ marginBottom: '0.75rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', fontWeight: 700, marginBottom: '4px', color: 'var(--text-main)' }}>
+                        <span>Realisasi Fisik Proyek:</span>
+                        <span style={{ color: '#059669' }}>{prog.progress}%</span>
+                      </div>
+                      <div style={{ height: '7px', background: '#e2e8f0', borderRadius: '4px', overflow: 'hidden' }}>
+                        <div style={{ width: `${prog.progress}%`, height: '100%', background: 'linear-gradient(90deg, #10b981, #059669)', borderRadius: '4px' }}></div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid var(--light-border)', paddingTop: '0.65rem' }}>
+                    <span>Pelaksana: <strong>{prog.pic}</strong></span>
+                    <span style={{ color: '#059669', fontWeight: 700 }}>✓ Transparan</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </section>
+
+      {/* 4. DEMOGRAFI & STATISTIK SECTION */}
+      <section className="section" style={{ background: '#f8fafc', borderBottom: '1px solid var(--light-border)' }}>
         <div className="container">
           <div className="section-title-wrap">
             <span className="section-badge">
@@ -231,7 +389,7 @@ export default function Home({
                 <ShoppingBag size={24} />
               </div>
               <div className="stat-data">
-                <h3>{profile?.stats?.umkmActive || umkmList?.length || 42}+</h3>
+                <h3>{profile?.stats?.umkmActive || (umkmList || []).length || 42}+</h3>
                 <p>Pelaku Usaha UMKM</p>
               </div>
             </div>
@@ -241,7 +399,7 @@ export default function Home({
                 <Palmtree size={24} />
               </div>
               <div className="stat-data">
-                <h3>{profile?.stats?.tourismSpots || tourismList?.length || 5}</h3>
+                <h3>{profile?.stats?.tourismSpots || (tourismList || []).length || 5}</h3>
                 <p>Destinasi Unggulan</p>
               </div>
             </div>
@@ -249,8 +407,8 @@ export default function Home({
         </div>
       </section>
 
-      {/* 4. BERITA & PENGUMUMAN TERKINI */}
-      <section className="section">
+      {/* 5. BERITA & PENGUMUMAN TERKINI */}
+      <section className="section" style={{ background: '#ffffff', borderBottom: '1px solid var(--light-border)' }}>
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
             <div>
@@ -299,8 +457,8 @@ export default function Home({
         </div>
       </section>
 
-      {/* 5. ETALASE PRODUK UMKM DESA */}
-      <section className="section" style={{ background: '#ffffff', borderTop: '1px solid var(--light-border)', borderBottom: '1px solid var(--light-border)' }}>
+      {/* 6. ETALASE PRODUK UMKM DESA */}
+      <section className="section" style={{ background: '#f8fafc', borderBottom: '1px solid var(--light-border)' }}>
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
             <div>
@@ -362,8 +520,8 @@ export default function Home({
         </div>
       </section>
 
-      {/* 6. PESONA WISATA DESA */}
-      <section className="section">
+      {/* 7. PESONA WISATA DESA */}
+      <section className="section" style={{ background: '#ffffff', borderBottom: '1px solid var(--light-border)' }}>
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
             <div>
@@ -385,7 +543,7 @@ export default function Home({
                 className="card" 
                 style={{ overflow: 'hidden' }}
               >
-                <div style={{ height: '260px', overflow: 'hidden', position: 'relative' }}>
+                <div style={{ height: '240px', overflow: 'hidden', position: 'relative' }}>
                   <img 
                     src={tour.image} 
                     alt={tour.name} 
@@ -405,7 +563,7 @@ export default function Home({
                     </div>
                   </div>
 
-                  <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', lineHeight: 1.6, margin: 0 }}>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: 1.6, margin: 0 }}>
                     {tour.description}
                   </p>
 
@@ -434,43 +592,43 @@ export default function Home({
         </div>
       </section>
 
-      {/* 7. CALL TO ACTION / LAYANAN MANDIRI PROMPT */}
-      <section className="section" style={{ padding: '0 0 5rem 0' }}>
+      {/* 8. CALL TO ACTION */}
+      <section className="section" style={{ padding: '3rem 0 5rem 0' }}>
         <div className="container">
           <div style={{
             background: 'linear-gradient(135deg, #064e3b, #047857)',
             borderRadius: 'var(--radius-xl)',
-            padding: 'clamp(2rem, 5vw, 3.5rem)',
+            padding: 'clamp(2rem, 4vw, 3rem)',
             color: '#ffffff',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
             flexWrap: 'wrap',
-            gap: '2rem',
+            gap: '1.5rem',
             boxShadow: 'var(--shadow-xl)'
           }}>
             <div style={{ maxWidth: '580px' }}>
-              <span className="badge" style={{ background: 'rgba(255,255,255,0.2)', color: '#a7f3d0', marginBottom: '0.75rem' }}>
+              <span className="badge" style={{ background: 'rgba(255,255,255,0.2)', color: '#a7f3d0', marginBottom: '0.65rem' }}>
                 Layanan Desa Mandiri 24 Jam
               </span>
-              <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.2rem)', fontWeight: 800, margin: '0 0 0.75rem 0', color: '#fff' }}>
-                Butuh Surat Keterangan Tanpa Perlu Antre di Kantor Balai Desa?
+              <h2 style={{ fontSize: 'clamp(1.4rem, 2.5vw, 2rem)', fontWeight: 800, margin: '0 0 0.5rem 0', color: '#fff' }}>
+                Butuh Surat Keterangan Cepat Tanpa Antre di Balai Desa?
               </h2>
-              <p style={{ fontSize: 'clamp(0.9rem, 1.6vw, 1.05rem)', color: '#cbd5e1', lineHeight: 1.6, margin: 0 }}>
-                Gunakan layanan permohonan surat online mandiri. Cukup siapkan NIK Anda, isi data, dan pantau proses verifikasi dokumen secara langsung dari ponsel Anda.
+              <p style={{ fontSize: 'clamp(0.85rem, 1.4vw, 0.95rem)', color: '#cbd5e1', lineHeight: 1.55, margin: 0 }}>
+                Gunakan layanan permohonan surat mandiri online. Cukup isi NIK Anda dan pantau nomor resi penerbitan secara langsung.
               </p>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: 'min(100%, 260px)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', width: 'min(100%, 240px)' }}>
               <button 
-                className="btn btn-accent btn-lg"
+                className="btn btn-accent"
                 style={{ width: '100%', justifyContent: 'center' }}
                 onClick={() => onOpenServiceModal('SKU')}
               >
                 Buat Surat Sekarang
               </button>
               <button 
-                className="btn btn-outline-white btn-lg"
+                className="btn btn-outline-white"
                 style={{ width: '100%', justifyContent: 'center' }}
                 onClick={onOpenTracking}
               >

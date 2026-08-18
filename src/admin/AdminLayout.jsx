@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { 
   LayoutDashboard, 
   Users, 
+  Briefcase,
   Newspaper, 
   ShoppingBag, 
   Palmtree, 
@@ -26,12 +27,14 @@ export default function AdminLayout({
   pendingCount, 
   complaintCount, 
   familyCount,
+  programCount,
   children 
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const menuItems = [
     { id: 'dashboard', label: 'Ringkasan & Statistik', icon: LayoutDashboard },
+    { id: 'programs', label: 'Program Kerja & APBDes', icon: Briefcase, badge: programCount },
     { id: 'citizens', label: 'Database KK & Warga', icon: Users, badge: familyCount },
     { id: 'services', label: 'Permohonan Masuk', icon: FileText, badge: pendingCount },
     { id: 'letter-templates', label: 'Template & Cetak Surat', icon: Printer },
@@ -54,9 +57,9 @@ export default function AdminLayout({
               src={profile.logo}
               alt="Logo Desa"
               style={{
-                width: '38px',
-                height: '38px',
-                borderRadius: '10px',
+                width: '34px',
+                height: '34px',
+                borderRadius: '8px',
                 objectFit: 'contain',
                 background: '#ffffff',
                 padding: '2px',
@@ -65,9 +68,9 @@ export default function AdminLayout({
             />
           ) : (
             <div style={{
-              width: '38px',
-              height: '38px',
-              borderRadius: '10px',
+              width: '34px',
+              height: '34px',
+              borderRadius: '8px',
               background: 'linear-gradient(135deg, #10b981, #059669)',
               display: 'flex',
               alignItems: 'center',
@@ -75,14 +78,14 @@ export default function AdminLayout({
               color: '#fff',
               flexShrink: 0
             }}>
-              <ShieldCheck size={22} />
+              <ShieldCheck size={20} />
             </div>
           )}
           <div style={{ flex: 1, minWidth: 0 }}>
-            <h3 style={{ fontSize: '0.95rem', fontWeight: 800, color: '#fff', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <h3 style={{ fontSize: '0.9rem', fontWeight: 800, color: '#fff', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {profile?.name || 'Admin Panel Desa'}
             </h3>
-            <span style={{ fontSize: '0.725rem', color: '#10b981', fontWeight: 600 }}>
+            <span style={{ fontSize: '0.7rem', color: '#10b981', fontWeight: 600 }}>
               Smart CMS v2.0
             </span>
           </div>
@@ -103,16 +106,16 @@ export default function AdminLayout({
                 }}
               >
                 <div className="admin-nav-icon-label">
-                  <Icon size={18} />
+                  <Icon size={16} />
                   <span>{item.label}</span>
                 </div>
                 {item.badge !== undefined && item.badge > 0 && (
                   <span style={{
-                    background: item.id === 'citizens' ? '#0d9488' : '#ef4444',
+                    background: item.id === 'citizens' ? '#0d9488' : item.id === 'programs' ? '#059669' : '#ef4444',
                     color: '#fff',
                     borderRadius: '9999px',
-                    padding: '0.15rem 0.5rem',
-                    fontSize: '0.75rem',
+                    padding: '0.1rem 0.45rem',
+                    fontSize: '0.7rem',
                     fontWeight: 800
                   }}>
                     {item.badge}
@@ -124,7 +127,7 @@ export default function AdminLayout({
         </nav>
 
         {/* Sidebar Footer */}
-        <div style={{ padding: '1rem', borderTop: '1px solid var(--dark-border)' }}>
+        <div style={{ padding: '0.85rem', borderTop: '1px solid var(--dark-border)' }}>
           <button
             className="btn btn-secondary btn-sm"
             onClick={onBackToPublic}
@@ -133,10 +136,11 @@ export default function AdminLayout({
               background: 'rgba(255,255,255,0.08)',
               color: '#fff',
               border: '1px solid rgba(255,255,255,0.15)',
-              justifyContent: 'flex-start'
+              justifyContent: 'flex-start',
+              fontSize: '0.8rem'
             }}
           >
-            <ExternalLink size={16} /> Keluar ke Portal Warga
+            <ExternalLink size={14} /> Keluar ke Portal Warga
           </button>
         </div>
       </aside>
@@ -151,9 +155,9 @@ export default function AdminLayout({
               onClick={() => setSidebarOpen(!sidebarOpen)}
               style={{ display: 'none' }}
             >
-              <Menu size={22} />
+              <Menu size={20} />
             </button>
-            <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
+            <h2 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
               {menuItems.find(m => m.id === activeTab)?.label || 'Dashboard'}
             </h2>
           </div>
@@ -163,13 +167,13 @@ export default function AdminLayout({
               <img
                 src={profile?.headOfVillage?.photo}
                 alt="Admin"
-                style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #10b981' }}
+                style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #10b981' }}
               />
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-main)' }}>
+                <span style={{ fontSize: '0.825rem', fontWeight: 700, color: 'var(--text-main)' }}>
                   Administrator
                 </span>
-                <span style={{ fontSize: '0.725rem', color: 'var(--text-muted)' }}>
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
                   {profile?.name}
                 </span>
               </div>
@@ -179,8 +183,9 @@ export default function AdminLayout({
               className="btn btn-sm btn-secondary"
               onClick={onBackToPublic}
               title="Keluar ke Portal Warga"
+              style={{ height: '32px', padding: '0 0.65rem' }}
             >
-              <LogOut size={15} /> Keluar
+              <LogOut size={13} /> Keluar
             </button>
           </div>
         </header>

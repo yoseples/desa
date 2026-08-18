@@ -1,5 +1,6 @@
 import {
   initialVillageProfile,
+  initialWorkPrograms,
   initialFamiliesList,
   initialNewsList,
   initialUmkmList,
@@ -11,6 +12,7 @@ import {
 
 const STORAGE_KEYS = {
   PROFILE: 'desa_profile_data',
+  WORK_PROGRAMS: 'desa_work_programs_data',
   FAMILIES: 'desa_families_data',
   NEWS: 'desa_news_data',
   UMKM: 'desa_umkm_data',
@@ -44,17 +46,6 @@ const initialOutgoingLetters = [
     date: "18 Agustus 2026",
     purpose: "Keringanan SPP Kuliah PTN",
     signer: "H. Budi Santoso, S.AP"
-  },
-  {
-    id: "OUT-003",
-    letterNumber: "593/018/DS-SKM/VIII/2026",
-    letterType: "SK_JUAL_BELI",
-    letterName: "Surat Keterangan Jual Beli (Tanah / Bangunan)",
-    recipientName: "Ujang Suherman & Bambang Sudrajat",
-    recipientNik: "3204151505750001",
-    date: "18 Agustus 2026",
-    purpose: "Sebidang Tanah Kebun Kopi Blok Sukarame",
-    signer: "H. Budi Santoso, S.AP"
   }
 ];
 
@@ -71,19 +62,6 @@ const initialIncomingLetters = [
     dispositionTo: "Sekretaris Desa",
     status: "SELESAI",
     scanFile: "https://images.unsplash.com/photo-1568667256549-094345857637?auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    id: "INC-002",
-    agendaNumber: "AG-2026-043",
-    letterNumber: "440/128/PKM-HM/VIII/2026",
-    letterDate: "16 Agustus 2026",
-    receivedDate: "17 Agustus 2026",
-    sender: "UPTD Puskesmas Harapan Makmur",
-    subject: "Pemberitahuan Pelaksanaan Bulan Imunisasi Anak Sekolah (BIAS) & Skrining Gigi",
-    disposition: "Koordinasikan dengan kader Posyandu, Bidan Desa, dan seluruh Kepala Dusun.",
-    dispositionTo: "Kasi Kesejahteraan (Kesra)",
-    status: "PROSES",
-    scanFile: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=800&q=80"
   }
 ];
 
@@ -96,7 +74,7 @@ function getFromStorage(key, fallback) {
     }
     const parsed = JSON.parse(item);
 
-    // If object (like profile), safely merge with fallback so new schema keys are always defined
+    // If object (like profile), safely merge with fallback
     if (typeof fallback === 'object' && !Array.isArray(fallback) && fallback !== null) {
       const merged = { ...fallback, ...parsed };
       if (merged.apparatus && Array.isArray(merged.apparatus) && merged.apparatus.length < 15 && fallback.apparatus) {
@@ -134,6 +112,42 @@ export const StorageService = {
   saveProfile(profile) {
     saveToStorage(STORAGE_KEYS.PROFILE, profile);
     return profile;
+  },
+
+  // Work Programs & APBDes
+  getWorkPrograms() {
+    return getFromStorage(STORAGE_KEYS.WORK_PROGRAMS, initialWorkPrograms);
+  },
+  saveWorkPrograms(list) {
+    saveToStorage(STORAGE_KEYS.WORK_PROGRAMS, list);
+    return list;
+  },
+  addWorkProgram(programData) {
+    const list = this.getWorkPrograms();
+    const newProg = {
+      ...programData,
+      id: `prog-${Date.now()}`,
+      progress: parseInt(programData.progress || 0, 10)
+    };
+    const updated = [newProg, ...list];
+    this.saveWorkPrograms(updated);
+    return newProg;
+  },
+  updateWorkProgram(id, updatedFields) {
+    const list = this.getWorkPrograms();
+    const updated = list.map(item => item.id === id ? { 
+      ...item, 
+      ...updatedFields, 
+      progress: updatedFields.progress !== undefined ? parseInt(updatedFields.progress, 10) : item.progress 
+    } : item);
+    this.saveWorkPrograms(updated);
+    return updated;
+  },
+  deleteWorkProgram(id) {
+    const list = this.getWorkPrograms();
+    const updated = list.filter(item => item.id !== id);
+    this.saveWorkPrograms(updated);
+    return updated;
   },
 
   // Kartu Keluarga & Citizens Database
@@ -516,11 +530,5 @@ export const StorageService = {
     });
     this.saveComplaints(updated);
     return updated;
-  },
-
-  // Reset to initial
-  resetToDefaults() {
-    localStorage.clear();
-    window.location.reload();
   }
 };

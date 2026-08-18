@@ -23,6 +23,7 @@ import Contact from './pages/Contact';
 import AdminLogin from './admin/AdminLogin';
 import AdminLayout from './admin/AdminLayout';
 import AdminDashboard from './admin/AdminDashboard';
+import AdminPrograms from './admin/AdminPrograms';
 import AdminCitizens from './admin/AdminCitizens';
 import AdminNews from './admin/AdminNews';
 import AdminUmkm from './admin/AdminUmkm';
@@ -100,7 +101,7 @@ export default function App() {
     return getPageFromPath(window.location.pathname);
   });
 
-  const [adminTab, setAdminTab] = useState('dashboard'); // dashboard, citizens, services, letter-templates, complaints, news, umkm, tourism, gallery, settings
+  const [adminTab, setAdminTab] = useState('dashboard'); // dashboard, programs, citizens, services, letter-templates, complaints, news, umkm, tourism, gallery, settings
 
   const navigateTo = (page, shouldPush = true) => {
     setActivePageState(page);
@@ -123,6 +124,7 @@ export default function App() {
 
   // Core Village Data State
   const [profile, setProfile] = useState(() => StorageService.getProfile());
+  const [workProgramsList, setWorkProgramsList] = useState(() => StorageService.getWorkPrograms());
   const [familiesList, setFamiliesList] = useState(() => StorageService.getFamilies());
   const [newsList, setNewsList] = useState(() => StorageService.getNews());
   const [umkmList, setUmkmList] = useState(() => StorageService.getUmkm());
@@ -158,6 +160,7 @@ export default function App() {
   useEffect(() => {
     const handleDataUpdate = () => {
       setProfile(StorageService.getProfile());
+      setWorkProgramsList(StorageService.getWorkPrograms());
       setFamiliesList(StorageService.getFamilies());
       setNewsList(StorageService.getNews());
       setUmkmList(StorageService.getUmkm());
@@ -184,6 +187,22 @@ export default function App() {
     localStorage.removeItem('desa_admin_logged_in');
     navigateTo('home');
     addToast('Anda telah keluar dari sesi Admin.', 'info');
+  };
+
+  // Work Programs Handlers
+  const handleAddWorkProgram = (item) => {
+    StorageService.addWorkProgram(item);
+    addToast(`Program kerja "${item.title}" berhasil ditambahkan!`, 'success');
+  };
+
+  const handleUpdateWorkProgram = (id, fields) => {
+    StorageService.updateWorkProgram(id, fields);
+    addToast('Program kerja berhasil diperbarui!');
+  };
+
+  const handleDeleteWorkProgram = (id) => {
+    StorageService.deleteWorkProgram(id);
+    addToast('Program kerja berhasil dihapus.', 'info');
   };
 
   // Family (KK) Handlers
@@ -217,7 +236,7 @@ export default function App() {
     addToast(`Berhasil mengimpor ${importedList.length} data Kartu Keluarga!`, 'success');
   };
 
-  // Handlers for public letter submission
+  // Public letter submission
   const handleOpenServiceModal = (type = 'SKU') => {
     setSelectedLetterType(type);
     setServiceModalOpen(true);
@@ -235,7 +254,7 @@ export default function App() {
     return created;
   };
 
-  // Handlers for Admin Operations
+  // Admin Operations
   const handleAddNews = (item) => {
     StorageService.addNews(item);
     addToast('Berita desa baru berhasil dipublikasikan!');
@@ -299,11 +318,11 @@ export default function App() {
     addToast('Pengaturan profil desa berhasil disimpan!');
   };
 
-  const pendingRequestsCount = requestsList.filter(
+  const pendingRequestsCount = (requestsList || []).filter(
     (r) => r.status === 'MENUNGGU' || r.status === 'DIPROSES'
   ).length;
 
-  const pendingComplaintsCount = complaintsList.filter(
+  const pendingComplaintsCount = (complaintsList || []).filter(
     (c) => c.status === 'MASUK'
   ).length;
 
@@ -370,7 +389,8 @@ export default function App() {
             profile={profile}
             pendingCount={pendingRequestsCount}
             complaintCount={pendingComplaintsCount}
-            familyCount={familiesList.length}
+            familyCount={(familiesList || []).length}
+            programCount={(workProgramsList || []).length}
           >
             {adminTab === 'dashboard' && (
               <AdminDashboard
@@ -383,6 +403,15 @@ export default function App() {
                 familiesList={familiesList}
                 setActiveTab={setAdminTab}
                 onSelectRequestToPrint={(req) => setPrintLetterReq(req)}
+              />
+            )}
+
+            {adminTab === 'programs' && (
+              <AdminPrograms
+                programsList={workProgramsList}
+                onAddProgram={handleAddWorkProgram}
+                onUpdateProgram={handleUpdateWorkProgram}
+                onDeleteProgram={handleDeleteWorkProgram}
               />
             )}
 
@@ -465,7 +494,7 @@ export default function App() {
           </AdminLayout>
         )
       ) : (
-        /* VIEW 3: CITIZEN PUBLIC PORTAL (/, /profil, /berita, /galeri, /umkm, /wisata, /pelayanan, /kontak) */
+        /* VIEW 3: CITIZEN PUBLIC PORTAL */
         <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
           {/* Public Navbar */}
           <Navbar
@@ -480,6 +509,7 @@ export default function App() {
             {activePage === 'home' && (
               <Home
                 profile={profile}
+                workProgramsList={workProgramsList}
                 newsList={newsList}
                 umkmList={umkmList}
                 tourismList={tourismList}
