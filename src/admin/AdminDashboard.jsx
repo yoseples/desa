@@ -1,6 +1,7 @@
 import React from 'react';
 import { 
   Users, 
+  Home,
   FileText, 
   ShoppingBag, 
   Palmtree, 
@@ -10,8 +11,10 @@ import {
   CheckCircle2, 
   AlertCircle, 
   ArrowRight,
-  TrendingUp
+  TrendingUp,
+  HeartHandshake
 } from 'lucide-react';
+import { StorageService } from '../services/storageService';
 
 export default function AdminDashboard({ 
   profile, 
@@ -20,6 +23,7 @@ export default function AdminDashboard({
   tourismList, 
   requestsList, 
   complaintsList, 
+  familiesList,
   setActiveTab,
   onSelectRequestToPrint 
 }) {
@@ -27,6 +31,10 @@ export default function AdminDashboard({
   const finishedRequests = requestsList.filter(r => r.status === 'SELESAI' || r.status === 'DISETUJUI');
   const recentRequests = requestsList.slice(0, 5);
   const recentComplaints = complaintsList.slice(0, 4);
+
+  const allCitizens = StorageService.getAllCitizens();
+  const totalFamilies = familiesList ? familiesList.length : 0;
+  const totalCitizens = allCitizens.length;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -51,10 +59,13 @@ export default function AdminDashboard({
             Selamat Datang di Pusat Manajemen Desa Pintar
           </h2>
           <p style={{ margin: 0, color: '#d1fae5', fontSize: '0.95rem' }}>
-            Kelola data profil desa, berita, produk UMKM, destinasi wisata, dan proses permohonan surat warga secara real-time.
+            Kelola data Kartu Keluarga & warga, pelayanan surat online, aspirasi warga, UMKM, wisata, dan berita desa.
           </p>
         </div>
         <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <button className="btn btn-secondary" onClick={() => setActiveTab('citizens')}>
+            <Home size={16} /> Data KK ({totalFamilies})
+          </button>
           <button className="btn btn-accent" onClick={() => setActiveTab('services')}>
             <FileText size={16} /> Proses Surat ({pendingRequests.length})
           </button>
@@ -62,10 +73,30 @@ export default function AdminDashboard({
       </div>
 
       {/* KPI Stats Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.5rem' }}>
-        <div className="stat-box">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.25rem' }}>
+        <div className="stat-box" style={{ cursor: 'pointer' }} onClick={() => setActiveTab('citizens')}>
+          <div className="stat-icon" style={{ background: '#d1fae5', color: '#059669' }}>
+            <Home size={26} />
+          </div>
+          <div className="stat-data">
+            <h3>{totalFamilies}</h3>
+            <p>Kartu Keluarga (KK)</p>
+          </div>
+        </div>
+
+        <div className="stat-box" style={{ cursor: 'pointer' }} onClick={() => setActiveTab('citizens')}>
+          <div className="stat-icon" style={{ background: '#ccfbf1', color: '#0f766e' }}>
+            <Users size={26} />
+          </div>
+          <div className="stat-data">
+            <h3>{totalCitizens}</h3>
+            <p>Jiwa Penduduk Terdata</p>
+          </div>
+        </div>
+
+        <div className="stat-box" style={{ cursor: 'pointer' }} onClick={() => setActiveTab('services')}>
           <div className="stat-icon" style={{ background: '#fef3c7', color: '#d97706' }}>
-            <Clock size={28} />
+            <Clock size={26} />
           </div>
           <div className="stat-data">
             <h3>{pendingRequests.length}</h3>
@@ -73,33 +104,13 @@ export default function AdminDashboard({
           </div>
         </div>
 
-        <div className="stat-box">
-          <div className="stat-icon" style={{ background: '#d1fae5', color: '#059669' }}>
-            <CheckCircle2 size={28} />
-          </div>
-          <div className="stat-data">
-            <h3>{finishedRequests.length}</h3>
-            <p>Surat Selesai</p>
-          </div>
-        </div>
-
-        <div className="stat-box">
+        <div className="stat-box" style={{ cursor: 'pointer' }} onClick={() => setActiveTab('complaints')}>
           <div className="stat-icon" style={{ background: '#e0e7ff', color: '#4338ca' }}>
-            <MessageSquare size={28} />
+            <MessageSquare size={26} />
           </div>
           <div className="stat-data">
             <h3>{complaintsList.length}</h3>
-            <p>Total Aspirasi / Laporan</p>
-          </div>
-        </div>
-
-        <div className="stat-box">
-          <div className="stat-icon" style={{ background: '#ccfbf1', color: '#0f766e' }}>
-            <ShoppingBag size={28} />
-          </div>
-          <div className="stat-data">
-            <h3>{umkmList.length}</h3>
-            <p>Produk UMKM Terdaftar</p>
+            <p>Aspirasi / Pengaduan</p>
           </div>
         </div>
       </div>

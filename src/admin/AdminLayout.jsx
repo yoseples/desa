@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { 
   LayoutDashboard, 
+  Users, 
   Newspaper, 
   ShoppingBag, 
   Palmtree, 
@@ -12,9 +13,7 @@ import {
   LogOut, 
   ShieldCheck, 
   Menu, 
-  X,
-  Bell,
-  Sparkles
+  X 
 } from 'lucide-react';
 
 export default function AdminLayout({ 
@@ -24,12 +23,14 @@ export default function AdminLayout({
   profile, 
   pendingCount, 
   complaintCount,
+  familyCount,
   children 
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const menuItems = [
     { id: 'dashboard', label: 'Ringkasan & Statistik', icon: LayoutDashboard },
+    { id: 'citizens', label: 'Database KK & Warga', icon: Users, badge: familyCount },
     { id: 'services', label: 'Pelayanan Surat Online', icon: FileText, badge: pendingCount },
     { id: 'complaints', label: 'Aspirasi & Pengaduan', icon: MessageSquare, badge: complaintCount },
     { id: 'news', label: 'Kelola Berita Desa', icon: Newspaper },
@@ -90,9 +91,9 @@ export default function AdminLayout({
                   <Icon size={18} />
                   <span>{item.label}</span>
                 </div>
-                {item.badge > 0 && (
+                {item.badge !== undefined && item.badge > 0 && (
                   <span style={{
-                    background: '#ef4444',
+                    background: item.id === 'citizens' ? '#0d9488' : '#ef4444',
                     color: '#fff',
                     borderRadius: '9999px',
                     padding: '0.15rem 0.5rem',
@@ -120,7 +121,7 @@ export default function AdminLayout({
               justifyContent: 'flex-start'
             }}
           >
-            <ExternalLink size={16} /> Lihat Portal Publik
+            <ExternalLink size={16} /> Keluar ke Portal Warga
           </button>
         </div>
       </aside>

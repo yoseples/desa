@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { X, CheckCircle, FileText, Send, User, MapPin, Phone, Briefcase, Info } from 'lucide-react';
+import { X, CheckCircle, FileText, Send, User, MapPin, Phone, Briefcase, Info, Sparkles, Search } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { letterTypes } from '../services/initialData';
+import { StorageService } from '../services/storageService';
 
 export default function ServiceModal({ isOpen, onClose, selectedLetterType, onSubmitSuccess }) {
   const [selectedType, setSelectedType] = useState(selectedLetterType || 'SKU');
@@ -18,10 +19,32 @@ export default function ServiceModal({ isOpen, onClose, selectedLetterType, onSu
     extraNotes: ''
   });
   const [submittedResult, setSubmittedResult] = useState(null);
+  const [autofillNotice, setAutofillNotice] = useState(false);
 
   if (!isOpen) return null;
 
   const currentLetter = letterTypes.find(l => l.id === selectedType) || letterTypes[0];
+
+  const handleLookupNik = () => {
+    if (!formData.nik || formData.nik.length < 5) {
+      alert('Masukkan minimal beberapa digit NIK untuk pencarian!');
+      return;
+    }
+    const citizen = StorageService.findCitizenByNik(formData.nik);
+    if (citizen) {
+      setFormData(prev => ({
+        ...prev,
+        citizenName: citizen.name || prev.citizenName,
+        phone: citizen.phone && citizen.phone !== '-' ? citizen.phone : prev.phone,
+        address: citizen.address || prev.address,
+        rtRw: `RT ${citizen.rt} / RW ${citizen.rw}`
+      }));
+      setAutofillNotice(true);
+      setTimeout(() => setAutofillNotice(false), 4000);
+    } else {
+      alert(`Data NIK ${formData.nik} belum terdaftar di database kependudukan desa. Anda tetap dapat melanjutkan dengan mengisi data manual.`);
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -201,6 +224,52 @@ export default function ServiceModal({ isOpen, onClose, selectedLetterType, onSu
                 </div>
               </div>
 
+              {autofillNotice && (
+                <div style={{
+                  background: '#ccfbf1',
+                  border: '1px solid #99f6e4',
+                  borderRadius: '8px',
+                  padding: '0.65rem 1rem',
+                  fontSize: '0.85rem',
+                  color: '#0f766e',
+                  fontWeight: 600,
+                  marginBottom: '1rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}>
+                  <Sparkles size={16} /> Data identitas berhasil ditemukan dan diisi otomatis dari database warga desa!
+                </div>
+              )}
+
+              {/* NIK Input with Auto Lookup */}
+              <div className="form-group">
+                <label className="form-label">Nomor Induk Kependudukan (NIK 16 Digit) *</label>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <input
+                    type="text"
+                    required
+                    maxLength={16}
+                    placeholder="Contoh: 3204151208850002"
+                    className="form-control"
+                    value={formData.nik}
+                    onChange={(e) => setFormData({ ...formData, nik: e.target.value })}
+                  />
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    style={{ flexShrink: 0, fontSize: '0.85rem' }}
+                    onClick={handleLookupNik}
+                    title="Cari data warga berdasarkan NIK"
+                  >
+                    <Search size={15} /> Cek NIK
+                  </button>
+                </div>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                  Ketik NIK lalu klik "Cek NIK" untuk mengisi otomatis data Anda dari database desa.
+                </span>
+              </div>
+
               <div className="form-row">
                 <div className="form-group">
                   <label className="form-label">Nama Lengkap Sesuai KTP *</label>
@@ -214,21 +283,6 @@ export default function ServiceModal({ isOpen, onClose, selectedLetterType, onSu
                   />
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Nomor Induk Kependudukan (NIK 16 Digit) *</label>
-                  <input
-                    type="text"
-                    required
-                    maxLength={16}
-                    placeholder="Contoh: 3204151208850002"
-                    className="form-control"
-                    value={formData.nik}
-                    onChange={(e) => setFormData({ ...formData, nik: e.target.value })}
-                  />
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
                   <label className="form-label">Nomor WhatsApp Aktif *</label>
                   <input
                     type="tel"
@@ -239,6 +293,9 @@ export default function ServiceModal({ isOpen, onClose, selectedLetterType, onSu
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   />
                 </div>
+              </div>
+
+              <div className="form-row">
                 <div className="form-group">
                   <label className="form-label">RT / RW</label>
                   <input
@@ -249,17 +306,16 @@ export default function ServiceModal({ isOpen, onClose, selectedLetterType, onSu
                     onChange={(e) => setFormData({ ...formData, rtRw: e.target.value })}
                   />
                 </div>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Alamat Lengkap Pemohon</label>
-                <input
-                  type="text"
-                  placeholder="Nama Kampung / Dusun / Jalan / No. Rumah"
-                  className="form-control"
-                  value={formData.address}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                />
+                <div className="form-group">
+                  <label className="form-label">Alamat Lengkap Pemohon</label>
+                  <input
+                    type="text"
+                    placeholder="Nama Kampung / Dusun / Jalan / No. Rumah"
+                    className="form-control"
+                    value={formData.address}
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                  />
+                </div>
               </div>
 
               {/* Conditional business fields for SKU */}

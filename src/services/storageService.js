@@ -1,5 +1,6 @@
 import {
   initialVillageProfile,
+  initialFamiliesList,
   initialNewsList,
   initialUmkmList,
   initialTourismList,
@@ -10,6 +11,7 @@ import {
 
 const STORAGE_KEYS = {
   PROFILE: 'desa_profile_data',
+  FAMILIES: 'desa_families_data',
   NEWS: 'desa_news_data',
   UMKM: 'desa_umkm_data',
   TOURISM: 'desa_tourism_data',
@@ -49,6 +51,97 @@ export const StorageService = {
   saveProfile(profile) {
     saveToStorage(STORAGE_KEYS.PROFILE, profile);
     return profile;
+  },
+
+  // Kartu Keluarga & Citizens Database
+  getFamilies() {
+    return getFromStorage(STORAGE_KEYS.FAMILIES, initialFamiliesList);
+  },
+  saveFamilies(familiesList) {
+    saveToStorage(STORAGE_KEYS.FAMILIES, familiesList);
+    return familiesList;
+  },
+  addFamily(familyData) {
+    const list = this.getFamilies();
+    const newFamily = {
+      ...familyData,
+      id: `kk-${Date.now()}`,
+      members: familyData.members || []
+    };
+    const updated = [newFamily, ...list];
+    this.saveFamilies(updated);
+    return newFamily;
+  },
+  updateFamily(id, updatedFields) {
+    const list = this.getFamilies();
+    const updated = list.map(item => item.id === id ? { ...item, ...updatedFields } : item);
+    this.saveFamilies(updated);
+    return updated;
+  },
+  deleteFamily(id) {
+    const list = this.getFamilies();
+    const updated = list.filter(item => item.id !== id);
+    this.saveFamilies(updated);
+    return updated;
+  },
+  addFamilyMember(kkId, memberData) {
+    const list = this.getFamilies();
+    const newMember = {
+      ...memberData,
+      id: `cit-${Date.now()}`
+    };
+    const updated = list.map(kk => {
+      if (kk.id === kkId) {
+        return {
+          ...kk,
+          members: [...(kk.members || []), newMember]
+        };
+      }
+      return kk;
+    });
+    this.saveFamilies(updated);
+    return newMember;
+  },
+  deleteFamilyMember(kkId, memberId) {
+    const list = this.getFamilies();
+    const updated = list.map(kk => {
+      if (kk.id === kkId) {
+        return {
+          ...kk,
+          members: (kk.members || []).filter(m => m.id !== memberId)
+        };
+      }
+      return kk;
+    });
+    this.saveFamilies(updated);
+    return updated;
+  },
+  getAllCitizens() {
+    const families = this.getFamilies();
+    const all = [];
+    families.forEach(kk => {
+      if (kk.members && Array.isArray(kk.members)) {
+        kk.members.forEach(member => {
+          all.push({
+            ...member,
+            kkId: kk.id,
+            noKk: kk.noKk,
+            headName: kk.headName,
+            address: kk.address,
+            rt: kk.rt,
+            rw: kk.rw,
+            dusun: kk.dusun,
+            economicStatus: kk.economicStatus
+          });
+        });
+      }
+    });
+    return all;
+  },
+  findCitizenByNik(nik) {
+    if (!nik) return null;
+    const citizens = this.getAllCitizens();
+    return citizens.find(c => c.nik === nik.trim()) || null;
   },
 
   // News
@@ -268,6 +361,7 @@ export const StorageService = {
   // Reset to initial
   resetToDefaults() {
     localStorage.removeItem(STORAGE_KEYS.PROFILE);
+    localStorage.removeItem(STORAGE_KEYS.FAMILIES);
     localStorage.removeItem(STORAGE_KEYS.NEWS);
     localStorage.removeItem(STORAGE_KEYS.UMKM);
     localStorage.removeItem(STORAGE_KEYS.TOURISM);

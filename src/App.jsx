@@ -22,6 +22,7 @@ import Contact from './pages/Contact';
 import AdminLogin from './admin/AdminLogin';
 import AdminLayout from './admin/AdminLayout';
 import AdminDashboard from './admin/AdminDashboard';
+import AdminCitizens from './admin/AdminCitizens';
 import AdminNews from './admin/AdminNews';
 import AdminUmkm from './admin/AdminUmkm';
 import AdminTourism from './admin/AdminTourism';
@@ -34,7 +35,7 @@ import { StorageService } from './services/storageService';
 
 export default function App() {
   const [activePage, setActivePage] = useState('home'); // home, profile, news, gallery, umkm, tourism, services, contact, admin
-  const [adminTab, setAdminTab] = useState('dashboard'); // dashboard, services, complaints, news, umkm, tourism, gallery, settings
+  const [adminTab, setAdminTab] = useState('dashboard'); // dashboard, citizens, services, complaints, news, umkm, tourism, gallery, settings
 
   // Admin Auth State
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(() => {
@@ -43,6 +44,7 @@ export default function App() {
 
   // Core Village Data State
   const [profile, setProfile] = useState(() => StorageService.getProfile());
+  const [familiesList, setFamiliesList] = useState(() => StorageService.getFamilies());
   const [newsList, setNewsList] = useState(() => StorageService.getNews());
   const [umkmList, setUmkmList] = useState(() => StorageService.getUmkm());
   const [tourismList, setTourismList] = useState(() => StorageService.getTourism());
@@ -77,6 +79,7 @@ export default function App() {
   useEffect(() => {
     const handleDataUpdate = () => {
       setProfile(StorageService.getProfile());
+      setFamiliesList(StorageService.getFamilies());
       setNewsList(StorageService.getNews());
       setUmkmList(StorageService.getUmkm());
       setTourismList(StorageService.getTourism());
@@ -101,6 +104,32 @@ export default function App() {
     localStorage.removeItem('desa_admin_logged_in');
     setActivePage('home');
     addToast('Anda telah keluar dari sesi Admin.', 'info');
+  };
+
+  // Family (KK) Handlers
+  const handleAddFamily = (familyData) => {
+    StorageService.addFamily(familyData);
+    addToast(`Kartu Keluarga No. ${familyData.noKk} berhasil ditambahkan!`);
+  };
+
+  const handleUpdateFamily = (id, fields) => {
+    StorageService.updateFamily(id, fields);
+    addToast('Data Kartu Keluarga berhasil diperbarui!');
+  };
+
+  const handleDeleteFamily = (id) => {
+    StorageService.deleteFamily(id);
+    addToast('Data Kartu Keluarga berhasil dihapus!', 'info');
+  };
+
+  const handleAddMember = (kkId, memberData) => {
+    StorageService.addFamilyMember(kkId, memberData);
+    addToast(`Anggota keluarga ${memberData.name} berhasil ditambahkan!`);
+  };
+
+  const handleDeleteMember = (kkId, memberId) => {
+    StorageService.deleteFamilyMember(kkId, memberId);
+    addToast('Anggota keluarga berhasil dihapus!', 'info');
   };
 
   // Handlers for public letter submission
@@ -249,6 +278,7 @@ export default function App() {
             profile={profile}
             pendingCount={pendingRequestsCount}
             complaintCount={pendingComplaintsCount}
+            familyCount={familiesList.length}
           >
             {adminTab === 'dashboard' && (
               <AdminDashboard
@@ -258,8 +288,21 @@ export default function App() {
                 tourismList={tourismList}
                 requestsList={requestsList}
                 complaintsList={complaintsList}
+                familiesList={familiesList}
                 setActiveTab={setAdminTab}
                 onSelectRequestToPrint={(req) => setPrintLetterReq(req)}
+              />
+            )}
+
+            {adminTab === 'citizens' && (
+              <AdminCitizens
+                familiesList={familiesList}
+                onAddFamily={handleAddFamily}
+                onUpdateFamily={handleUpdateFamily}
+                onDeleteFamily={handleDeleteFamily}
+                onAddMember={handleAddMember}
+                onDeleteMember={handleDeleteMember}
+                profile={profile}
               />
             )}
 
