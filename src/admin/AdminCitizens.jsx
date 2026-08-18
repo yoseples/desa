@@ -177,10 +177,22 @@ export default function AdminCitizens({
     rt: 'Semua'
   });
 
-  // New Family Form State
+  // New Family Form State (Full KK & Head of Family Data)
   const [familyForm, setFamilyForm] = useState({
     noKk: '',
     headName: '',
+    headNik: '',
+    headGender: 'Laki-Laki',
+    headBirthPlace: 'Bandung',
+    headBirthDate: '1980-01-01',
+    headReligion: 'Islam',
+    headEducation: 'SMA / Sederajat',
+    headOccupation: 'Wiraswasta',
+    headMaritalStatus: 'Kawin',
+    headBloodType: 'O',
+    headFatherName: '',
+    headMotherName: '',
+    headPhone: '',
     address: '',
     rt: '001',
     rw: '001',
@@ -192,7 +204,7 @@ export default function AdminCitizens({
     electricity: '450 VA (Subsidi)',
     waterSource: 'Mata Air Pegunungan / Sumur Gali',
     sanitation: 'Jamban Sehat Pribadi',
-    bansosTypes: ['PKH', 'BPNT', 'BLT Dana Desa'],
+    bansosTypes: ['PKH', 'BPNT'],
     issueDate: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
   });
 
@@ -463,24 +475,39 @@ export default function AdminCitizens({
       return;
     }
     const newKk = {
-      ...familyForm,
+      id: `kk-${Date.now()}`,
+      noKk: familyForm.noKk,
+      headName: familyForm.headName,
+      address: familyForm.address,
+      rt: familyForm.rt,
+      rw: familyForm.rw,
+      dusun: familyForm.dusun,
+      postalCode: familyForm.postalCode || '40375',
+      economicStatus: familyForm.economicStatus,
+      bpjsStatus: familyForm.bpjsStatus,
+      houseOwnership: familyForm.houseOwnership || 'Milik Sendiri',
+      electricity: familyForm.electricity || '450 VA (Subsidi)',
+      waterSource: familyForm.waterSource || 'Mata Air Pegunungan / Sumur Gali',
+      sanitation: familyForm.sanitation || 'Jamban Sehat Pribadi',
+      bansosTypes: familyForm.bansosTypes || [],
+      issueDate: familyForm.issueDate || new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
       members: [
         {
           id: `cit-${Date.now()}`,
-          nik: `${familyForm.noKk.slice(0, 12)}0001`,
+          nik: familyForm.headNik || `${familyForm.noKk.slice(0, 12)}0001`,
           name: familyForm.headName,
-          gender: 'Laki-Laki',
-          birthPlace: 'Bandung',
-          birthDate: '01-01-1980',
-          religion: 'Islam',
-          education: 'SMA / Sederajat',
-          occupation: 'Wiraswasta',
-          maritalStatus: 'Kawin',
+          gender: familyForm.headGender || 'Laki-Laki',
+          birthPlace: familyForm.headBirthPlace || 'Bandung',
+          birthDate: familyForm.headBirthDate || '01-01-1980',
+          religion: familyForm.headReligion || 'Islam',
+          education: familyForm.headEducation || 'SMA / Sederajat',
+          occupation: familyForm.headOccupation || 'Wiraswasta',
+          maritalStatus: familyForm.headMaritalStatus || 'Kawin',
           relation: 'Kepala Keluarga',
-          bloodType: 'O',
-          fatherName: '-',
-          motherName: '-',
-          phone: '081234567890'
+          bloodType: familyForm.headBloodType || 'O',
+          fatherName: familyForm.headFatherName || '-',
+          motherName: familyForm.headMotherName || '-',
+          phone: familyForm.headPhone || '-'
         }
       ]
     };
@@ -1708,127 +1735,312 @@ export default function AdminCitizens({
         </div>
       )}
 
-      {/* MODAL 2: TAMBAH KK BARU */}
+      {/* MODAL 2: TAMBAH KK BARU (LENGKAP) */}
       {addFamilyModal && (
         <div className="modal-backdrop">
-          <div className="modal-content" style={{ maxWidth: '650px' }}>
+          <div className="modal-content" style={{ maxWidth: '820px', maxHeight: '90vh', overflowY: 'auto' }}>
             <div className="modal-header">
-              <h3 className="modal-title">Tambah Kartu Keluarga (KK) Baru</h3>
+              <div>
+                <h3 className="modal-title">Tambah Kartu Keluarga (KK) Baru</h3>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                  Isi data dokumen KK serta biodata lengkap Kepala Keluarga sebagai anggota pertama.
+                </span>
+              </div>
               <button className="modal-close" onClick={() => setAddFamilyModal(false)}>
                 <X size={18} />
               </button>
             </div>
             
             <form onSubmit={handleAddFamilySubmit}>
-              <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <div className="form-row">
-                  <div className="form-group">
-                    <label className="form-label">Nomor Kartu Keluarga (16 Digit) *</label>
+              <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                
+                {/* SEKSI 1: DOKUMEN KK & DOMISILI */}
+                <div style={{ background: '#f8fafc', padding: '1.1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--light-border)' }}>
+                  <h4 style={{ fontSize: '0.875rem', fontWeight: 800, color: '#059669', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <Building size={16} /> 1. Data Dokumen KK & Wilayah Domisili
+                  </h4>
+
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label className="form-label">Nomor Kartu Keluarga (16 Digit) *</label>
+                      <input
+                        type="text"
+                        required
+                        maxLength={16}
+                        className="form-control"
+                        value={familyForm.noKk}
+                        onChange={(e) => setFamilyForm({ ...familyForm, noKk: e.target.value })}
+                        placeholder="Contoh: 3204150801120001"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Kode Pos</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={familyForm.postalCode}
+                        onChange={(e) => setFamilyForm({ ...familyForm, postalCode: e.target.value })}
+                        placeholder="40375"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-group" style={{ marginTop: '0.65rem' }}>
+                    <label className="form-label">Alamat Domisili Lengkap</label>
                     <input
                       type="text"
-                      required
-                      maxLength={16}
                       className="form-control"
-                      value={familyForm.noKk}
-                      onChange={(e) => setFamilyForm({ ...familyForm, noKk: e.target.value })}
-                      placeholder="3204150801120001"
+                      value={familyForm.address}
+                      onChange={(e) => setFamilyForm({ ...familyForm, address: e.target.value })}
+                      placeholder="Contoh: Jl. Pasirjati No. 12, Kp. Babakan"
                     />
                   </div>
-                  <div className="form-group">
-                    <label className="form-label">Nama Lengkap Kepala Keluarga *</label>
-                    <input
-                      type="text"
-                      required
-                      className="form-control"
-                      value={familyForm.headName}
-                      onChange={(e) => setFamilyForm({ ...familyForm, headName: e.target.value })}
-                      placeholder="Bambang Sudrajat"
-                    />
+
+                  <div className="form-row" style={{ marginTop: '0.65rem' }}>
+                    <div className="form-group">
+                      <label className="form-label">Dusun</label>
+                      <select
+                        className="form-control"
+                        value={familyForm.dusun}
+                        onChange={(e) => setFamilyForm({ ...familyForm, dusun: e.target.value })}
+                      >
+                        <option value="Dusun Pasirjati">Dusun 1 Pasirjati</option>
+                        <option value="Dusun Sukamukti">Dusun 2 Sukamukti</option>
+                        <option value="Dusun Mekarwangi">Dusun 3 Mekarwangi</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">RW</label>
+                      <select
+                        className="form-control"
+                        value={familyForm.rw}
+                        onChange={(e) => setFamilyForm({ ...familyForm, rw: e.target.value })}
+                      >
+                        {[...Array(10)].map((_, i) => {
+                          const rwNum = String(i + 1).padStart(2, '0');
+                          return <option key={rwNum} value={rwNum}>RW {rwNum}</option>;
+                        })}
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">RT</label>
+                      <select
+                        className="form-control"
+                        value={familyForm.rt}
+                        onChange={(e) => setFamilyForm({ ...familyForm, rt: e.target.value })}
+                      >
+                        {[...Array(20)].map((_, i) => {
+                          const rtNum = String(i + 1).padStart(3, '0');
+                          return <option key={rtNum} value={rtNum}>RT {String(i + 1).padStart(2, '0')}</option>;
+                        })}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="form-row" style={{ marginTop: '0.65rem' }}>
+                    <div className="form-group">
+                      <label className="form-label">Status Kesejahteraan (BPS / DTKS)</label>
+                      <select
+                        className="form-control"
+                        value={familyForm.economicStatus}
+                        onChange={(e) => setFamilyForm({ ...familyForm, economicStatus: e.target.value })}
+                      >
+                        {bpsClassifications.map(c => (
+                          <option key={c.id} value={c.id}>{c.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Status BPJS Kesehatan</label>
+                      <select
+                        className="form-control"
+                        value={familyForm.bpjsStatus}
+                        onChange={(e) => setFamilyForm({ ...familyForm, bpjsStatus: e.target.value })}
+                      >
+                        <option value="Aktif (PBI Pemerintah)">Aktif (PBI Pemerintah)</option>
+                        <option value="Aktif (Mandiri)">Aktif (Mandiri)</option>
+                        <option value="Aktif (Pekerja / Perusahaan)">Aktif (Pekerja / Perusahaan)</option>
+                        <option value="Tidak Memiliki BPJS">Tidak Memiliki BPJS</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
 
-                <div className="form-group">
-                  <label className="form-label">Alamat Domisili</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    value={familyForm.address}
-                    onChange={(e) => setFamilyForm({ ...familyForm, address: e.target.value })}
-                    placeholder="Kp. Pasirjati No. 12"
-                  />
+                {/* SEKSI 2: BIODATA LENGKAP KEPALA KELUARGA */}
+                <div style={{ background: '#ffffff', padding: '1.1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--light-border)' }}>
+                  <h4 style={{ fontSize: '0.875rem', fontWeight: 800, color: '#2563eb', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <Users size={16} /> 2. Biodata Lengkap Kepala Keluarga (Anggota I)
+                  </h4>
+
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label className="form-label">Nama Lengkap Kepala Keluarga *</label>
+                      <input
+                        type="text"
+                        required
+                        className="form-control"
+                        value={familyForm.headName}
+                        onChange={(e) => setFamilyForm({ ...familyForm, headName: e.target.value })}
+                        placeholder="Bambang Sudrajat"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">NIK Kepala Keluarga (16 Digit)</label>
+                      <input
+                        type="text"
+                        maxLength={16}
+                        className="form-control"
+                        value={familyForm.headNik}
+                        onChange={(e) => setFamilyForm({ ...familyForm, headNik: e.target.value })}
+                        placeholder="Contoh: 3204150801800001"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-row" style={{ marginTop: '0.65rem' }}>
+                    <div className="form-group">
+                      <label className="form-label">Jenis Kelamin</label>
+                      <select
+                        className="form-control"
+                        value={familyForm.headGender}
+                        onChange={(e) => setFamilyForm({ ...familyForm, headGender: e.target.value })}
+                      >
+                        <option value="Laki-Laki">Laki-Laki</option>
+                        <option value="Perempuan">Perempuan</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Tempat Lahir</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={familyForm.headBirthPlace}
+                        onChange={(e) => setFamilyForm({ ...familyForm, headBirthPlace: e.target.value })}
+                        placeholder="Bandung"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Tanggal Lahir</label>
+                      <input
+                        type="date"
+                        className="form-control"
+                        value={familyForm.headBirthDate}
+                        onChange={(e) => setFamilyForm({ ...familyForm, headBirthDate: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-row" style={{ marginTop: '0.65rem' }}>
+                    <div className="form-group">
+                      <label className="form-label">Agama</label>
+                      <select
+                        className="form-control"
+                        value={familyForm.headReligion}
+                        onChange={(e) => setFamilyForm({ ...familyForm, headReligion: e.target.value })}
+                      >
+                        <option value="Islam">Islam</option>
+                        <option value="Kristen Protestan">Kristen Protestan</option>
+                        <option value="Katolik">Katolik</option>
+                        <option value="Hindu">Hindu</option>
+                        <option value="Buddha">Buddha</option>
+                        <option value="Konghucu">Konghucu</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Pendidikan Terakhir</label>
+                      <select
+                        className="form-control"
+                        value={familyForm.headEducation}
+                        onChange={(e) => setFamilyForm({ ...familyForm, headEducation: e.target.value })}
+                      >
+                        <option value="Tidak / Belum Sekolah">Tidak / Belum Sekolah</option>
+                        <option value="SD / Sederajat">SD / Sederajat</option>
+                        <option value="SMP / Sederajat">SMP / Sederajat</option>
+                        <option value="SMA / Sederajat">SMA / Sederajat</option>
+                        <option value="Diploma (D1-D3)">Diploma (D1-D3)</option>
+                        <option value="Strata 1 (S1)">Strata 1 (S1)</option>
+                        <option value="Strata 2 (S2)">Strata 2 (S2)</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Jenis Pekerjaan</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={familyForm.headOccupation}
+                        onChange={(e) => setFamilyForm({ ...familyForm, headOccupation: e.target.value })}
+                        placeholder="Petani / Wiraswasta"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-row" style={{ marginTop: '0.65rem' }}>
+                    <div className="form-group">
+                      <label className="form-label">Status Perkawinan</label>
+                      <select
+                        className="form-control"
+                        value={familyForm.headMaritalStatus}
+                        onChange={(e) => setFamilyForm({ ...familyForm, headMaritalStatus: e.target.value })}
+                      >
+                        <option value="Kawin">Kawin</option>
+                        <option value="Belum Kawin">Belum Kawin</option>
+                        <option value="Cerai Hidup">Cerai Hidup</option>
+                        <option value="Cerai Mati">Cerai Mati</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Golongan Darah</label>
+                      <select
+                        className="form-control"
+                        value={familyForm.headBloodType}
+                        onChange={(e) => setFamilyForm({ ...familyForm, headBloodType: e.target.value })}
+                      >
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="AB">AB</option>
+                        <option value="O">O</option>
+                        <option value="-">Tidak Tahu / -</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Nomor WhatsApp / HP</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={familyForm.headPhone}
+                        onChange={(e) => setFamilyForm({ ...familyForm, headPhone: e.target.value })}
+                        placeholder="08123456789"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-row" style={{ marginTop: '0.65rem' }}>
+                    <div className="form-group">
+                      <label className="form-label">Nama Ayah Kandung</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={familyForm.headFatherName}
+                        onChange={(e) => setFamilyForm({ ...familyForm, headFatherName: e.target.value })}
+                        placeholder="Nama Ayah"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Nama Ibu Kandung</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={familyForm.headMotherName}
+                        onChange={(e) => setFamilyForm({ ...familyForm, headMotherName: e.target.value })}
+                        placeholder="Nama Ibu"
+                      />
+                    </div>
+                  </div>
                 </div>
 
-                <div className="form-row">
-                  <div className="form-group">
-                    <label className="form-label">Dusun</label>
-                    <select
-                      className="form-control"
-                      value={familyForm.dusun}
-                      onChange={(e) => setFamilyForm({ ...familyForm, dusun: e.target.value })}
-                    >
-                      <option value="Dusun Pasirjati">Dusun 1 Pasirjati</option>
-                      <option value="Dusun Sukamukti">Dusun 2 Sukamukti</option>
-                      <option value="Dusun Mekarwangi">Dusun 3 Mekarwangi</option>
-                    </select>
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">RW</label>
-                    <select
-                      className="form-control"
-                      value={familyForm.rw}
-                      onChange={(e) => setFamilyForm({ ...familyForm, rw: e.target.value })}
-                    >
-                      {[...Array(10)].map((_, i) => {
-                        const rwNum = String(i + 1).padStart(2, '0');
-                        return <option key={rwNum} value={rwNum}>RW {rwNum}</option>;
-                      })}
-                    </select>
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">RT</label>
-                    <select
-                      className="form-control"
-                      value={familyForm.rt}
-                      onChange={(e) => setFamilyForm({ ...familyForm, rt: e.target.value })}
-                    >
-                      {[...Array(20)].map((_, i) => {
-                        const rtNum = String(i + 1).padStart(3, '0');
-                        return <option key={rtNum} value={rtNum}>RT {String(i + 1).padStart(2, '0')}</option>;
-                      })}
-                    </select>
-                  </div>
-                </div>
-
-                <div className="form-row">
-                  <div className="form-group">
-                    <label className="form-label">Status Kesejahteraan (BPS / DTKS)</label>
-                    <select
-                      className="form-control"
-                      value={familyForm.economicStatus}
-                      onChange={(e) => setFamilyForm({ ...familyForm, economicStatus: e.target.value })}
-                    >
-                      {bpsClassifications.map(c => (
-                        <option key={c.id} value={c.id}>{c.name}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Status BPJS Kesehatan</label>
-                    <select
-                      className="form-control"
-                      value={familyForm.bpjsStatus}
-                      onChange={(e) => setFamilyForm({ ...familyForm, bpjsStatus: e.target.value })}
-                    >
-                      <option value="Aktif (PBI Pemerintah)">Aktif (PBI Pemerintah)</option>
-                      <option value="Aktif (Mandiri)">Aktif (Mandiri)</option>
-                      <option value="Aktif (Pekerja / Perusahaan)">Aktif (Pekerja / Perusahaan)</option>
-                      <option value="Tidak Memiliki BPJS">Tidak Memiliki BPJS</option>
-                    </select>
-                  </div>
-                </div>
               </div>
 
-              <div className="modal-footer">
+              <div className="modal-footer" style={{ borderTop: '1px solid var(--light-border)', background: 'var(--light-surface)', padding: '0.75rem 1.5rem' }}>
                 <button type="button" className="btn btn-secondary" onClick={() => setAddFamilyModal(false)}>Batal</button>
                 <button type="submit" className="btn btn-primary">Simpan Kartu Keluarga</button>
               </div>
