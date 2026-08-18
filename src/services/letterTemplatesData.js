@@ -33,6 +33,30 @@ export const officialLetterTemplates = [
     closingText: "Demikian Surat Keterangan Usaha ini kami buat dengan sebenarnya agar dapat dipergunakan sebagai persyaratan pengajuan bantuan permodalan / perbankan sebagaimana mestinya."
   },
   {
+    id: "SK_JUAL_BELI",
+    code: "593/SK-JB",
+    name: "Surat Keterangan Jual Beli (Tanah / Bangunan / Barang)",
+    category: "Pertanahan & Transaksi",
+    description: "Surat perjanjian dan keterangan resmi transaksi jual beli tanah darat, sawah, bangunan, kendaraan bermotor, atau aset berharga di hadapan saksi dan diketahui Pemerintah Desa.",
+    fields: [
+      { key: "sellerName", label: "Nama Pihak I (Penjual)", placeholder: "Ujang Suherman" },
+      { key: "sellerNik", label: "NIK Pihak I (Penjual)", placeholder: "3204151505750001" },
+      { key: "sellerAddress", label: "Alamat Pihak I (Penjual)", placeholder: "Dusun Sukarame RT 03 RW 02" },
+      { key: "buyerName", label: "Nama Pihak II (Pembeli)", placeholder: "Bambang Sudrajat" },
+      { key: "buyerNik", label: "NIK Pihak II (Pembeli)", placeholder: "3204151208850002" },
+      { key: "buyerAddress", label: "Alamat Pihak II (Pembeli)", placeholder: "Kp. Pasir Salam RT 02 RW 03" },
+      { key: "itemType", label: "Objek Transaksi (Tanah/Bangunan/Barang)", placeholder: "Sebidang Tanah Kebun Kopi & Tanaman Produktif" },
+      { key: "itemLocation", label: "Lokasi / Nomor Persil / Kohir / SPPT", placeholder: "Blok Sukarame Persil No. 24 Kohir No. 118" },
+      { key: "itemSize", label: "Luas / Ukuran Objek Transaksi", placeholder: "Luas ± 650 m² (Enam Ratus Lima Puluh Meter Persegi)" },
+      { key: "itemBorders", label: "Batas-Batas Objek (Utara, Timur, Selatan, Barat)", placeholder: "Utara: Tanah Bpk. H. Supriatna | Timur: Jalan Desa | Selatan: Saluran Irigasi | Barat: Tanah Bpk. Hendra" },
+      { key: "transactionPrice", label: "Harga Kesepakatan Transaksi (Rp)", placeholder: "Rp 150.000.000,- (Seratus Lima Puluh Juta Rupiah)" },
+      { key: "witnessNames", label: "Nama Saksi-Saksi", placeholder: "1. Ketua RW 02 (Drs. Subagja), 2. Tokoh Masyarakat (Ahmad Fauzi)" }
+    ],
+    openingText: "Yang bertanda tangan di bawah ini menerangkan bahwa pada hari ini telah terjadi kesepakatan jual beli yang sah antara para pihak sebagai berikut:",
+    bodyParagraph: "PIHAK I (PENJUAL) telah menjual dan melepaskan hak kepemilikannya atas objek tersebut kepada PIHAK II (PEMBELI) dengan harga yang telah disepakati dan dibayar lunas tanpa ada paksaan dari pihak manapun.",
+    closingText: "Surat Keterangan Jual Beli ini dibuat dalam keadaan sadar dan sehat jasmani rohani, serta diketahui dan disahkan oleh Pemerintah Desa Sukamaju Mandiri untuk dijadikan pegangan hukum bagi kedua belah pihak."
+  },
+  {
     id: "SURAT_UNDANGAN",
     code: "005/UND-DESA",
     name: "Surat Undangan Resmi Musyawarah Desa / Rapat",

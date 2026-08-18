@@ -22,7 +22,8 @@ import {
   Trash2,
   Calendar,
   X,
-  FileDown
+  FileDown,
+  Handshake
 } from 'lucide-react';
 import { officialLetterTemplates, defaultLetterheadConfig } from '../services/letterTemplatesData';
 import { StorageService } from '../services/storageService';
@@ -44,8 +45,8 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
   const [incomingSearch, setIncomingSearch] = useState('');
 
   // Generator State
-  const [selectedTemplateId, setSelectedTemplateId] = useState('SKU');
-  const [letterNumber, setLetterNumber] = useState(`500/014/DS-SKM/VIII/${new Date().getFullYear()}`);
+  const [selectedTemplateId, setSelectedTemplateId] = useState('SK_JUAL_BELI');
+  const [letterNumber, setLetterNumber] = useState(`593/018/DS-SKM/VIII/${new Date().getFullYear()}`);
   const [citizenNik, setCitizenNik] = useState('');
   const [citizenName, setCitizenName] = useState('');
   const [citizenAddress, setCitizenAddress] = useState('');
@@ -67,7 +68,19 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
     meetingDateTime: 'Senin, 25 Agustus 2026 Pukul 08.30 WIB s.d. Selesai',
     meetingLocation: 'Aula Balai Desa Sukamaju Mandiri',
     meetingAgenda: 'Pembahasan Prioritas Dana Desa 2027 & Penetapan Program Ketahanan Pangan',
-    meetingNotes: 'Pakaian Batik / Rapi, dimohon hadir 15 menit sebelum acara dimulai'
+    meetingNotes: 'Pakaian Batik / Rapi, dimohon hadir 15 menit sebelum acara dimulai',
+    sellerName: 'Ujang Suherman',
+    sellerNik: '3204151505750001',
+    sellerAddress: 'Dusun Sukarame RT 03 RW 02 Desa Sukamaju',
+    buyerName: 'Bambang Sudrajat',
+    buyerNik: '3204151208850002',
+    buyerAddress: 'Kp. Pasir Salam RT 02 RW 03 Desa Sukamaju',
+    itemType: 'Sebidang Tanah Kebun Kopi & Tanaman Produktif',
+    itemLocation: 'Blok Sukarame Persil No. 24 Kohir No. 118',
+    itemSize: 'Luas ± 650 m² (Enam Ratus Lima Puluh Meter Persegi)',
+    itemBorders: 'Utara: Tanah Bpk. H. Supriatna | Timur: Jalan Desa | Selatan: Saluran Irigasi | Barat: Tanah Bpk. Hendra',
+    transactionPrice: 'Rp 150.000.000,- (Seratus Lima Puluh Juta Rupiah)',
+    witnessNames: '1. Drs. Subagja (Ketua RW 02), 2. Ahmad Fauzi, S.Kom'
   });
 
   const [autofillSuccess, setAutofillSuccess] = useState(false);
@@ -102,6 +115,16 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
       setCitizenRtRw(`RT ${citizen.rt} / RW ${citizen.rw}`);
       setCitizenPhone(citizen.phone !== '-' ? citizen.phone : '081234567890');
       setCitizenJob(citizen.occupation || 'Wiraswasta');
+      
+      if (selectedTemplateId === 'SK_JUAL_BELI') {
+        setDynamicFieldValues(prev => ({
+          ...prev,
+          sellerName: citizen.name,
+          sellerNik: citizen.nik,
+          sellerAddress: `${citizen.address} RT ${citizen.rt} RW ${citizen.rw}`
+        }));
+      }
+
       setAutofillSuccess(true);
       setTimeout(() => setAutofillSuccess(false), 3000);
     } else {
@@ -121,18 +144,20 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
 
   // Print & Auto-Archive to Outgoing Letters Registry
   const handlePrintDocument = () => {
-    // 1. Save to Outgoing Archive
-    const recipient = selectedTemplateId === 'SURAT_UNDANGAN' 
-      ? (dynamicFieldValues.meetingRecipient || 'Tokoh & Lembaga Desa')
-      : (citizenName || 'Warga Desa');
+    let recipient = citizenName || 'Warga Desa';
+    if (selectedTemplateId === 'SURAT_UNDANGAN') {
+      recipient = dynamicFieldValues.meetingRecipient || 'Tokoh & Lembaga Desa';
+    } else if (selectedTemplateId === 'SK_JUAL_BELI') {
+      recipient = `${dynamicFieldValues.sellerName || 'Penjual'} & ${dynamicFieldValues.buyerName || 'Pembeli'}`;
+    }
 
-    const created = StorageService.addOutgoingLetter({
+    StorageService.addOutgoingLetter({
       letterNumber,
       letterType: selectedTemplateId,
       letterName: currentTemplate.name,
       recipientName: recipient,
-      recipientNik: citizenNik || '-',
-      purpose: dynamicFieldValues.purpose || dynamicFieldValues.meetingSubject || 'Pelayanan Desa',
+      recipientNik: citizenNik || dynamicFieldValues.sellerNik || '-',
+      purpose: dynamicFieldValues.itemType || dynamicFieldValues.purpose || dynamicFieldValues.meetingSubject || 'Pelayanan Administrasi',
       signer: letterhead.signatoryName
     });
 
@@ -140,11 +165,9 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
     setSaveArchiveNotice(true);
     setTimeout(() => setSaveArchiveNotice(false), 4000);
 
-    // 2. Trigger Print Dialog
     window.print();
   };
 
-  // Incoming Letter Scan Upload Handler
   const handleScanFileUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -256,7 +279,7 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
           background: '#dcfce7',
           border: '1px solid #86efac',
           borderRadius: 'var(--radius-md)',
-          padding: '0.75rem 1.25rem',
+          padding: '0.75rem 12px',
           color: '#166534',
           fontWeight: 700,
           display: 'flex',
@@ -314,8 +337,8 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
               />
             </div>
 
-            {/* If NOT Surat Undangan, show Citizen Lookup */}
-            {selectedTemplateId !== 'SURAT_UNDANGAN' && (
+            {/* If NOT Surat Undangan & NOT Jual Beli, show Standard Citizen Lookup */}
+            {selectedTemplateId !== 'SURAT_UNDANGAN' && selectedTemplateId !== 'SK_JUAL_BELI' && (
               <>
                 <div className="form-group" style={{ background: '#f8fafc', padding: '1rem', borderRadius: '10px', border: '1px solid var(--light-border)' }}>
                   <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -339,11 +362,6 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
                       <Search size={14} /> Cek NIK
                     </button>
                   </div>
-                  {autofillSuccess && (
-                    <span style={{ fontSize: '0.75rem', color: '#16a34a', fontWeight: 700, display: 'block', marginTop: '4px' }}>
-                      ✓ Data warga berhasil ditemukan dan disalin!
-                    </span>
-                  )}
                 </div>
 
                 <div className="form-row">
@@ -398,7 +416,7 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
             {/* Dynamic Specific Fields */}
             <div style={{ borderTop: '1px solid var(--light-border)', paddingTop: '1rem', marginTop: '0.5rem' }}>
               <h4 style={{ fontSize: '0.9rem', color: '#059669', marginBottom: '0.75rem' }}>
-                Rincian Khusus Template ({currentTemplate.id}):
+                Rincian Data Dokumen ({currentTemplate.id}):
               </h4>
               {currentTemplate.fields.map((field) => (
                 <div className="form-group" key={field.key}>
@@ -416,7 +434,7 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
                 </div>
               ))}
 
-              {selectedTemplateId !== 'SURAT_UNDANGAN' && (
+              {selectedTemplateId !== 'SURAT_UNDANGAN' && selectedTemplateId !== 'SK_JUAL_BELI' && (
                 <div className="form-group">
                   <label className="form-label">Keperluan / Keterangan Tambahan *</label>
                   <textarea
@@ -493,8 +511,98 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
                 </div>
               </div>
 
-              {/* FORMAT SURAT UNDANGAN RESMI */}
-              {selectedTemplateId === 'SURAT_UNDANGAN' ? (
+              {/* 1. FORMAT KHUSUS SURAT KETERANGAN JUAL BELI */}
+              {selectedTemplateId === 'SK_JUAL_BELI' ? (
+                <div>
+                  <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
+                    <h3 style={{ fontSize: '12pt', fontWeight: 'bold', textTransform: 'uppercase', textDecoration: 'underline', margin: 0 }}>
+                      SURAT KETERANGAN JUAL BELI
+                    </h3>
+                    <p style={{ fontSize: '10pt', margin: '2px 0 0 0' }}>
+                      Nomor: {letterNumber}
+                    </p>
+                  </div>
+
+                  <div style={{ textAlign: 'justify', fontSize: '10pt', lineHeight: 1.45 }}>
+                    <p style={{ textIndent: '24px', margin: '0 0 0.5rem 0' }}>
+                      {currentTemplate.openingText}
+                    </p>
+
+                    {/* PIHAK I & PIHAK II */}
+                    <div style={{ marginBottom: '0.65rem' }}>
+                      <div style={{ fontWeight: 'bold' }}>1. PIHAK I (PENJUAL):</div>
+                      <table style={{ width: '100%', fontSize: '9.5pt', margin: '2px 0 0 16px' }}>
+                        <tbody>
+                          <tr><td style={{ width: '150px' }}>Nama Lengkap</td><td style={{ width: '10px' }}>:</td><td style={{ fontWeight: 'bold' }}>{dynamicFieldValues.sellerName || '-'}</td></tr>
+                          <tr><td>NIK</td><td>:</td><td>{dynamicFieldValues.sellerNik || '-'}</td></tr>
+                          <tr><td>Alamat</td><td>:</td><td>{dynamicFieldValues.sellerAddress || '-'}</td></tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div style={{ marginBottom: '0.65rem' }}>
+                      <div style={{ fontWeight: 'bold' }}>2. PIHAK II (PEMBELI):</div>
+                      <table style={{ width: '100%', fontSize: '9.5pt', margin: '2px 0 0 16px' }}>
+                        <tbody>
+                          <tr><td style={{ width: '150px' }}>Nama Lengkap</td><td style={{ width: '10px' }}>:</td><td style={{ fontWeight: 'bold' }}>{dynamicFieldValues.buyerName || '-'}</td></tr>
+                          <tr><td>NIK</td><td>:</td><td>{dynamicFieldValues.buyerNik || '-'}</td></tr>
+                          <tr><td>Alamat</td><td>:</td><td>{dynamicFieldValues.buyerAddress || '-'}</td></tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <p style={{ textIndent: '24px', margin: '0.5rem 0' }}>
+                      Kedua belah pihak telah bersepakat mengadakan transaksi jual beli atas:
+                    </p>
+
+                    {/* RINCIAN OBJEK TANAH/BARANG */}
+                    <table style={{ width: '100%', background: '#f8fafc', border: '1px solid #cbd5e1', fontSize: '9.5pt', padding: '4px', margin: '4px 0 0.5rem 0' }}>
+                      <tbody>
+                        <tr><td style={{ width: '170px', padding: '2px 4px' }}>Objek Transaksi</td><td style={{ width: '10px' }}>:</td><td style={{ fontWeight: 'bold' }}>{dynamicFieldValues.itemType}</td></tr>
+                        <tr><td style={{ padding: '2px 4px' }}>Lokasi / Persil / Kohir</td><td>:</td><td>{dynamicFieldValues.itemLocation}</td></tr>
+                        <tr><td style={{ padding: '2px 4px' }}>Ukuran / Luas</td><td>:</td><td>{dynamicFieldValues.itemSize}</td></tr>
+                        <tr><td style={{ padding: '2px 4px' }}>Batas-Batas Objek</td><td>:</td><td>{dynamicFieldValues.itemBorders}</td></tr>
+                        <tr><td style={{ padding: '2px 4px' }}>Harga Kesepakatan (Lunas)</td><td>:</td><td style={{ fontWeight: 'bold' }}>{dynamicFieldValues.transactionPrice}</td></tr>
+                      </tbody>
+                    </table>
+
+                    <p style={{ textIndent: '24px', margin: '0.4rem 0' }}>
+                      {currentTemplate.bodyParagraph}
+                    </p>
+
+                    <p style={{ textIndent: '24px', margin: '0.4rem 0' }}>
+                      {currentTemplate.closingText}
+                    </p>
+                  </div>
+
+                  {/* SIGNATURE 3 BLOCKS: PIHAK I, PIHAK II, SAKSI & KADES */}
+                  <div style={{ marginTop: '1.25rem', fontSize: '9.5pt' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', textAlign: 'center', marginBottom: '1rem' }}>
+                      <div>
+                        <div>PIHAK II (PEMBELI)</div>
+                        <div style={{ height: '48px' }}></div>
+                        <div style={{ fontWeight: 'bold', textDecoration: 'underline' }}>{dynamicFieldValues.buyerName || '(................................)'}</div>
+                      </div>
+                      <div>
+                        <div>PIHAK I (PENJUAL)</div>
+                        <div style={{ height: '48px' }}></div>
+                        <div style={{ fontWeight: 'bold', textDecoration: 'underline' }}>{dynamicFieldValues.sellerName || '(................................)'}</div>
+                      </div>
+                    </div>
+
+                    <div style={{ textAlign: 'center', margin: '0.5rem auto 0 auto', width: '250px' }}>
+                      <div>Mengetahui,</div>
+                      <div style={{ fontWeight: 'bold' }}>{letterhead.signatoryRole}</div>
+                      <div style={{ height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <span style={{ fontSize: '8pt', color: '#059669', fontStyle: 'italic', fontWeight: 'bold' }}>[ TTE Terverifikasi ]</span>
+                      </div>
+                      <div style={{ fontWeight: 'bold', textDecoration: 'underline' }}>{letterhead.signatoryName}</div>
+                      <div style={{ fontSize: '8pt' }}>NIP. {letterhead.signatoryNip}</div>
+                    </div>
+                  </div>
+                </div>
+              ) : selectedTemplateId === 'SURAT_UNDANGAN' ? (
+                /* 2. FORMAT SURAT UNDANGAN RESMI */
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', fontSize: '10.5pt' }}>
                     <table style={{ width: '58%' }}>
@@ -536,9 +644,22 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
                   <p style={{ textIndent: '28px', margin: '0.5rem 0' }}>
                     {currentTemplate.closingText}
                   </p>
+
+                  {/* TTE PEJABAT */}
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '2rem', fontSize: '10pt' }}>
+                    <div style={{ textAlign: 'center', width: '220px' }}>
+                      <p style={{ margin: 0 }}>Sukamaju, {currentDate}</p>
+                      <p style={{ margin: '2px 0 0 0', fontWeight: 'bold' }}>{letterhead.signatoryRole}</p>
+                      <div style={{ height: '55px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <span style={{ fontSize: '8.5pt', color: '#059669', fontStyle: 'italic', fontWeight: 'bold' }}>[ TTE Terverifikasi ]</span>
+                      </div>
+                      <p style={{ margin: 0, fontWeight: 'bold', textDecoration: 'underline' }}>{letterhead.signatoryName}</p>
+                      <p style={{ margin: 0, fontSize: '8.5pt' }}>NIP. {letterhead.signatoryNip}</p>
+                    </div>
+                  </div>
                 </div>
               ) : (
-                /* FORMAT SURAT KETERANGAN RESMI */
+                /* 3. FORMAT SURAT KETERANGAN UMUM (SKU, SKTM, SKD, DLL) */
                 <div>
                   <div style={{ textAlign: 'center', marginBottom: '1.25rem' }}>
                     <h3 style={{ fontSize: '12.5pt', fontWeight: 'bold', textTransform: 'uppercase', textDecoration: 'underline', margin: 0 }}>
@@ -578,33 +699,33 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
                       {currentTemplate.closingText}
                     </p>
                   </div>
+
+                  {/* TANDA TANGAN & TTE QR */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginTop: '2rem', fontSize: '10pt' }}>
+                    {letterhead.showQrVerification && (
+                      <div style={{ width: '180px', textAlign: 'center', padding: '0.5rem', border: '1px dashed #64748b', borderRadius: '4px' }}>
+                        <div style={{ fontSize: '7.5pt', color: '#64748b', marginBottom: '2px' }}>VERIFIKASI DIGITAL DESA</div>
+                        <div style={{ background: '#f8fafc', padding: '4px', border: '1px solid #059669', color: '#059669', fontWeight: 'bold', fontSize: '8pt', borderRadius: '3px' }}>
+                          ✓ TTE TERVERIFIKASI
+                        </div>
+                        <div style={{ fontSize: '7pt', color: '#64748b', marginTop: '3px' }}>
+                          Dokumen Resmi Elektronik
+                        </div>
+                      </div>
+                    )}
+
+                    <div style={{ textAlign: 'center', width: '220px' }}>
+                      <p style={{ margin: 0 }}>Sukamaju, {currentDate}</p>
+                      <p style={{ margin: '2px 0 0 0', fontWeight: 'bold' }}>{letterhead.signatoryRole}</p>
+                      <div style={{ height: '55px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <span style={{ fontSize: '8.5pt', color: '#059669', fontStyle: 'italic', fontWeight: 'bold' }}>[ TTE Terverifikasi ]</span>
+                      </div>
+                      <p style={{ margin: 0, fontWeight: 'bold', textDecoration: 'underline' }}>{letterhead.signatoryName}</p>
+                      <p style={{ margin: 0, fontSize: '8.5pt' }}>NIP. {letterhead.signatoryNip}</p>
+                    </div>
+                  </div>
                 </div>
               )}
-
-              {/* TANDA TANGAN & TTE QR */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginTop: '2rem', fontSize: '10pt' }}>
-                {letterhead.showQrVerification && (
-                  <div style={{ width: '180px', textAlign: 'center', padding: '0.5rem', border: '1px dashed #64748b', borderRadius: '4px' }}>
-                    <div style={{ fontSize: '7.5pt', color: '#64748b', marginBottom: '2px' }}>VERIFIKASI DIGITAL DESA</div>
-                    <div style={{ background: '#f8fafc', padding: '4px', border: '1px solid #059669', color: '#059669', fontWeight: 'bold', fontSize: '8pt', borderRadius: '3px' }}>
-                      ✓ TTE TERVERIFIKASI
-                    </div>
-                    <div style={{ fontSize: '7pt', color: '#64748b', marginTop: '3px' }}>
-                      Dokumen Resmi Elektronik
-                    </div>
-                  </div>
-                )}
-
-                <div style={{ textAlign: 'center', width: '220px' }}>
-                  <p style={{ margin: 0 }}>Sukamaju, {currentDate}</p>
-                  <p style={{ margin: '2px 0 0 0', fontWeight: 'bold' }}>{letterhead.signatoryRole}</p>
-                  <div style={{ height: '55px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <span style={{ fontSize: '8.5pt', color: '#059669', fontStyle: 'italic', fontWeight: 'bold' }}>[ TTE Terverifikasi ]</span>
-                  </div>
-                  <p style={{ margin: 0, fontWeight: 'bold', textDecoration: 'underline' }}>{letterhead.signatoryName}</p>
-                  <p style={{ margin: 0, fontSize: '8.5pt' }}>NIP. {letterhead.signatoryNip}</p>
-                </div>
-              </div>
 
             </div>
           </div>
