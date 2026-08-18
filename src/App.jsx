@@ -35,14 +35,91 @@ import AdminSettings from './admin/AdminSettings';
 
 import { StorageService } from './services/storageService';
 
-export default function App() {
-  const [activePage, setActivePage] = useState('home'); // home, profile, news, gallery, umkm, tourism, services, contact, admin
-  const [adminTab, setAdminTab] = useState('dashboard'); // dashboard, citizens, services, letter-templates, complaints, news, umkm, tourism, gallery, settings
+// Helper function to resolve page from pathname
+const getPageFromPath = (path) => {
+  const cleanPath = path.toLowerCase().replace(/\/$/, '') || '/';
+  switch (cleanPath) {
+    case '/login':
+    case '/admin/login':
+      return 'login';
+    case '/dashboard':
+    case '/admin':
+    case '/admin/dashboard':
+      return 'dashboard';
+    case '/profil':
+    case '/profile':
+      return 'profile';
+    case '/berita':
+    case '/news':
+      return 'news';
+    case '/galeri':
+    case '/gallery':
+      return 'gallery';
+    case '/umkm':
+      return 'umkm';
+    case '/wisata':
+    case '/tourism':
+      return 'tourism';
+    case '/pelayanan':
+    case '/services':
+      return 'services';
+    case '/kontak':
+    case '/contact':
+      return 'contact';
+    case '/':
+    case '/home':
+    default:
+      return 'home';
+  }
+};
 
+const getPathFromPage = (page) => {
+  switch (page) {
+    case 'login': return '/login';
+    case 'dashboard': return '/dashboard';
+    case 'profile': return '/profil';
+    case 'news': return '/berita';
+    case 'gallery': return '/galeri';
+    case 'umkm': return '/umkm';
+    case 'tourism': return '/wisata';
+    case 'services': return '/pelayanan';
+    case 'contact': return '/kontak';
+    case 'home':
+    default: return '/';
+  }
+};
+
+export default function App() {
   // Admin Auth State
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(() => {
     return localStorage.getItem('desa_admin_logged_in') === 'true';
   });
+
+  // URL Path & Router State
+  const [activePage, setActivePageState] = useState(() => {
+    return getPageFromPath(window.location.pathname);
+  });
+
+  const [adminTab, setAdminTab] = useState('dashboard'); // dashboard, citizens, services, letter-templates, complaints, news, umkm, tourism, gallery, settings
+
+  const navigateTo = (page, shouldPush = true) => {
+    setActivePageState(page);
+    const newPath = getPathFromPage(page);
+    if (shouldPush && window.location.pathname !== newPath) {
+      window.history.pushState({ page }, '', newPath);
+    }
+  };
+
+  // Listen to browser Back / Forward buttons (popstate)
+  useEffect(() => {
+    const handlePopState = () => {
+      const page = getPageFromPath(window.location.pathname);
+      setActivePageState(page);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   // Core Village Data State
   const [profile, setProfile] = useState(() => StorageService.getProfile());
@@ -98,13 +175,14 @@ export default function App() {
   const handleAdminLoginSuccess = () => {
     setIsAdminLoggedIn(true);
     localStorage.setItem('desa_admin_logged_in', 'true');
+    navigateTo('dashboard');
     addToast('Selamat datang! Berhasil login ke Dashboard Admin.', 'success');
   };
 
   const handleAdminLogout = () => {
     setIsAdminLoggedIn(false);
     localStorage.removeItem('desa_admin_logged_in');
-    setActivePage('home');
+    navigateTo('home');
     addToast('Anda telah keluar dari sesi Admin.', 'info');
   };
 
@@ -269,13 +347,20 @@ export default function App() {
         profile={profile}
       />
 
-      {/* VIEW SWITCHER: ADMIN LOGIN / DASHBOARD OR CITIZEN PORTAL */}
-      {activePage === 'admin' ? (
+      {/* VIEW 1: SPECIFIC LOGIN PAGE SLUG (/login) */}
+      {activePage === 'login' ? (
+        <AdminLogin
+          profile={profile}
+          onLoginSuccess={handleAdminLoginSuccess}
+          onBackToHome={() => navigateTo('home')}
+        />
+      ) : activePage === 'dashboard' ? (
+        /* VIEW 2: SPECIFIC ADMIN DASHBOARD SLUG (/dashboard) */
         !isAdminLoggedIn ? (
           <AdminLogin
             profile={profile}
             onLoginSuccess={handleAdminLoginSuccess}
-            onBackToHome={() => setActivePage('home')}
+            onBackToHome={() => navigateTo('home')}
           />
         ) : (
           <AdminLayout
@@ -380,11 +465,12 @@ export default function App() {
           </AdminLayout>
         )
       ) : (
+        /* VIEW 3: CITIZEN PUBLIC PORTAL (/, /profil, /berita, /galeri, /umkm, /wisata, /pelayanan, /kontak) */
         <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
           {/* Public Navbar */}
           <Navbar
             activePage={activePage}
-            setActivePage={setActivePage}
+            setActivePage={(page) => navigateTo(page)}
             onOpenTracking={() => setTrackingModalOpen(true)}
             profile={profile}
           />
@@ -398,7 +484,7 @@ export default function App() {
                 umkmList={umkmList}
                 tourismList={tourismList}
                 galleryList={galleryList}
-                setActivePage={setActivePage}
+                setActivePage={(page) => navigateTo(page)}
                 onOpenServiceModal={handleOpenServiceModal}
                 onOpenTracking={() => setTrackingModalOpen(true)}
                 onSelectNews={(news) => setSelectedNews(news)}
@@ -458,7 +544,7 @@ export default function App() {
           {/* Public Footer */}
           <Footer
             profile={profile}
-            setActivePage={setActivePage}
+            setActivePage={(page) => navigateTo(page)}
             onOpenTracking={() => setTrackingModalOpen(true)}
           />
         </div>
