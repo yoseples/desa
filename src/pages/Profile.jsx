@@ -79,11 +79,11 @@ export default function Profile({ profile }) {
               </p>
               
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1.5rem' }}>
-                <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--light-border)' }}>
+                <div style={{ background: 'var(--light-surface)', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--light-border)' }}>
                   <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 700 }}>Kode Wilayah</span>
                   <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--primary)' }}>{profile?.code}</div>
                 </div>
-                <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--light-border)' }}>
+                <div style={{ background: 'var(--light-surface)', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--light-border)' }}>
                   <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 700 }}>Luas Wilayah</span>
                   <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--primary)' }}>{profile?.stats?.areaSize}</div>
                 </div>
@@ -95,7 +95,7 @@ export default function Profile({ profile }) {
                 borderRadius: 'var(--radius-xl)',
                 overflow: 'hidden',
                 boxShadow: 'var(--shadow-xl)',
-                border: '4px solid #ffffff'
+                border: '4px solid var(--light-surface)'
               }}>
                 <img
                   src={profile?.officePhoto || profile?.bannerImage}
@@ -107,7 +107,7 @@ export default function Profile({ profile }) {
                 position: 'absolute',
                 bottom: '-1.25rem',
                 right: '1.5rem',
-                background: '#ffffff',
+                background: 'var(--light-surface)',
                 padding: '0.85rem 1.25rem',
                 borderRadius: 'var(--radius-lg)',
                 boxShadow: 'var(--shadow-lg)',
@@ -120,7 +120,7 @@ export default function Profile({ profile }) {
                   <Award size={20} />
                 </div>
                 <div>
-                  <h4 style={{ fontSize: '0.875rem', fontWeight: 800, margin: 0 }}>Desa Mandiri 2026</h4>
+                  <h4 style={{ fontSize: '0.875rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Desa Mandiri 2026</h4>
                   <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Status IDM Tertinggi</span>
                 </div>
               </div>
@@ -130,7 +130,7 @@ export default function Profile({ profile }) {
       </section>
 
       {/* 3. Visi & Misi */}
-      <section className="section" style={{ background: '#ffffff', borderTop: '1px solid var(--light-border)', borderBottom: '1px solid var(--light-border)' }}>
+      <section className="section" style={{ background: 'var(--light-surface)', borderTop: '1px solid var(--light-border)', borderBottom: '1px solid var(--light-border)' }}>
         <div className="container">
           <div className="section-title-wrap">
             <span className="section-badge">Arah Kebijakan</span>
@@ -163,7 +163,7 @@ export default function Profile({ profile }) {
 
             {/* Misi Card */}
             <div style={{
-              background: '#f8fafc',
+              background: 'var(--light-bg)',
               border: '1px solid var(--light-border)',
               borderRadius: 'var(--radius-xl)',
               padding: '2rem',
@@ -221,7 +221,7 @@ export default function Profile({ profile }) {
 
           {/* Search & Hierarchy Category Filter */}
           <div style={{
-            background: '#ffffff',
+            background: 'var(--light-surface)',
             padding: '1.25rem',
             borderRadius: 'var(--radius-xl)',
             border: '1px solid var(--light-border)',

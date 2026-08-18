@@ -587,8 +587,8 @@ export default function Home({
                     {tour.description}
                   </p>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', fontSize: '0.825rem', color: '#475569' }}>
-                    <MapPin size={15} color="#059669" /> {tour.location}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', fontSize: '0.825rem', color: 'var(--text-muted)' }}>
+                    <MapPin size={15} color="#059669" /> <span>{tour.location}</span>
                   </div>
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '0.85rem', borderTop: '1px solid var(--light-border)' }}>

@@ -92,17 +92,17 @@ export default function Tourism({ tourismList }) {
 
                   {/* Metadata */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.25rem', fontSize: '0.85rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#334155' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-body)' }}>
                       <MapPin size={15} color="#059669" style={{ flexShrink: 0 }} />
                       <span>{spot.location}</span>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#334155' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-body)' }}>
                       <Clock size={15} color="#059669" style={{ flexShrink: 0 }} />
                       <span>{spot.openHours}</span>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#334155' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-body)' }}>
                       <Ticket size={15} color="#059669" style={{ flexShrink: 0 }} />
-                      <span>Tiket Masuk: <strong style={{ color: '#059669' }}>{spot.ticketPrice === 0 ? 'Gratis' : formatRupiah(spot.ticketPrice)}</strong></span>
+                      <span>Tiket Masuk: <strong style={{ color: 'var(--primary)' }}>{spot.ticketPrice === 0 ? 'Gratis' : formatRupiah(spot.ticketPrice)}</strong></span>
                     </div>
                   </div>
 
@@ -117,11 +117,11 @@ export default function Tourism({ tourismList }) {
                           <span
                             key={fIdx}
                             style={{
-                              background: '#f1f5f9',
+                              background: 'var(--light-border)',
                               padding: '0.2rem 0.55rem',
                               borderRadius: '6px',
                               fontSize: '0.775rem',
-                              color: '#475569',
+                              color: 'var(--text-body)',
                               display: 'inline-flex',
                               alignItems: 'center',
                               gap: '0.3rem'
