@@ -39,7 +39,7 @@ export default function AdminLayout({
       title: 'Menu Utama',
       items: [
         { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-        { id: 'programs', label: 'Program Kerja & APBDes', icon: Briefcase, badge: programCount, badgeColor: '#059669' },
+        { id: 'programs', label: 'RAPBDes', icon: Briefcase, badge: programCount, badgeColor: '#059669' },
         { id: 'citizens', label: 'Database', icon: Users, badge: familyCount, badgeColor: '#0d9488' },
       ]
     },

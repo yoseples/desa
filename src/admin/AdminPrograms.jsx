@@ -209,10 +209,10 @@ export default function AdminPrograms({
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '1rem' }}>
           <div>
             <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-main)', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Briefcase size={20} color="#059669" /> Daftar Program Kerja & Transparansi APBDes
+              <Briefcase size={20} color="#059669" /> Rencana Anggaran & Transparansi RAPBDes
             </h3>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-              Kelola rencana pembangunan fisik, pemberdayaan ekonomi, dan fasilitas publik desa.
+              Rencana pembangunan fisik, pemberdayaan ekonomi, dan alokasi dana desa.
             </span>
           </div>
 
@@ -221,7 +221,7 @@ export default function AdminPrograms({
               <Search size={14} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
               <input
                 type="text"
-                placeholder="Cari program, lokasi..."
+                placeholder="Cari kegiatan RAPBDes..."
                 className="form-control"
                 style={{ paddingLeft: '2.25rem', height: '36px', fontSize: '0.825rem' }}
                 value={searchQuery}
@@ -233,7 +233,7 @@ export default function AdminPrograms({
               className="btn btn-primary btn-sm"
               onClick={handleOpenAdd}
             >
-              <Plus size={14} /> Tambah Program Kerja
+              <Plus size={14} /> Tambah Kegiatan RAPBDes
             </button>
           </div>
         </div>
