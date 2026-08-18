@@ -561,81 +561,51 @@ export default function AdminCitizens({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       
-      {/* 1. TOP SUB-NAV & ACTIONS */}
+      {/* 1. TOP SUB-NAV & ACTION TOOLBAR */}
       <div style={{
         display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
+        flexDirection: 'column',
+        gap: '0.85rem',
         background: 'var(--light-surface)',
-        padding: '0.75rem 1rem',
-        borderRadius: 'var(--radius-lg)',
+        padding: '1rem',
+        borderRadius: 'var(--radius-xl)',
         border: '1px solid var(--light-border)',
-        boxShadow: 'var(--shadow-sm)',
-        flexWrap: 'wrap',
-        gap: '0.75rem'
+        boxShadow: 'var(--shadow-sm)'
       }}>
-        {/* Navigation Sub-Tabs */}
-        <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
-          <button
-            className={`btn btn-sm ${activeSubTab === 'area-classification' ? 'btn-primary' : 'btn-secondary'}`}
-            onClick={() => setActiveSubTab('area-classification')}
-          >
-            <MapPin size={14} /> Wilayah (RT/RW)
-          </button>
-          <button
-            className={`btn btn-sm ${activeSubTab === 'bps-classification' ? 'btn-primary' : 'btn-secondary'}`}
-            onClick={() => setActiveSubTab('bps-classification')}
-          >
-            <TrendingDown size={14} /> Status BPS / DTKS
-          </button>
-          <button
-            className={`btn btn-sm ${activeSubTab === 'families-list' ? 'btn-primary' : 'btn-secondary'}`}
-            onClick={() => setActiveSubTab('families-list')}
-          >
-            <Building size={14} /> Kartu Keluarga ({familiesList.length})
-          </button>
-          <button
-            className={`btn btn-sm ${activeSubTab === 'citizens-list' ? 'btn-primary' : 'btn-secondary'}`}
-            onClick={() => setActiveSubTab('citizens-list')}
-          >
-            <Users size={14} /> Seluruh Warga ({allCitizens.length})
-          </button>
-        </div>
+        {/* Row 1: Sub-Tabs Navigation */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+            <button
+              className={`btn btn-sm ${activeSubTab === 'area-classification' ? 'btn-primary' : 'btn-secondary'}`}
+              onClick={() => setActiveSubTab('area-classification')}
+              style={{ fontWeight: 700 }}
+            >
+              <MapPin size={14} /> Wilayah (RT/RW)
+            </button>
+            <button
+              className={`btn btn-sm ${activeSubTab === 'bps-classification' ? 'btn-primary' : 'btn-secondary'}`}
+              onClick={() => setActiveSubTab('bps-classification')}
+              style={{ fontWeight: 700 }}
+            >
+              <TrendingDown size={14} /> Status Sosial (BPS)
+            </button>
+            <button
+              className={`btn btn-sm ${activeSubTab === 'families-list' ? 'btn-primary' : 'btn-secondary'}`}
+              onClick={() => setActiveSubTab('families-list')}
+              style={{ fontWeight: 700 }}
+            >
+              <Building size={14} /> Kartu Keluarga ({familiesList.length})
+            </button>
+            <button
+              className={`btn btn-sm ${activeSubTab === 'citizens-list' ? 'btn-primary' : 'btn-secondary'}`}
+              onClick={() => setActiveSubTab('citizens-list')}
+              style={{ fontWeight: 700 }}
+            >
+              <Users size={14} /> Data Warga ({allCitizens.length})
+            </button>
+          </div>
 
-        {/* Action Buttons */}
-        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-          <button
-            className="btn btn-secondary btn-sm"
-            onClick={handleTriggerResetSample}
-            title="Muat Ulang Contoh Data Lengkap 20 RT & 10 RW"
-            style={{ color: '#059669', borderColor: '#a7f3d0' }}
-          >
-            <RotateCcw size={14} /> Muat Contoh Data
-          </button>
-          <button
-            className="btn btn-secondary btn-sm"
-            onClick={() => {
-              setBulkDeleteTarget({ dusun: 'Semua', rw: 'Semua', rt: 'Semua' });
-              setBulkDeleteModalOpen(true);
-            }}
-            style={{ color: '#dc2626', borderColor: '#fca5a5' }}
-            title="Hapus massal warga per RT / RW tertentu"
-          >
-            <UserX size={14} /> Hapus per RT/RW
-          </button>
-          <button
-            className="btn btn-secondary btn-sm"
-            onClick={exportBpsCsv}
-            title="Download Rekap CSV / Excel"
-          >
-            <FileDown size={14} /> Ekspor CSV
-          </button>
-          <button
-            className="btn btn-secondary btn-sm"
-            onClick={() => setImportModalOpen(true)}
-          >
-            <Upload size={14} /> Import Data KK
-          </button>
+          {/* Primary Action Button */}
           <button
             className="btn btn-primary btn-sm"
             onClick={() => {
@@ -658,9 +628,64 @@ export default function AdminCitizens({
               });
               setAddFamilyModal(true);
             }}
+            style={{ fontWeight: 700, padding: '0.45rem 0.9rem' }}
           >
-            <Plus size={14} /> Tambah KK Baru
+            <Plus size={15} /> Tambah KK Baru
           </button>
+        </div>
+
+        {/* Row 2: Secondary Quick Actions & Data Management Tools */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          paddingTop: '0.75rem',
+          borderTop: '1px solid var(--light-border)',
+          flexWrap: 'wrap',
+          gap: '0.5rem',
+          fontSize: '0.8rem'
+        }}>
+          <span style={{ color: 'var(--text-muted)' }}>
+            Manajemen Data: <strong style={{ color: 'var(--text-main)' }}>{familiesList.length} KK</strong> • <strong style={{ color: 'var(--primary)' }}>{allCitizens.length} Jiwa</strong> di 3 Dusun, 10 RW, 20 RT
+          </span>
+
+          <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+            <button
+              className="btn btn-secondary btn-sm"
+              onClick={() => setImportModalOpen(true)}
+              style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem' }}
+              title="Import Data dari file Excel atau CSV"
+            >
+              <Upload size={13} /> Impor KK
+            </button>
+            <button
+              className="btn btn-secondary btn-sm"
+              onClick={exportBpsCsv}
+              style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem' }}
+              title="Download Data Kependudukan Format CSV / Excel"
+            >
+              <FileDown size={13} /> Ekspor CSV
+            </button>
+            <button
+              className="btn btn-secondary btn-sm"
+              onClick={handleTriggerResetSample}
+              style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem', color: '#059669', borderColor: '#a7f3d0' }}
+              title="Muat Ulang Contoh Data Lengkap 20 RT & 10 RW"
+            >
+              <RotateCcw size={13} /> Muat Contoh Data
+            </button>
+            <button
+              className="btn btn-secondary btn-sm"
+              onClick={() => {
+                setBulkDeleteTarget({ dusun: 'Semua', rw: 'Semua', rt: 'Semua' });
+                setBulkDeleteModalOpen(true);
+              }}
+              style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem', color: '#dc2626', borderColor: '#fca5a5' }}
+              title="Hapus massal data per RT / RW tertentu"
+            >
+              <UserX size={13} /> Hapus per RT/RW
+            </button>
+          </div>
         </div>
       </div>
 
