@@ -701,12 +701,32 @@ export default function AdminCitizens({
             </div>
 
             <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-              <div style={{ background: 'rgba(255,255,255,0.1)', padding: '0.65rem 1rem', borderRadius: '10px', textAlign: 'center', minWidth: '90px' }}>
-                <span style={{ fontSize: '0.725rem', color: '#a7f3d0', display: 'block' }}>Total KK</span>
+              <div 
+                onClick={() => {
+                  setFilterDusun('Semua');
+                  setFilterRw('Semua');
+                  setFilterRt('Semua');
+                  setFilterEconomic('Semua');
+                  setActiveSubTab('families-list');
+                }}
+                style={{ background: 'rgba(255,255,255,0.12)', padding: '0.65rem 1rem', borderRadius: '10px', textAlign: 'center', minWidth: '95px', cursor: 'pointer', transition: 'all 0.2s', border: '1px solid rgba(255,255,255,0.15)' }}
+                title="Klik untuk membuka daftar seluruh Kartu Keluarga"
+              >
+                <span style={{ fontSize: '0.725rem', color: '#a7f3d0', display: 'block', fontWeight: 600 }}>Total KK ↗</span>
                 <strong style={{ fontSize: '1.4rem', color: '#ffffff' }}>{familiesList.length}</strong>
               </div>
-              <div style={{ background: 'rgba(255,255,255,0.1)', padding: '0.65rem 1rem', borderRadius: '10px', textAlign: 'center', minWidth: '90px' }}>
-                <span style={{ fontSize: '0.725rem', color: '#a7f3d0', display: 'block' }}>Total Jiwa</span>
+              <div 
+                onClick={() => {
+                  setFilterDusun('Semua');
+                  setFilterRw('Semua');
+                  setFilterRt('Semua');
+                  setFilterEconomic('Semua');
+                  setActiveSubTab('citizens-list');
+                }}
+                style={{ background: 'rgba(255,255,255,0.12)', padding: '0.65rem 1rem', borderRadius: '10px', textAlign: 'center', minWidth: '95px', cursor: 'pointer', transition: 'all 0.2s', border: '1px solid rgba(255,255,255,0.15)' }}
+                title="Klik untuk membuka daftar seluruh Jiwa Warga"
+              >
+                <span style={{ fontSize: '0.725rem', color: '#a7f3d0', display: 'block', fontWeight: 600 }}>Total Jiwa ↗</span>
                 <strong style={{ fontSize: '1.4rem', color: '#ffffff' }}>{allCitizens.length}</strong>
               </div>
             </div>
@@ -752,9 +772,35 @@ export default function AdminCitizens({
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                    <span className="badge badge-neutral" style={{ fontSize: '0.8rem', padding: '0.35rem 0.65rem' }}>
-                      <strong>{dStats.kkCount} KK</strong> • {dStats.totalSouls} Jiwa
-                    </span>
+                    <div style={{ display: 'flex', gap: '0.35rem' }}>
+                      <button
+                        onClick={() => {
+                          setFilterDusun(dusun.dusunShort);
+                          setFilterRw('Semua');
+                          setFilterRt('Semua');
+                          setActiveSubTab('families-list');
+                        }}
+                        className="badge badge-neutral"
+                        style={{ cursor: 'pointer', border: '1px solid var(--light-border)', padding: '0.35rem 0.6rem', fontSize: '0.775rem' }}
+                        title={`Klik untuk melihat ${dStats.kkCount} Kartu Keluarga di ${dusun.dusunName}`}
+                      >
+                        📂 <strong>{dStats.kkCount} KK</strong> ↗
+                      </button>
+                      <button
+                        onClick={() => {
+                          setFilterDusun(dusun.dusunShort);
+                          setFilterRw('Semua');
+                          setFilterRt('Semua');
+                          setActiveSubTab('citizens-list');
+                        }}
+                        className="badge badge-neutral"
+                        style={{ cursor: 'pointer', border: '1px solid var(--light-border)', padding: '0.35rem 0.6rem', fontSize: '0.775rem' }}
+                        title={`Klik untuk melihat ${dStats.totalSouls} Jiwa di ${dusun.dusunName}`}
+                      >
+                        👥 <strong>{dStats.totalSouls} Jiwa</strong> ↗
+                      </button>
+                    </div>
+
                     <button
                       className="btn btn-secondary btn-sm"
                       onClick={() => {
@@ -812,9 +858,32 @@ export default function AdminCitizens({
                           </div>
 
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            <span style={{ fontSize: '0.775rem', color: 'var(--text-muted)' }}>
-                              Total RW {rwObj.rw}: <strong style={{ color: 'var(--text-main)' }}>{rwStats.kkCount} KK</strong> ({rwStats.totalSouls} Jiwa)
-                            </span>
+                            <button
+                              onClick={() => {
+                                setFilterDusun(dusun.dusunShort);
+                                setFilterRw(rwObj.rw);
+                                setFilterRt('Semua');
+                                setActiveSubTab('families-list');
+                              }}
+                              className="btn btn-secondary btn-sm"
+                              style={{ fontSize: '0.75rem', padding: '0.25rem 0.55rem', height: '28px', color: 'var(--text-main)' }}
+                              title={`Buka ${rwStats.kkCount} Kartu Keluarga di RW ${rwObj.rw}`}
+                            >
+                              📂 <strong>{rwStats.kkCount} KK</strong> ↗
+                            </button>
+                            <button
+                              onClick={() => {
+                                setFilterDusun(dusun.dusunShort);
+                                setFilterRw(rwObj.rw);
+                                setFilterRt('Semua');
+                                setActiveSubTab('citizens-list');
+                              }}
+                              className="btn btn-secondary btn-sm"
+                              style={{ fontSize: '0.75rem', padding: '0.25rem 0.55rem', height: '28px', color: 'var(--primary)' }}
+                              title={`Buka ${rwStats.totalSouls} Jiwa Warga di RW ${rwObj.rw}`}
+                            >
+                              👥 <strong>{rwStats.totalSouls} Jiwa</strong> ↗
+                            </button>
                             <button
                               className="btn btn-secondary btn-sm"
                               onClick={() => {
@@ -866,21 +935,62 @@ export default function AdminCitizens({
                                     </span>
                                   </div>
 
-                                  {/* RT Data Counters */}
+                                  {/* RT Data Counters (Clickable) */}
                                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', margin: '0.65rem 0' }}>
-                                    <div style={{ background: 'var(--light-bg)', padding: '0.45rem 0.65rem', borderRadius: '6px' }}>
-                                      <span style={{ fontSize: '0.675rem', color: 'var(--text-muted)', display: 'block' }}>Kartu Keluarga</span>
-                                      <strong style={{ fontSize: '1.1rem', color: 'var(--text-main)' }}>{rtStats.kkCount}</strong>
+                                    <div 
+                                      onClick={() => {
+                                        setFilterDusun(dusun.dusunShort);
+                                        setFilterRw(rwObj.rw);
+                                        setFilterRt(rtObj.rt);
+                                        setActiveSubTab('families-list');
+                                      }}
+                                      style={{ background: 'var(--light-bg)', padding: '0.5rem 0.65rem', borderRadius: '6px', cursor: 'pointer', border: '1px solid transparent', transition: 'all 0.2s' }}
+                                      title={`Klik untuk membuka ${rtStats.kkCount} Kartu Keluarga di RT ${rtObj.rt}`}
+                                    >
+                                      <span style={{ fontSize: '0.675rem', color: 'var(--text-muted)', display: 'block' }}>Kartu Keluarga ↗</span>
+                                      <strong style={{ fontSize: '1.15rem', color: 'var(--text-main)' }}>{rtStats.kkCount}</strong>
                                     </div>
-                                    <div style={{ background: 'var(--light-bg)', padding: '0.45rem 0.65rem', borderRadius: '6px' }}>
-                                      <span style={{ fontSize: '0.675rem', color: 'var(--text-muted)', display: 'block' }}>Total Jiwa</span>
-                                      <strong style={{ fontSize: '1.1rem', color: 'var(--primary)' }}>{rtStats.totalSouls}</strong>
+                                    <div 
+                                      onClick={() => {
+                                        setFilterDusun(dusun.dusunShort);
+                                        setFilterRw(rwObj.rw);
+                                        setFilterRt(rtObj.rt);
+                                        setActiveSubTab('citizens-list');
+                                      }}
+                                      style={{ background: 'var(--light-bg)', padding: '0.5rem 0.65rem', borderRadius: '6px', cursor: 'pointer', border: '1px solid transparent', transition: 'all 0.2s' }}
+                                      title={`Klik untuk membuka ${rtStats.totalSouls} Jiwa Warga di RT ${rtObj.rt}`}
+                                    >
+                                      <span style={{ fontSize: '0.675rem', color: 'var(--text-muted)', display: 'block' }}>Total Jiwa ↗</span>
+                                      <strong style={{ fontSize: '1.15rem', color: 'var(--primary)' }}>{rtStats.totalSouls}</strong>
                                     </div>
                                   </div>
 
                                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.725rem', color: 'var(--text-muted)' }}>
-                                    <span>Laki: <strong>{rtStats.maleCount}</strong> • Pr: <strong>{rtStats.femaleCount}</strong></span>
-                                    <span>DTKS: <strong style={{ color: '#d97706' }}>{rtStats.dtksCount} KK</strong></span>
+                                    <span 
+                                      onClick={() => {
+                                        setFilterDusun(dusun.dusunShort);
+                                        setFilterRw(rwObj.rw);
+                                        setFilterRt(rtObj.rt);
+                                        setActiveSubTab('citizens-list');
+                                      }}
+                                      style={{ cursor: 'pointer' }}
+                                      title="Klik untuk membuka daftar warga RT ini"
+                                    >
+                                      Laki: <strong>{rtStats.maleCount}</strong> • Pr: <strong>{rtStats.femaleCount}</strong>
+                                    </span>
+                                    <span 
+                                      onClick={() => {
+                                        setFilterDusun(dusun.dusunShort);
+                                        setFilterRw(rwObj.rw);
+                                        setFilterRt(rtObj.rt);
+                                        setFilterEconomic('Desil 2 (Tidak Mampu)');
+                                        setActiveSubTab('families-list');
+                                      }}
+                                      style={{ cursor: 'pointer' }}
+                                      title="Klik untuk membuka data DTKS RT ini"
+                                    >
+                                      DTKS: <strong style={{ color: '#d97706', textDecoration: 'underline' }}>{rtStats.dtksCount} KK</strong>
+                                    </span>
                                   </div>
                                 </div>
 
@@ -894,7 +1004,7 @@ export default function AdminCitizens({
                                   <button
                                     className="btn btn-secondary btn-sm"
                                     onClick={() => {
-                                      setFilterDusun('Semua');
+                                      setFilterDusun(dusun.dusunShort);
                                       setFilterRw(rwObj.rw);
                                       setFilterRt(rtObj.rt);
                                       setActiveSubTab('citizens-list');
@@ -943,14 +1053,12 @@ export default function AdminCitizens({
             {statsByBps.map((cat) => (
               <div
                 key={cat.id}
-                onClick={() => setFilterEconomic(cat.id === filterEconomic ? 'Semua' : cat.id)}
                 style={{
                   background: 'var(--light-surface)',
                   border: filterEconomic === cat.id ? `2px solid ${cat.color}` : '1px solid var(--light-border)',
                   borderRadius: 'var(--radius-lg)',
                   padding: '1.15rem',
                   boxShadow: filterEconomic === cat.id ? '0 10px 20px -5px rgba(0,0,0,0.1)' : 'var(--shadow-sm)',
-                  cursor: 'pointer',
                   transition: 'var(--transition)',
                   position: 'relative',
                   overflow: 'hidden'
@@ -966,12 +1074,26 @@ export default function AdminCitizens({
                   </span>
                 </div>
 
-                <div style={{ fontSize: '1.6rem', fontWeight: 900, color: 'var(--text-main)' }}>
-                  {cat.kkCount} <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)' }}>KK</span>
+                <div 
+                  onClick={() => {
+                    setFilterEconomic(cat.id);
+                    setActiveSubTab('families-list');
+                  }}
+                  style={{ fontSize: '1.6rem', fontWeight: 900, color: 'var(--text-main)', cursor: 'pointer' }}
+                  title={`Klik untuk membuka ${cat.kkCount} KK ${cat.label}`}
+                >
+                  {cat.kkCount} <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)' }}>KK ↗</span>
                 </div>
 
-                <div style={{ fontSize: '0.775rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-                  Populasi: <strong>{cat.soulsCount} Jiwa</strong>
+                <div 
+                  onClick={() => {
+                    setFilterEconomic(cat.id);
+                    setActiveSubTab('citizens-list');
+                  }}
+                  style={{ fontSize: '0.775rem', color: 'var(--text-muted)', marginTop: '0.25rem', cursor: 'pointer' }}
+                  title={`Klik untuk membuka ${cat.soulsCount} Jiwa ${cat.label}`}
+                >
+                  Populasi: <strong style={{ color: 'var(--primary)' }}>{cat.soulsCount} Jiwa ↗</strong>
                 </div>
               </div>
             ))}
