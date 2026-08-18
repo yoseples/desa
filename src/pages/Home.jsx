@@ -229,7 +229,7 @@ export default function Home({
       </div>
 
       {/* 3. TRANSPARANSI PROGRAM KERJA & APBDes DESA */}
-      <section className="section" style={{ background: '#ffffff', borderBottom: '1px solid var(--light-border)' }}>
+      <section className="section" style={{ background: 'var(--light-surface)', borderBottom: '1px solid var(--light-border)' }}>
         <div className="container">
           
           <div className="section-title-wrap" style={{ marginBottom: '1.75rem' }}>
@@ -291,7 +291,7 @@ export default function Home({
                   padding: '1.35rem',
                   border: '1px solid var(--light-border)',
                   borderRadius: 'var(--radius-lg)',
-                  background: '#ffffff',
+                  background: 'var(--light-surface)',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '0.85rem'
@@ -343,7 +343,7 @@ export default function Home({
                 }}>
                   <div>
                     <span style={{ fontSize: '0.725rem', color: 'var(--text-muted)', display: 'block' }}>Alokasi Dana:</span>
-                    <strong style={{ fontSize: '1.1rem', color: '#064e3b', fontWeight: 900 }}>
+                    <strong style={{ fontSize: '1.1rem', color: 'var(--primary)', fontWeight: 900 }}>
                       {formatRupiah(prog.budget)}
                     </strong>
                   </div>
@@ -367,7 +367,7 @@ export default function Home({
       </section>
 
       {/* 4. DEMOGRAFI & STATISTIK SECTION */}
-      <section className="section" style={{ background: '#f8fafc', borderBottom: '1px solid var(--light-border)' }}>
+      <section className="section" style={{ background: 'var(--light-bg)', borderBottom: '1px solid var(--light-border)' }}>
         <div className="container">
           <div className="section-title-wrap">
             <span className="section-badge">
@@ -424,7 +424,7 @@ export default function Home({
       </section>
 
       {/* 5. BERITA & PENGUMUMAN TERKINI */}
-      <section className="section" style={{ background: '#ffffff', borderBottom: '1px solid var(--light-border)' }}>
+      <section className="section" style={{ background: 'var(--light-surface)', borderBottom: '1px solid var(--light-border)' }}>
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
             <div>
@@ -475,7 +475,7 @@ export default function Home({
       </section>
 
       {/* 6. ETALASE PRODUK UMKM DESA */}
-      <section className="section" style={{ background: '#f8fafc', borderBottom: '1px solid var(--light-border)' }}>
+      <section className="section" style={{ background: 'var(--light-bg)', borderBottom: '1px solid var(--light-border)' }}>
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
             <div>
@@ -540,7 +540,7 @@ export default function Home({
       </section>
 
       {/* 7. PESONA WISATA DESA */}
-      <section className="section" style={{ background: '#ffffff', borderBottom: '1px solid var(--light-border)' }}>
+      <section className="section" style={{ background: 'var(--light-surface)', borderBottom: '1px solid var(--light-border)' }}>
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
             <div>

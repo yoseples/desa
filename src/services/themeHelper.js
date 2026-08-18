@@ -23,6 +23,48 @@ function adjustColor(hex, percent) {
   return `#${nr}${ng}${nb}`;
 }
 
+export function initColorMode() {
+  if (typeof window === 'undefined') return 'auto';
+  
+  const savedMode = localStorage.getItem('desa_color_mode') || 'auto';
+  applyColorMode(savedMode);
+  
+  // Listen to system preference changes if auto
+  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+  const handleSystemChange = () => {
+    const currentMode = localStorage.getItem('desa_color_mode') || 'auto';
+    if (currentMode === 'auto') {
+      applyColorMode('auto');
+    }
+  };
+
+  if (mediaQuery.addEventListener) {
+    mediaQuery.addEventListener('change', handleSystemChange);
+  } else if (mediaQuery.addListener) {
+    mediaQuery.addListener(handleSystemChange);
+  }
+
+  return savedMode;
+}
+
+export function applyColorMode(mode) {
+  if (typeof document === 'undefined') return;
+  const root = document.documentElement;
+  let effectiveMode = mode;
+
+  if (mode === 'auto') {
+    const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    effectiveMode = systemPrefersDark ? 'dark' : 'light';
+  }
+
+  root.setAttribute('data-theme', effectiveMode);
+  root.setAttribute('data-color-mode', mode);
+  localStorage.setItem('desa_color_mode', mode);
+  
+  // Dispatch custom event for UI updates
+  window.dispatchEvent(new CustomEvent('desa-colormode-changed', { detail: { mode, effectiveMode } }));
+}
+
 export function applyThemeToDocument(theme) {
   if (!theme || typeof document === 'undefined') return;
   const root = document.documentElement;

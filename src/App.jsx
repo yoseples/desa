@@ -35,7 +35,7 @@ import AdminComplaints from './admin/AdminComplaints';
 import AdminSettings from './admin/AdminSettings';
 
 import { StorageService } from './services/storageService';
-import { applyThemeToDocument } from './services/themeHelper';
+import { applyThemeToDocument, initColorMode } from './services/themeHelper';
 
 // Helper function to resolve page from pathname
 const getPageFromPath = (path) => {
@@ -134,8 +134,9 @@ export default function App() {
   const [requestsList, setRequestsList] = useState(() => StorageService.getRequests());
   const [complaintsList, setComplaintsList] = useState(() => StorageService.getComplaints());
 
-  // Dynamic Theme & CSS Variables Application
+  // Dynamic Theme & CSS Variables Application + Dark/Light Color Mode
   useEffect(() => {
+    initColorMode();
     if (profile?.theme) {
       applyThemeToDocument(profile.theme);
     }
@@ -510,6 +511,7 @@ export default function App() {
             setActivePage={(page) => navigateTo(page)}
             onOpenTracking={() => setTrackingModalOpen(true)}
             profile={profile}
+            isAdminLoggedIn={isAdminLoggedIn}
           />
 
           {/* Public Page View */}
