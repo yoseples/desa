@@ -1342,54 +1342,86 @@ export default function AdminCitizens({
                       <th>Pendidikan & Pekerjaan</th>
                       <th>RT / RW</th>
                       <th>No. KK Terkait</th>
+                      <th style={{ textAlign: 'center' }}>Aksi</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredCitizens.length === 0 ? (
                       <tr>
-                        <td colSpan={8} style={{ textAlign: 'center', padding: '2.5rem', color: 'var(--text-muted)' }}>
+                        <td colSpan={9} style={{ textAlign: 'center', padding: '2.5rem', color: 'var(--text-muted)' }}>
                           Tidak ditemukan data warga.
                         </td>
                       </tr>
                     ) : (
-                      filteredCitizens.map((cit, idx) => (
-                        <tr key={cit.id || idx}>
-                          <td style={{ fontWeight: 'bold' }}>{idx + 1}</td>
-                          <td>
-                            <span style={{ fontFamily: 'monospace', fontWeight: 800, color: 'var(--primary)', display: 'block', fontSize: '0.825rem' }}>
-                              {cit.nik}
-                            </span>
-                            <strong style={{ fontSize: '0.95rem', color: 'var(--text-main)' }}>{cit.name}</strong>
-                          </td>
-                          <td>
-                            <span className={`badge ${cit.gender === 'Laki-Laki' ? 'badge-info' : 'badge-warning'}`} style={{ fontSize: '0.725rem' }}>
-                              {cit.gender}
-                            </span>
-                          </td>
-                          <td style={{ fontSize: '0.825rem', color: 'var(--text-body)' }}>
-                            {cit.birthPlace ? `${cit.birthPlace}, ` : ''}{cit.birthDate || '-'}
-                          </td>
-                          <td>
-                            <span className={`badge ${cit.relation === 'Kepala Keluarga' ? 'badge-success' : 'badge-neutral'}`} style={{ fontSize: '0.725rem' }}>
-                              {cit.relation}
-                            </span>
-                          </td>
-                          <td style={{ fontSize: '0.825rem', color: 'var(--text-body)' }}>
-                            <div>{cit.education || '-'}</div>
-                            <span style={{ fontSize: '0.725rem', color: 'var(--text-muted)' }}>{cit.occupation || '-'}</span>
-                          </td>
-                          <td>
-                            <span className="badge badge-neutral" style={{ fontSize: '0.725rem' }}>
-                              RT {cit.rt} / RW {cit.rw}
-                            </span>
-                          </td>
-                          <td>
-                            <span style={{ fontFamily: 'monospace', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                              {cit.noKk}
-                            </span>
-                          </td>
-                        </tr>
-                      ))
+                      filteredCitizens.map((cit, idx) => {
+                        const citizenFamily = familiesList.find(f => f.id === cit.kkId || f.noKk === cit.noKk);
+                        return (
+                          <tr key={cit.id || idx}>
+                            <td style={{ fontWeight: 'bold' }}>{idx + 1}</td>
+                            <td>
+                              <div
+                                onClick={() => {
+                                  if (citizenFamily) setViewFamilyDetail(citizenFamily);
+                                }}
+                                style={{ cursor: 'pointer' }}
+                                title="Klik untuk membuka detail Kartu Keluarga (KK)"
+                              >
+                                <span style={{ fontFamily: 'monospace', fontWeight: 800, color: 'var(--primary)', display: 'block', fontSize: '0.825rem' }}>
+                                  {cit.nik}
+                                </span>
+                                <strong style={{ fontSize: '0.95rem', color: 'var(--text-main)', textDecoration: 'underline', textDecorationColor: 'rgba(5,150,105,0.4)', textUnderlineOffset: '3px' }}>
+                                  {cit.name}
+                                </strong>
+                              </div>
+                            </td>
+                            <td>
+                              <span className={`badge ${cit.gender === 'Laki-Laki' ? 'badge-info' : 'badge-warning'}`} style={{ fontSize: '0.725rem' }}>
+                                {cit.gender}
+                              </span>
+                            </td>
+                            <td style={{ fontSize: '0.825rem', color: 'var(--text-body)' }}>
+                              {cit.birthPlace ? `${cit.birthPlace}, ` : ''}{cit.birthDate || '-'}
+                            </td>
+                            <td>
+                              <span className={`badge ${cit.relation === 'Kepala Keluarga' ? 'badge-success' : 'badge-neutral'}`} style={{ fontSize: '0.725rem' }}>
+                                {cit.relation}
+                              </span>
+                            </td>
+                            <td style={{ fontSize: '0.825rem', color: 'var(--text-body)' }}>
+                              <div>{cit.education || '-'}</div>
+                              <span style={{ fontSize: '0.725rem', color: 'var(--text-muted)' }}>{cit.occupation || '-'}</span>
+                            </td>
+                            <td>
+                              <span className="badge badge-neutral" style={{ fontSize: '0.725rem' }}>
+                                RT {cit.rt} / RW {cit.rw}
+                              </span>
+                            </td>
+                            <td>
+                              <span 
+                                onClick={() => {
+                                  if (citizenFamily) setViewFamilyDetail(citizenFamily);
+                                }}
+                                style={{ fontFamily: 'monospace', fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 700, cursor: 'pointer' }}
+                                title="Klik untuk membuka Kartu Keluarga ini"
+                              >
+                                {cit.noKk}
+                              </span>
+                            </td>
+                            <td style={{ textAlign: 'center' }}>
+                              <button
+                                className="btn btn-secondary btn-sm"
+                                onClick={() => {
+                                  if (citizenFamily) setViewFamilyDetail(citizenFamily);
+                                }}
+                                style={{ fontSize: '0.75rem', padding: '0.25rem 0.55rem', display: 'inline-flex', alignItems: 'center', gap: '0.25rem', color: 'var(--primary)' }}
+                                title="Lihat Kartu Keluarga Lengkap"
+                              >
+                                <Eye size={12} /> Detail KK
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })
                     )}
                   </tbody>
                 </table>
