@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   LayoutDashboard, 
   Users, 
@@ -18,14 +18,27 @@ import {
   X,
   Building2,
   ChevronRight,
-  Globe
+  Globe,
+  UserCheck,
+  Shield,
+  Sun,
+  Moon,
+  Monitor,
+  HeartPulse,
+  Tractor,
+  Store,
+  BookOpen
 } from 'lucide-react';
+import { USER_ROLES } from '../services/initialData';
+import { initColorMode, applyColorMode } from '../services/themeHelper';
 
 export default function AdminLayout({ 
   activeTab, 
   setActiveTab, 
   onBackToPublic, 
   profile, 
+  currentUser,
+  userCount,
   pendingCount, 
   complaintCount, 
   familyCount,
@@ -33,37 +46,85 @@ export default function AdminLayout({
   children 
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [colorMode, setColorMode] = useState('auto');
+
+  useEffect(() => {
+    const initial = initColorMode();
+    setColorMode(initial);
+
+    const handleThemeChange = (e) => {
+      if (e.detail?.mode) {
+        setColorMode(e.detail.mode);
+      }
+    };
+
+    window.addEventListener('desa-colormode-changed', handleThemeChange);
+    return () => window.removeEventListener('desa-colormode-changed', handleThemeChange);
+  }, []);
+
+  const handleCycleTheme = () => {
+    let next = 'auto';
+    if (colorMode === 'auto') next = 'dark';
+    else if (colorMode === 'dark') next = 'light';
+    else if (colorMode === 'light') next = 'auto';
+
+    setColorMode(next);
+    applyColorMode(next);
+  };
 
   const menuSections = [
     {
-      title: 'Utama',
+      title: 'Info Desa & Keuangan',
       items: [
-        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-        { id: 'programs', label: 'RAPBDes', icon: Briefcase, badge: programCount, badgeColor: '#059669' },
-        { id: 'citizens', label: 'Database', icon: Users, badge: familyCount, badgeColor: '#0d9488' },
+        { id: 'dashboard', label: 'Dashboard Siteman', icon: LayoutDashboard },
+        { id: 'profile', label: 'Identitas & Pamong', icon: Building2 },
+        { id: 'programs', label: 'Keuangan APBDes', icon: Briefcase, badge: programCount, badgeColor: '#059669' },
       ]
     },
     {
-      title: 'Layanan',
+      title: 'Kependudukan OpenSID',
       items: [
-        { id: 'services', label: 'Permohonan', icon: FileText, badge: pendingCount, badgeColor: '#2563eb' },
-        { id: 'letter-templates', label: 'Template Surat', icon: Printer },
-        { id: 'complaints', label: 'Pengaduan', icon: MessageSquare, badge: complaintCount, badgeColor: '#dc2626' },
+        { id: 'citizens', label: 'Data Penduduk & KK', icon: Users, badge: familyCount, badgeColor: '#0d9488' },
+        { id: 'statistics', label: 'Statistik & Piramida', icon: Sun, badgeColor: '#2563eb' },
       ]
     },
     {
-      title: 'Informasi',
+      title: 'Layanan Administrasi',
       items: [
-        { id: 'news', label: 'Berita', icon: Newspaper },
-        { id: 'umkm', label: 'UMKM', icon: ShoppingBag },
-        { id: 'tourism', label: 'Wisata', icon: Palmtree },
-        { id: 'gallery', label: 'Galeri', icon: Image },
+        { id: 'services', label: 'Permohonan Surat', icon: FileText, badge: pendingCount, badgeColor: '#2563eb' },
+        { id: 'letter-templates', label: '51 Template Surat', icon: Printer },
+        { id: 'complaints', label: 'Pengaduan Warga', icon: MessageSquare, badge: complaintCount, badgeColor: '#dc2626' },
       ]
     },
     {
-      title: 'Sistem',
+      title: 'Bansos & Pertanahan',
       items: [
-        { id: 'settings', label: 'Pengaturan', icon: Settings },
+        { id: 'bansos', label: 'Bansos & DTKS', icon: ShieldCheck, badgeColor: '#059669' },
+        { id: 'land', label: 'Buku Letter C & TKD', icon: BookOpen, badgeColor: '#d97706' },
+      ]
+    },
+    {
+      title: 'Kesehatan & Ekonomi',
+      items: [
+        { id: 'health', label: 'e-Posyandu & Stunting', icon: HeartPulse, badgeColor: '#db2777' },
+        { id: 'agriculture', label: 'Pertanian & Poktan', icon: Tractor },
+        { id: 'bumdes', label: 'BUMDes & Pasar', icon: Store },
+      ]
+    },
+    {
+      title: 'Informasi & Publikasi',
+      items: [
+        { id: 'news', label: 'Berita & Pengumuman', icon: Newspaper },
+        { id: 'umkm', label: 'Katalog UMKM', icon: ShoppingBag },
+        { id: 'tourism', label: 'Pariwisata Desa', icon: Palmtree },
+      ]
+    },
+    {
+      title: 'Sistem & Pelaporan',
+      items: [
+        { id: 'reports', label: 'Buku Administrasi 47/2016', icon: BookOpen },
+        { id: 'users', label: 'Pengguna & Hak Akses', icon: UserCheck, badge: userCount, badgeColor: '#10b981' },
+        { id: 'settings', label: 'Pengaturan Sistem', icon: Settings },
       ]
     }
   ];
@@ -219,19 +280,35 @@ export default function AdminLayout({
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
+            {/* Quick Dark / Light Mode Switcher */}
+            <button 
+              className="btn btn-sm btn-secondary"
+              onClick={handleCycleTheme}
+              title={`Mode Tampilan: ${colorMode === 'auto' ? 'Otomatis (Sesuai Sistem & Malam)' : colorMode === 'dark' ? 'Mode Gelap (Nyaman Mata)' : 'Mode Terang'} (Klik untuk ganti)`}
+              style={{ width: '34px', height: '34px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 'var(--radius-full)' }}
+            >
+              {colorMode === 'auto' ? (
+                <Monitor size={15} style={{ color: 'var(--primary)' }} />
+              ) : colorMode === 'dark' ? (
+                <Moon size={15} style={{ color: '#fbbf24' }} />
+              ) : (
+                <Sun size={15} style={{ color: '#f59e0b' }} />
+              )}
+            </button>
+
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
               <img
-                src={profile?.headOfVillage?.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'}
-                alt="Admin"
-                style={{ width: '34px', height: '34px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #10b981', background: '#e2e8f0' }}
+                src={currentUser?.avatar || profile?.headOfVillage?.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'}
+                alt={currentUser?.name || "Admin"}
+                style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #10b981', background: '#e2e8f0' }}
               />
               <div style={{ display: 'flex', flexDirection: 'column' }} className="d-none-mobile">
-                <span style={{ fontSize: '0.825rem', fontWeight: 700, color: 'var(--text-main)' }}>
-                  Administrator
+                <span style={{ fontSize: '0.825rem', fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  {currentUser?.name || 'Administrator'}
                 </span>
-                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {profile?.name}
+                <span style={{ fontSize: '0.7rem', color: 'var(--primary)', fontWeight: 700, maxWidth: '160px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {currentUser ? (USER_ROLES[currentUser.role]?.label || currentUser.position) : (profile?.name || 'Admin Panel')}
                 </span>
               </div>
             </div>

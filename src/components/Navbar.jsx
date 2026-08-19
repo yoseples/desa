@@ -8,11 +8,24 @@ import {
   Moon,
   Monitor,
   User,
-  ShieldCheck
+  ShieldCheck,
+  Compass,
+  AlertTriangle,
+  UserCheck
 } from 'lucide-react';
 import { initColorMode, applyColorMode } from '../services/themeHelper';
 
-export default function Navbar({ activePage, setActivePage, onOpenTracking, profile, isAdminLoggedIn = false }) {
+export default function Navbar({ 
+  activePage, 
+  setActivePage, 
+  onOpenTracking, 
+  onOpenBansos,
+  onOpenPanic,
+  onOpenMap,
+  onOpenSelfService,
+  profile, 
+  isAdminLoggedIn = false 
+}) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [colorMode, setColorMode] = useState('auto'); // 'auto', 'dark', 'light'
 
@@ -98,9 +111,34 @@ export default function Navbar({ activePage, setActivePage, onOpenTracking, prof
         </nav>
 
         {/* 3. Action Buttons & Quick Controls */}
-        <div className="navbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+        <div className="navbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           
-          {/* Automatic / Dark / Light Mode Switcher (Icon Only) */}
+          {/* Cek Bansos Button */}
+          {onOpenBansos && (
+            <button
+              type="button"
+              className="navbar-btn-secondary d-none-mobile"
+              onClick={onOpenBansos}
+              title="Cek Kepesertaan Bansos & BLT Dana Desa"
+              style={{ color: '#059669', borderColor: '#86efac', fontWeight: 700 }}
+            >
+              <ShieldCheck size={13} />
+              <span>Cek Bansos</span>
+            </button>
+          )}
+
+          {/* Lacak Surat Button */}
+          <button 
+            type="button" 
+            className="navbar-btn-secondary d-none-mobile"
+            onClick={onOpenTracking}
+            title="Lacak Surat Masuk / Keluar Online"
+          >
+            <Search size={13} />
+            <span>Lacak</span>
+          </button>
+
+          {/* Automatic / Dark / Light Mode Switcher */}
           <button 
             className="navbar-btn-secondary navbar-theme-btn"
             onClick={handleCycleTheme}
@@ -125,15 +163,7 @@ export default function Navbar({ activePage, setActivePage, onOpenTracking, prof
             )}
           </button>
 
-          {/* Lacak Permohonan Resi Button */}
-          <button 
-            className="navbar-btn-secondary"
-            onClick={onOpenTracking}
-            title="Lacak Pengajuan Surat Berdasarkan Nomor Resi"
-          >
-            <Search size={13} />
-            <span>Lacak</span>
-          </button>
+          {/* Duplicate Lacak button removed */}
 
           {/* SVG Profil Orang / Admin Avatar Button */}
           <button 
@@ -214,25 +244,20 @@ export default function Navbar({ activePage, setActivePage, onOpenTracking, prof
             ))}
           </div>
 
-          <div className="mobile-actions-row" style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <div className="mobile-actions-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginTop: '0.75rem' }}>
+            {onOpenBansos && (
+              <button 
+                className="navbar-btn-secondary"
+                style={{ justifyContent: 'center', color: '#059669', borderColor: '#86efac', fontWeight: 700 }}
+                onClick={() => { onOpenBansos(); setMobileMenuOpen(false); }}
+              >
+                <ShieldCheck size={14} /> Cek Bansos
+              </button>
+            )}
+
             <button 
               className="navbar-btn-secondary"
-              style={{ width: '42px', height: '40px', padding: 0, justifyContent: 'center', borderRadius: '8px' }}
-              onClick={handleCycleTheme}
-              title={`Mode Tampilan: ${colorMode === 'auto' ? 'Otomatis' : colorMode === 'dark' ? 'Gelap' : 'Terang'}`}
-              aria-label="Ganti Mode Tampilan"
-            >
-              {colorMode === 'auto' ? (
-                <Monitor size={17} style={{ color: 'var(--primary)' }} />
-              ) : colorMode === 'dark' ? (
-                <Moon size={17} style={{ color: '#38bdf8' }} />
-              ) : (
-                <Sun size={17} style={{ color: '#f59e0b' }} />
-              )}
-            </button>
-            <button 
-              className="navbar-btn-secondary"
-              style={{ flex: 1, justifyContent: 'center' }}
+              style={{ justifyContent: 'center' }}
               onClick={() => {
                 onOpenTracking();
                 setMobileMenuOpen(false);
@@ -240,9 +265,21 @@ export default function Navbar({ activePage, setActivePage, onOpenTracking, prof
             >
               <Search size={14} /> Lacak Resi
             </button>
+
+            <button 
+              className="navbar-btn-secondary"
+              style={{ justifyContent: 'center', gridColumn: 'span 2' }}
+              onClick={handleCycleTheme}
+              title={`Mode: ${colorMode}`}
+            >
+              {colorMode === 'dark' ? <Moon size={14} style={{ color: '#38bdf8' }} /> : <Sun size={14} style={{ color: '#f59e0b' }} />} {colorMode === 'auto' ? 'Tema Otomatis' : colorMode === 'dark' ? 'Tema Gelap' : 'Tema Terang'}
+            </button>
+          </div>
+
+          <div style={{ marginTop: '0.75rem' }}>
             <button 
               className="navbar-btn-primary"
-              style={{ flex: '1 1 100%', justifyContent: 'center', gap: '0.5rem' }}
+              style={{ width: '100%', justifyContent: 'center', gap: '0.5rem', height: '38px' }}
               onClick={() => handleNavClick(isAdminLoggedIn ? 'dashboard' : 'login')}
             >
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">

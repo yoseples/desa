@@ -8,6 +8,10 @@ import NewsDetailModal from './components/NewsDetailModal';
 import UmkmDetailModal from './components/UmkmDetailModal';
 import LetterPrintModal from './components/LetterPrintModal';
 import VillageChatbot from './components/VillageChatbot';
+import BansosCheckerModal from './components/BansosCheckerModal';
+import PanicButtonModal from './components/PanicButtonModal';
+import VillageMapModal from './components/VillageMapModal';
+import CitizenSelfServiceModal from './components/CitizenSelfServiceModal';
 
 // Public Pages
 import Home from './pages/Home';
@@ -25,6 +29,9 @@ import AdminLayout from './admin/AdminLayout';
 import AdminDashboard from './admin/AdminDashboard';
 import AdminPrograms from './admin/AdminPrograms';
 import AdminCitizens from './admin/AdminCitizens';
+import AdminPopulation from './admin/AdminPopulation';
+import AdminStatistics from './admin/AdminStatistics';
+import AdminLand from './admin/AdminLand';
 import AdminNews from './admin/AdminNews';
 import AdminUmkm from './admin/AdminUmkm';
 import AdminTourism from './admin/AdminTourism';
@@ -33,6 +40,12 @@ import AdminServices from './admin/AdminServices';
 import AdminLetterTemplates from './admin/AdminLetterTemplates';
 import AdminComplaints from './admin/AdminComplaints';
 import AdminSettings from './admin/AdminSettings';
+import AdminUsers from './admin/AdminUsers';
+import AdminBansos from './admin/AdminBansos';
+import AdminHealth from './admin/AdminHealth';
+import AdminAgriculture from './admin/AdminAgriculture';
+import AdminBumdes from './admin/AdminBumdes';
+import AdminReports from './admin/AdminReports';
 
 import { StorageService } from './services/storageService';
 import { applyThemeToDocument, initColorMode, applySeoAndFavicon } from './services/themeHelper';
@@ -133,6 +146,8 @@ export default function App() {
   const [galleryList, setGalleryList] = useState(() => StorageService.getGallery());
   const [requestsList, setRequestsList] = useState(() => StorageService.getRequests());
   const [complaintsList, setComplaintsList] = useState(() => StorageService.getComplaints());
+  const [usersList, setUsersList] = useState(() => StorageService.getUsers());
+  const [currentUser, setCurrentUser] = useState(() => StorageService.getCurrentUser());
 
   // Dynamic Theme, Dark/Light Mode & Open Graph / Favicon Metadata
   useEffect(() => {
@@ -152,6 +167,10 @@ export default function App() {
   const [selectedNews, setSelectedNews] = useState(null);
   const [selectedUmkm, setSelectedUmkm] = useState(null);
   const [printLetterReq, setPrintLetterReq] = useState(null);
+  const [bansosModalOpen, setBansosModalOpen] = useState(false);
+  const [panicModalOpen, setPanicModalOpen] = useState(false);
+  const [mapModalOpen, setMapModalOpen] = useState(false);
+  const [citizenSelfServiceOpen, setCitizenSelfServiceOpen] = useState(false);
 
   // Toast notifications
   const [toasts, setToasts] = useState([]);
@@ -180,6 +199,8 @@ export default function App() {
       setGalleryList(StorageService.getGallery());
       setRequestsList(StorageService.getRequests());
       setComplaintsList(StorageService.getComplaints());
+      setUsersList(StorageService.getUsers());
+      setCurrentUser(StorageService.getCurrentUser());
     };
 
     window.addEventListener('desa-data-updated', handleDataUpdate);
@@ -187,18 +208,53 @@ export default function App() {
   }, []);
 
   // Admin Auth Handlers
-  const handleAdminLoginSuccess = () => {
+  const handleAdminLoginSuccess = (authenticatedUser) => {
     setIsAdminLoggedIn(true);
     localStorage.setItem('desa_admin_logged_in', 'true');
+    if (authenticatedUser) {
+      setCurrentUser(authenticatedUser);
+    }
     navigateTo('dashboard');
-    addToast('Selamat datang! Berhasil login ke Dashboard Admin.', 'success');
+    addToast(`Selamat datang, ${authenticatedUser?.name || 'Administrator'}! Berhasil masuk ke Dashboard.`, 'success');
   };
 
   const handleAdminLogout = () => {
     setIsAdminLoggedIn(false);
     localStorage.removeItem('desa_admin_logged_in');
+    StorageService.clearCurrentUser();
     navigateTo('home');
     addToast('Anda telah keluar dari sesi Admin.', 'info');
+  };
+
+  // User Management Handlers
+  const handleAddUser = (userData) => {
+    const created = StorageService.addUser(userData);
+    addToast(`Pengguna baru "${created.name}" (@${created.username}) berhasil ditambahkan!`, 'success');
+  };
+
+  const handleUpdateUser = (id, fields) => {
+    StorageService.updateUser(id, fields);
+    addToast('Data akun pengguna berhasil diperbarui!', 'success');
+  };
+
+  const handleDeleteUser = (id) => {
+    StorageService.deleteUser(id);
+    addToast('Akun pengguna telah dihapus dari sistem.', 'info');
+  };
+
+  const handleResetUserPassword = (id, newPassword) => {
+    StorageService.resetUserPassword(id, newPassword);
+    addToast('Kata sandi pengguna berhasil direset!', 'success');
+  };
+
+  const handleToggleUserStatus = (id) => {
+    StorageService.toggleUserStatus(id);
+    addToast('Status keaktifan akun pengguna berhasil diperbarui!');
+  };
+
+  const handleResetSampleUsers = () => {
+    StorageService.resetSampleUsers();
+    addToast('Akun pengguna contoh bawaan berhasil dimuat ulang!', 'success');
   };
 
   // Work Programs Handlers
@@ -388,6 +444,30 @@ export default function App() {
         profile={profile}
       />
 
+      <BansosCheckerModal
+        isOpen={bansosModalOpen}
+        onClose={() => setBansosModalOpen(false)}
+      />
+
+      <PanicButtonModal
+        isOpen={panicModalOpen}
+        onClose={() => setPanicModalOpen(false)}
+        profile={profile}
+      />
+
+      <VillageMapModal
+        isOpen={mapModalOpen}
+        onClose={() => setMapModalOpen(false)}
+        profile={profile}
+      />
+
+      <CitizenSelfServiceModal
+        isOpen={citizenSelfServiceOpen}
+        onClose={() => setCitizenSelfServiceOpen(false)}
+        onOpenServiceModal={handleOpenServiceModal}
+        profile={profile}
+      />
+
       {/* VIEW 1: SPECIFIC LOGIN PAGE SLUG (/login) */}
       {activePage === 'login' ? (
         <AdminLogin
@@ -409,6 +489,8 @@ export default function App() {
             setActiveTab={setAdminTab}
             onBackToPublic={handleAdminLogout}
             profile={profile}
+            currentUser={currentUser}
+            userCount={(usersList || []).length}
             pendingCount={pendingRequestsCount}
             complaintCount={pendingComplaintsCount}
             familyCount={(familiesList || []).length}
@@ -423,6 +505,7 @@ export default function App() {
                 requestsList={requestsList}
                 complaintsList={complaintsList}
                 familiesList={familiesList}
+                programsList={workProgramsList}
                 setActiveTab={setAdminTab}
                 onSelectRequestToPrint={(req) => setPrintLetterReq(req)}
               />
@@ -438,18 +521,15 @@ export default function App() {
             )}
 
             {adminTab === 'citizens' && (
-              <AdminCitizens
-                familiesList={familiesList}
-                onAddFamily={handleAddFamily}
-                onUpdateFamily={handleUpdateFamily}
-                onDeleteFamily={handleDeleteFamily}
-                onAddMember={handleAddMember}
-                onDeleteMember={handleDeleteMember}
-                onBatchImport={handleBatchImportFamilies}
-                onBulkDeleteFamilies={handleBulkDeleteFamilies}
-                onResetSampleFamilies={handleResetSampleFamilies}
-                profile={profile}
-              />
+              <AdminPopulation profile={profile} />
+            )}
+
+            {adminTab === 'statistics' && (
+              <AdminStatistics profile={profile} />
+            )}
+
+            {adminTab === 'land' && (
+              <AdminLand profile={profile} />
             )}
 
             {adminTab === 'services' && (
@@ -509,10 +589,52 @@ export default function App() {
               />
             )}
 
+            {adminTab === 'users' && (
+              <AdminUsers
+                usersList={usersList}
+                currentUser={currentUser}
+                onAddUser={handleAddUser}
+                onUpdateUser={handleUpdateUser}
+                onDeleteUser={handleDeleteUser}
+                onResetPassword={handleResetUserPassword}
+                onToggleStatus={handleToggleUserStatus}
+                onResetSampleUsers={handleResetSampleUsers}
+              />
+            )}
+
+            {adminTab === 'bansos' && (
+              <AdminBansos profile={profile} />
+            )}
+
+            {adminTab === 'health' && (
+              <AdminHealth profile={profile} />
+            )}
+
+            {adminTab === 'agriculture' && (
+              <AdminAgriculture profile={profile} />
+            )}
+
+            {adminTab === 'bumdes' && (
+              <AdminBumdes profile={profile} />
+            )}
+
+            {adminTab === 'reports' && (
+              <AdminReports profile={profile} />
+            )}
+
+            {adminTab === 'profile' && (
+              <AdminSettings
+                profile={profile}
+                onUpdateProfile={handleUpdateProfile}
+                defaultTab="general"
+              />
+            )}
+
             {adminTab === 'settings' && (
               <AdminSettings
                 profile={profile}
                 onUpdateProfile={handleUpdateProfile}
+                defaultTab="seo"
               />
             )}
           </AdminLayout>
@@ -525,6 +647,10 @@ export default function App() {
             activePage={activePage}
             setActivePage={(page) => navigateTo(page)}
             onOpenTracking={() => setTrackingModalOpen(true)}
+            onOpenBansos={() => setBansosModalOpen(true)}
+            onOpenPanic={() => setPanicModalOpen(true)}
+            onOpenMap={() => setMapModalOpen(true)}
+            onOpenSelfService={() => setCitizenSelfServiceOpen(true)}
             profile={profile}
             isAdminLoggedIn={isAdminLoggedIn}
           />
@@ -542,6 +668,10 @@ export default function App() {
                 setActivePage={(page) => navigateTo(page)}
                 onOpenServiceModal={handleOpenServiceModal}
                 onOpenTracking={() => setTrackingModalOpen(true)}
+                onOpenBansos={() => setBansosModalOpen(true)}
+                onOpenPanic={() => setPanicModalOpen(true)}
+                onOpenMap={() => setMapModalOpen(true)}
+                onOpenSelfService={() => setCitizenSelfServiceOpen(true)}
                 onSelectNews={(news) => setSelectedNews(news)}
                 onSelectUmkm={(umkm) => setSelectedUmkm(umkm)}
               />

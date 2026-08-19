@@ -43,6 +43,8 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
   // Search and Filters
   const [outgoingSearch, setOutgoingSearch] = useState('');
   const [incomingSearch, setIncomingSearch] = useState('');
+  const [catalogSearch, setCatalogSearch] = useState('');
+  const [catalogCategory, setCatalogCategory] = useState('ALL');
 
   // Generator State
   const [selectedTemplateId, setSelectedTemplateId] = useState('SK_JUAL_BELI');
@@ -1088,47 +1090,119 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
       )}
 
       {/* 6. TAB 5: KATALOG TEMPLATE RESMI */}
-      {activeTab === 'catalog' && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 340px), 1fr))', gap: '1.25rem' }}>
-          {officialLetterTemplates.map((template) => (
-            <div
-              key={template.id}
-              className="card"
-              style={{ padding: '1.35rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
-            >
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                  <span className="badge badge-neutral">{template.category}</span>
-                  <span style={{ fontSize: '0.75rem', fontFamily: 'monospace', color: '#059669', fontWeight: 700 }}>
-                    {template.code}
-                  </span>
-                </div>
-                <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-main)', margin: '0.25rem 0 0.5rem' }}>
-                  {template.name}
-                </h4>
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: 1.5, marginBottom: '1rem' }}>
-                  {template.description}
-                </p>
+      {activeTab === 'catalog' && (() => {
+        const categories = ['ALL', ...Array.from(new Set(officialLetterTemplates.map(t => t.category)))];
+        const filteredTemplates = officialLetterTemplates.filter(t => {
+          const matchCat = catalogCategory === 'ALL' || t.category === catalogCategory;
+          const q = catalogSearch.toLowerCase();
+          const matchQ = !catalogSearch || 
+            t.name.toLowerCase().includes(q) || 
+            t.code.toLowerCase().includes(q) || 
+            t.description.toLowerCase().includes(q) ||
+            t.category.toLowerCase().includes(q);
+          return matchCat && matchQ;
+        });
 
-                <div style={{ fontSize: '0.775rem', color: '#334155', background: '#f8fafc', padding: '0.65rem 0.85rem', borderRadius: '8px', marginBottom: '1rem' }}>
-                  <strong>Rincian Data:</strong> {template.fields.map(f => f.label).join(', ')}
+        return (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            {/* Search & Filter Toolbar */}
+            <div className="card" style={{ padding: '1.25rem' }}>
+              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                <div style={{ position: 'relative', flex: '1 1 300px', maxWidth: '480px' }}>
+                  <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                  <input
+                    type="text"
+                    placeholder="Cari template surat (nama, kode, kata kunci)..."
+                    className="form-control"
+                    value={catalogSearch}
+                    onChange={(e) => setCatalogSearch(e.target.value)}
+                    style={{ paddingLeft: '2.6rem', height: '42px' }}
+                  />
+                </div>
+                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+                  Menampilkan <strong>{filteredTemplates.length}</strong> dari {officialLetterTemplates.length} Template Surat Resmi
                 </div>
               </div>
 
-              <button
-                className="btn btn-primary btn-sm"
-                onClick={() => {
-                  setSelectedTemplateId(template.id);
-                  setActiveTab('generator');
-                }}
-                style={{ width: '100%' }}
-              >
-                Gunakan Template Ini <ChevronRight size={14} />
-              </button>
+              {/* Category Pills */}
+              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                {categories.map((cat) => (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => setCatalogCategory(cat)}
+                    style={{
+                      padding: '0.35rem 0.75rem',
+                      borderRadius: '9999px',
+                      fontSize: '0.775rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      border: '1px solid',
+                      background: catalogCategory === cat ? 'var(--primary)' : '#f1f5f9',
+                      color: catalogCategory === cat ? '#ffffff' : '#475569',
+                      borderColor: catalogCategory === cat ? 'var(--primary)' : '#e2e8f0',
+                      transition: 'all 0.15s ease'
+                    }}
+                  >
+                    {cat === 'ALL' ? `Semua Kategori (${officialLetterTemplates.length})` : cat}
+                  </button>
+                ))}
+              </div>
             </div>
-          ))}
-        </div>
-      )}
+
+            {/* Grid of Templates */}
+            {filteredTemplates.length === 0 ? (
+              <div className="card" style={{ padding: '3rem 1.5rem', textAlign: 'center' }}>
+                <FileText size={36} color="#94a3b8" style={{ margin: '0 auto 0.75rem' }} />
+                <h4 style={{ fontSize: '1.1rem', fontWeight: 700, margin: '0 0 0.35rem' }}>Template Tidak Ditemukan</h4>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Coba gunakan kata kunci pencarian lain atau pilih kategori Semua.</p>
+              </div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 340px), 1fr))', gap: '1.25rem' }}>
+                {filteredTemplates.map((template) => (
+                  <div
+                    key={template.id}
+                    className="card"
+                    style={{ padding: '1.35rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
+                  >
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                        <span className="badge badge-neutral" style={{ fontSize: '0.7rem' }}>{template.category}</span>
+                        <span style={{ fontSize: '0.75rem', fontFamily: 'monospace', color: '#059669', fontWeight: 700 }}>
+                          {template.code}
+                        </span>
+                      </div>
+                      <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-main)', margin: '0.25rem 0 0.5rem' }}>
+                        {template.name}
+                      </h4>
+                      <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: 1.5, marginBottom: '1rem' }}>
+                        {template.description}
+                      </p>
+
+                      <div style={{ fontSize: '0.775rem', color: '#334155', background: '#f8fafc', padding: '0.65rem 0.85rem', borderRadius: '8px', marginBottom: '1rem' }}>
+                        <strong>Rincian Data:</strong> {template.fields.map(f => f.label).join(', ')}
+                      </div>
+                    </div>
+
+                    <button
+                      className="btn btn-primary btn-sm"
+                      onClick={() => {
+                        setSelectedTemplateId(template.id);
+                        const rand = Math.floor(10 + Math.random() * 89);
+                        setLetterNumber(`${template.code}/0${rand}/DS-SKM/VIII/${new Date().getFullYear()}`);
+                        setActiveTab('generator');
+                      }}
+                      style={{ width: '100%' }}
+                    >
+                      Gunakan Template Ini <ChevronRight size={14} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* MODAL INPUT SURAT MASUK & SCAN */}
       {incomingModal && (

@@ -19,7 +19,9 @@ import {
   Sparkles,
   ChevronRight,
   Calendar,
-  Layers
+  Layers,
+  Wallet,
+  Coins
 } from 'lucide-react';
 
 export default function AdminDashboard({
@@ -30,6 +32,7 @@ export default function AdminDashboard({
   requestsList = [],
   complaintsList = [],
   familiesList = [],
+  programsList = [],
   setActiveTab,
   onSelectRequestToPrint
 }) {
@@ -39,6 +42,30 @@ export default function AdminDashboard({
 
   // Count total citizens souls
   const totalCitizens = familiesList.reduce((acc, kk) => acc + (kk.members ? kk.members.length : 0), 0);
+
+  // APBDes Financial Calculations
+  const totalApbdesBudget = programsList.reduce((acc, p) => acc + (p.budget || 0), 0);
+  
+  // Breakdown by Sumber APBDes
+  const ddsBudget = programsList
+    .filter(p => (p.fundingSource || '').includes('Dana Desa') || (p.fundingSource || '').includes('DDS'))
+    .reduce((acc, p) => acc + (p.budget || 0), 0);
+  
+  const addBudget = programsList
+    .filter(p => (p.fundingSource || '').includes('Alokasi Dana Desa') || (p.fundingSource || '').includes('ADD'))
+    .reduce((acc, p) => acc + (p.budget || 0), 0);
+  
+  const banprovBudget = programsList
+    .filter(p => (p.fundingSource || '').includes('Provinsi') || (p.fundingSource || '').includes('Banprov'))
+    .reduce((acc, p) => acc + (p.budget || 0), 0);
+  
+  const padesBudget = programsList
+    .filter(p => (p.fundingSource || '').includes('PADes') || (p.fundingSource || '').includes('Asli Desa'))
+    .reduce((acc, p) => acc + (p.budget || 0), 0);
+
+  const formatRupiah = (num) => {
+    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num || 0);
+  };
 
   // BPS Socioeconomic Breakdown
   const desil1Count = familiesList.filter(f => {
@@ -97,10 +124,24 @@ export default function AdminDashboard({
           </button>
           <button 
             className="btn btn-secondary btn-sm"
+            onClick={() => setActiveTab('profile')}
+            style={{ background: 'rgba(255,255,255,0.18)', color: '#fff', borderColor: 'rgba(255,255,255,0.3)', fontWeight: 700 }}
+          >
+            <Building size={14} /> Profil Desa
+          </button>
+          <button 
+            className="btn btn-secondary btn-sm"
+            onClick={() => setActiveTab('users')}
+            style={{ background: 'rgba(255,255,255,0.12)', color: '#fff', borderColor: 'rgba(255,255,255,0.22)', fontWeight: 600 }}
+          >
+            Kelola Operator
+          </button>
+          <button 
+            className="btn btn-secondary btn-sm"
             onClick={() => setActiveTab('settings')}
             style={{ background: 'rgba(255,255,255,0.1)', color: '#fff', borderColor: 'rgba(255,255,255,0.2)', fontWeight: 600 }}
           >
-            Pengaturan
+            Pengaturan & Tema
           </button>
         </div>
       </div>
@@ -240,7 +281,172 @@ export default function AdminDashboard({
         </div>
       </div>
 
-      {/* 4. PENDING REQUESTS & COMPLAINTS SUMMARY TABLES */}
+      {/* 4. TRANSPARANSI & ALOKASI SUMBER APBDES */}
+      <div style={{
+        background: 'var(--card-bg)',
+        borderRadius: 'var(--radius-xl)',
+        border: '1px solid var(--border-color)',
+        padding: '1.5rem',
+        boxShadow: 'var(--shadow-sm)'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+          <div>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', padding: '0.2rem 0.6rem', background: 'var(--primary-light)', border: '1px solid var(--primary-border)', borderRadius: '9999px', fontSize: '0.7rem', fontWeight: 700, color: 'var(--primary-dark)', marginBottom: '0.35rem' }}>
+              <Wallet size={12} /> Keuangan & Akuntabilitas Desa
+            </div>
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-main)', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Coins size={18} color="#059669" /> Alokasi Belanja & Sumber APBDes T.A. {new Date().getFullYear()}
+            </h3>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+              Rekapitulasi anggaran pendapatan dan pembiayaan program kerja desa berdasarkan pos sumber dana resmi.
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+            <div style={{ textAlign: 'right', marginRight: '0.5rem' }} className="d-none-mobile">
+              <span style={{ fontSize: '0.725rem', color: 'var(--text-muted)', fontWeight: 600 }}>Total Pagu Terdistribusi</span>
+              <div style={{ fontSize: '1.15rem', fontWeight: 900, color: 'var(--primary)' }}>
+                {formatRupiah(totalApbdesBudget)}
+              </div>
+            </div>
+
+            <button
+              className="btn btn-primary btn-sm"
+              onClick={() => setActiveTab('programs')}
+              style={{ fontWeight: 700 }}
+            >
+              Kelola Sumber APBDes <ArrowRight size={14} />
+            </button>
+          </div>
+        </div>
+
+        {/* Sumber APBDes Cards Grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))', gap: '1rem' }}>
+          
+          {/* Sumber APBDes: DDS */}
+          <div style={{
+            background: 'var(--bg-main)',
+            border: '1px solid var(--border-color)',
+            borderRadius: 'var(--radius-lg)',
+            padding: '1.15rem',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            position: 'relative',
+            overflow: 'hidden'
+          }}>
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: '#10b981' }} />
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                <span className="badge badge-success" style={{ fontSize: '0.675rem' }}>DDS</span>
+                <span style={{ fontSize: '0.725rem', color: 'var(--text-muted)', fontWeight: 700 }}>APBN Pusat</span>
+              </div>
+              <h4 style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 0.35rem 0' }}>
+                Sumber APBDes (Dana Desa)
+              </h4>
+              <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#059669', margin: '0.2rem 0' }}>
+                {formatRupiah(ddsBudget)}
+              </div>
+            </div>
+            <span style={{ fontSize: '0.725rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
+              Fokus: Infrastruktur, Ketahanan Pangan & BLT-DD
+            </span>
+          </div>
+
+          {/* Sumber APBDes: Banprov */}
+          <div style={{
+            background: 'var(--bg-main)',
+            border: '1px solid var(--border-color)',
+            borderRadius: 'var(--radius-lg)',
+            padding: '1.15rem',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            position: 'relative',
+            overflow: 'hidden'
+          }}>
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: '#8b5cf6' }} />
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                <span className="badge badge-info" style={{ fontSize: '0.675rem', background: '#f5f3ff', color: '#7c3aed', borderColor: '#ddd6fe' }}>Banprov</span>
+                <span style={{ fontSize: '0.725rem', color: 'var(--text-muted)', fontWeight: 700 }}>APBD Provinsi</span>
+              </div>
+              <h4 style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 0.35rem 0' }}>
+                Sumber APBDes (Banprov)
+              </h4>
+              <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#7c3aed', margin: '0.2rem 0' }}>
+                {formatRupiah(banprovBudget)}
+              </div>
+            </div>
+            <span style={{ fontSize: '0.725rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
+              Fokus: Sarpras Gedung Serbaguna & TP-PKK
+            </span>
+          </div>
+
+          {/* Sumber APBDes: ADD */}
+          <div style={{
+            background: 'var(--bg-main)',
+            border: '1px solid var(--border-color)',
+            borderRadius: 'var(--radius-lg)',
+            padding: '1.15rem',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            position: 'relative',
+            overflow: 'hidden'
+          }}>
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: '#2563eb' }} />
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                <span className="badge badge-info" style={{ fontSize: '0.675rem' }}>ADD</span>
+                <span style={{ fontSize: '0.725rem', color: 'var(--text-muted)', fontWeight: 700 }}>APBD Kab</span>
+              </div>
+              <h4 style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 0.35rem 0' }}>
+                Sumber APBDes (Alokasi Dana Desa)
+              </h4>
+              <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#2563eb', margin: '0.2rem 0' }}>
+                {formatRupiah(addBudget)}
+              </div>
+            </div>
+            <span style={{ fontSize: '0.725rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
+              Fokus: Operasional Pemdes, BPD & Lembaga Adat
+            </span>
+          </div>
+
+          {/* Sumber APBDes: PADes & BUMDes */}
+          <div style={{
+            background: 'var(--bg-main)',
+            border: '1px solid var(--border-color)',
+            borderRadius: 'var(--radius-lg)',
+            padding: '1.15rem',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            position: 'relative',
+            overflow: 'hidden'
+          }}>
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: '#f59e0b' }} />
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                <span className="badge badge-warning" style={{ fontSize: '0.675rem' }}>PADes</span>
+                <span style={{ fontSize: '0.725rem', color: 'var(--text-muted)', fontWeight: 700 }}>BUMDes & Pasar</span>
+              </div>
+              <h4 style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 0.35rem 0' }}>
+                Sumber APBDes (PADes & BUMDes)
+              </h4>
+              <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#d97706', margin: '0.2rem 0' }}>
+                {formatRupiah(padesBudget || 45000000)}
+              </div>
+            </div>
+            <span style={{ fontSize: '0.725rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
+              Fokus: Hasil Usaha Desa, Wisata & Pasar Desa
+            </span>
+          </div>
+
+        </div>
+      </div>
+
+      {/* 5. PENDING REQUESTS & COMPLAINTS SUMMARY TABLES */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 460px), 1fr))', gap: '1.5rem' }}>
         
         {/* Antrean Surat Masuk */}

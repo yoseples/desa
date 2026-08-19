@@ -15,8 +15,10 @@ import {
   Layers,
   ArrowRight,
   TrendingUp,
-  Percent
+  Percent,
+  Wallet
 } from 'lucide-react';
+import { APBDES_FUNDING_SOURCES } from '../services/initialData';
 
 export default function AdminPrograms({ 
   programsList = [], 
@@ -25,6 +27,7 @@ export default function AdminPrograms({
   onDeleteProgram 
 }) {
   const [activeFilter, setActiveFilter] = useState('ALL'); // 'ALL', 'PRIORITAS', 'SEDANG_BERJALAN', 'WAKTU_DEKAT', 'RENCANA_SELANJUTNYA'
+  const [fundingSourceFilter, setFundingSourceFilter] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   
   // Modal state
@@ -35,7 +38,7 @@ export default function AdminPrograms({
     title: '',
     category: 'Infrastruktur & Pertanian',
     budget: '',
-    fundingSource: 'Dana Desa (DDS) T.A. 2026',
+    fundingSource: 'Sumber APBDes (Dana Desa / DDS)',
     location: '',
     schedule: '',
     status: 'PRIORITAS',
@@ -50,7 +53,7 @@ export default function AdminPrograms({
       title: '',
       category: 'Infrastruktur & Pertanian',
       budget: '',
-      fundingSource: 'Dana Desa (DDS) T.A. 2026',
+      fundingSource: 'Sumber APBDes (Dana Desa / DDS)',
       location: 'Dusun Pasirjati',
       schedule: 'Agustus - Oktober 2026',
       status: 'PRIORITAS',
@@ -119,11 +122,12 @@ export default function AdminPrograms({
 
   const filteredPrograms = programsList.filter(p => {
     const matchFilter = activeFilter === 'ALL' || p.status === activeFilter;
+    const matchSource = fundingSourceFilter === 'ALL' || p.fundingSource === fundingSourceFilter;
     const matchSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.fundingSource.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchFilter && matchSearch;
+      (p.fundingSource || '').toLowerCase().includes(searchQuery.toLowerCase());
+    return matchFilter && matchSource && matchSearch;
   });
 
   const getStatusBadge = (status) => {
@@ -238,38 +242,57 @@ export default function AdminPrograms({
           </div>
         </div>
 
-        {/* Filter Pills */}
-        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.25rem', overflowX: 'auto', paddingBottom: '0.25rem' }}>
-          <button
-            className={`btn btn-sm ${activeFilter === 'ALL' ? 'btn-primary' : 'btn-secondary'}`}
-            onClick={() => setActiveFilter('ALL')}
-          >
-            Semua ({programsList.length})
-          </button>
-          <button
-            className={`btn btn-sm ${activeFilter === 'PRIORITAS' ? 'btn-primary' : 'btn-secondary'}`}
-            onClick={() => setActiveFilter('PRIORITAS')}
-          >
-            🌟 Prioritas Utama ({prioritasCount})
-          </button>
-          <button
-            className={`btn btn-sm ${activeFilter === 'SEDANG_BERJALAN' ? 'btn-primary' : 'btn-secondary'}`}
-            onClick={() => setActiveFilter('SEDANG_BERJALAN')}
-          >
-            ⏳ Sedang Dikerjakan ({sedangBerjalanCount})
-          </button>
-          <button
-            className={`btn btn-sm ${activeFilter === 'WAKTU_DEKAT' ? 'btn-primary' : 'btn-secondary'}`}
-            onClick={() => setActiveFilter('WAKTU_DEKAT')}
-          >
-            🗓️ Waktu Dekat ({waktuDekatCount})
-          </button>
-          <button
-            className={`btn btn-sm ${activeFilter === 'RENCANA_SELANJUTNYA' ? 'btn-primary' : 'btn-secondary'}`}
-            onClick={() => setActiveFilter('RENCANA_SELANJUTNYA')}
-          >
-            📋 Rencana Selanjutnya ({rencanaNantiCount})
-          </button>
+        {/* Filter Pills & Funding Source Selector */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1.25rem' }}>
+          <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '0.25rem', flexWrap: 'wrap' }}>
+            <button
+              className={`btn btn-sm ${activeFilter === 'ALL' ? 'btn-primary' : 'btn-secondary'}`}
+              onClick={() => setActiveFilter('ALL')}
+            >
+              Semua ({programsList.length})
+            </button>
+            <button
+              className={`btn btn-sm ${activeFilter === 'PRIORITAS' ? 'btn-primary' : 'btn-secondary'}`}
+              onClick={() => setActiveFilter('PRIORITAS')}
+            >
+              🌟 Prioritas Utama ({prioritasCount})
+            </button>
+            <button
+              className={`btn btn-sm ${activeFilter === 'SEDANG_BERJALAN' ? 'btn-primary' : 'btn-secondary'}`}
+              onClick={() => setActiveFilter('SEDANG_BERJALAN')}
+            >
+              ⏳ Sedang Dikerjakan ({sedangBerjalanCount})
+            </button>
+            <button
+              className={`btn btn-sm ${activeFilter === 'WAKTU_DEKAT' ? 'btn-primary' : 'btn-secondary'}`}
+              onClick={() => setActiveFilter('WAKTU_DEKAT')}
+            >
+              🗓️ Waktu Dekat ({waktuDekatCount})
+            </button>
+            <button
+              className={`btn btn-sm ${activeFilter === 'RENCANA_SELANJUTNYA' ? 'btn-primary' : 'btn-secondary'}`}
+              onClick={() => setActiveFilter('RENCANA_SELANJUTNYA')}
+            >
+              📋 Rencana Selanjutnya ({rencanaNantiCount})
+            </button>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <Wallet size={14} color="#059669" />
+            <select
+              className="form-control"
+              value={fundingSourceFilter}
+              onChange={(e) => setFundingSourceFilter(e.target.value)}
+              style={{ height: '34px', fontSize: '0.8rem', padding: '0.2rem 0.65rem', minWidth: '220px' }}
+            >
+              <option value="ALL">Semua Sumber Dana APBDes</option>
+              {APBDES_FUNDING_SOURCES.map((source) => (
+                <option key={source} value={source}>
+                  {source}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {/* Programs Table */}
@@ -431,19 +454,17 @@ export default function AdminPrograms({
 
                 <div className="form-row">
                   <div className="form-group">
-                    <label className="form-label">Sumber Dana *</label>
+                    <label className="form-label">Sumber Dana APBDes *</label>
                     <select
                       className="form-control"
                       value={formData.fundingSource}
                       onChange={(e) => setFormData({ ...formData, fundingSource: e.target.value })}
                     >
-                      <option value="Dana Desa (DDS) T.A. 2026">Dana Desa (DDS) T.A. 2026</option>
-                      <option value="Dana Desa (DDS) Tahap II">Dana Desa (DDS) Tahap II</option>
-                      <option value="Alokasi Dana Desa (ADD)">Alokasi Dana Desa (ADD)</option>
-                      <option value="Pendapatan Asli Desa (PADes)">Pendapatan Asli Desa (PADes)</option>
-                      <option value="Bantuan Keuangan Provinsi (Banprov)">Bantuan Keuangan Provinsi (Banprov)</option>
-                      <option value="Bagi Hasil Pajak & Retribusi (PBD)">Bagi Hasil Pajak & Retribusi (PBD)</option>
-                      <option value="Rencana APBDes T.A. 2027 (Musrenbangdes)">Rencana APBDes T.A. 2027 (Musrenbangdes)</option>
+                      {APBDES_FUNDING_SOURCES.map((source) => (
+                        <option key={source} value={source}>
+                          {source}
+                        </option>
+                      ))}
                     </select>
                   </div>
 

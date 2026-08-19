@@ -23,6 +23,12 @@ function adjustColor(hex, percent) {
   return `#${nr}${ng}${nb}`;
 }
 
+export function isNightTime() {
+  if (typeof window === 'undefined') return false;
+  const hours = new Date().getHours();
+  return hours >= 18 || hours < 6;
+}
+
 export function initColorMode() {
   if (typeof window === 'undefined') return 'auto';
   
@@ -54,7 +60,8 @@ export function applyColorMode(mode) {
 
   if (mode === 'auto') {
     const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    effectiveMode = systemPrefersDark ? 'dark' : 'light';
+    const night = isNightTime();
+    effectiveMode = (systemPrefersDark || night) ? 'dark' : 'light';
   }
 
   root.setAttribute('data-theme', effectiveMode);

@@ -114,6 +114,18 @@ export const initialVillageProfile = {
   }
 };
 
+// Daftar Sumber Dana APBDes Resmi
+export const APBDES_FUNDING_SOURCES = [
+  "Sumber APBDes (Dana Desa / DDS)",
+  "Sumber APBDes (Alokasi Dana Desa / ADD)",
+  "Sumber APBDes (Pendapatan Asli Desa / PADes)",
+  "Sumber APBDes (Bantuan Keuangan Provinsi / Banprov)",
+  "Sumber APBDes (Bagi Hasil Pajak & Retribusi Daerah / PBH)",
+  "Sumber APBDes (APBDes Murni T.A. 2026)",
+  "Sumber APBDes (Rencana Musrenbangdes T.A. 2027)",
+  "Sumber APBDes (Swadaya / Partisipasi Masyarakat)"
+];
+
 // Database Program Kerja & Transparansi APBDes Desa
 export const initialWorkPrograms = [
   {
@@ -121,7 +133,7 @@ export const initialWorkPrograms = [
     title: "Pembangunan Jalan Usaha Tani & Saluran Irigasi Tersier",
     category: "Infrastruktur & Pertanian",
     budget: 185000000,
-    fundingSource: "Dana Desa (DDS) T.A. 2026",
+    fundingSource: "Sumber APBDes (Dana Desa / DDS)",
     location: "Dusun Sukarame (RW 04 & RW 05)",
     schedule: "Juli - September 2026",
     status: "SEDANG_BERJALAN",
@@ -134,7 +146,7 @@ export const initialWorkPrograms = [
     title: "Pengadaan 50 Titik Lampu Penerangan Jalan Umum (PJU) Tenaga Surya",
     category: "Fasilitas Publik & Keamanan",
     budget: 75000000,
-    fundingSource: "Dana Desa (DDS) T.A. 2026",
+    fundingSource: "Sumber APBDes (Dana Desa / DDS)",
     location: "Dusun Pasirjati (RW 01 s/d RW 03) & Dusun Cikembar",
     schedule: "Agustus - September 2026",
     status: "PRIORITAS",
@@ -147,7 +159,7 @@ export const initialWorkPrograms = [
     title: "Pembangunan Gedung Serbaguna & Balai Pertemuan RW Ramah Lansia",
     category: "Pemberdayaan & Kemasyarakatan",
     budget: 250000000,
-    fundingSource: "Bantuan Keuangan Provinsi (Banprov)",
+    fundingSource: "Sumber APBDes (Bantuan Keuangan Provinsi / Banprov)",
     location: "Kawasan Balai RW 07 Dusun Cikembar",
     schedule: "Oktober - Desember 2026",
     status: "WAKTU_DEKAT",
@@ -160,7 +172,7 @@ export const initialWorkPrograms = [
     title: "Pengadaan Mesin Roasting Kopi Modern & Pelatihan Barista BUMDes",
     category: "Ekonomi Kreatif & BUMDes",
     budget: 65000000,
-    fundingSource: "Alokasi Dana Desa (ADD) & PADes",
+    fundingSource: "Sumber APBDes (Alokasi Dana Desa / ADD)",
     location: "Sentra Olahan Kopi Dusun Sukarame",
     schedule: "Agustus - Oktober 2026",
     status: "SEDANG_BERJALAN",
@@ -738,5 +750,662 @@ export const initialComplaints = [
     status: "DITINDAKLANJUTI",
     date: "16 Agustus 2026",
     adminResponse: "Tim teknisi PJU desa sudah melakukan perbaikan."
+  }
+];
+
+export const USER_ROLES = {
+  SUPER_ADMIN: {
+    key: "SUPER_ADMIN",
+    label: "Super Administrator",
+    badgeColor: "#dc2626",
+    badgeBg: "#fee2e2",
+    description: "Akses penuh seluruh fitur, pengaturan sistem, dan hak kuasa penuh atas semua data desa."
+  },
+  OPERATOR_LAYANAN: {
+    key: "OPERATOR_LAYANAN",
+    label: "Operator Layanan & Surat",
+    badgeColor: "#2563eb",
+    badgeBg: "#dbeafe",
+    description: "Mengelola verifikasi permohonan surat warga, arsip buku register, database kependudukan & respon pengaduan."
+  },
+  OPERATOR_MEDIA: {
+    key: "OPERATOR_MEDIA",
+    label: "Redaksi & Pengelola Media",
+    badgeColor: "#059669",
+    badgeBg: "#d1fae5",
+    description: "Mengelola publikasi berita desa, direktori etalase UMKM, informasi wisata dan galeri dokumentasi kegiatan."
+  },
+  OPERATOR_KEUANGAN: {
+    key: "OPERATOR_KEUANGAN",
+    label: "Kaur Keuangan & APBDes",
+    badgeColor: "#d97706",
+    badgeBg: "#fef3c7",
+    description: "Mengelola transparansi anggaran pendapatan & belanja desa (APBDes) serta pelacakan realisasi program kerja."
+  },
+  STAFF_ADMIN: {
+    key: "STAFF_ADMIN",
+    label: "Staf Administrasi",
+    badgeColor: "#4f46e5",
+    badgeBg: "#e0e7ff",
+    description: "Staf operasional pelayanan harian dan operasional umum kantor desa."
+  }
+};
+
+export const AVAILABLE_PERMISSIONS = [
+  { id: 'dashboard', label: 'Ringkasan Dashboard', category: 'Utama' },
+  { id: 'profile', label: 'Profil & Identitas Desa', category: 'Utama' },
+  { id: 'programs', label: 'RAPBDes & Program Kerja', category: 'Utama' },
+  { id: 'citizens', label: 'Database Kependudukan (KK & NIK)', category: 'Utama' },
+  { id: 'bansos', label: 'Bantuan Sosial & BLT-DD', category: 'Layanan' },
+  { id: 'health', label: 'e-Posyandu & Stunting', category: 'Layanan' },
+  { id: 'services', label: 'Permohonan Surat Warga', category: 'Layanan' },
+  { id: 'letter-templates', label: 'Cetak & Template Surat', category: 'Layanan' },
+  { id: 'complaints', label: 'Pengaduan & Aspirasi Warga', category: 'Layanan' },
+  { id: 'agriculture', label: 'Pertanian & Ketahanan Pangan', category: 'Informasi' },
+  { id: 'bumdes', label: 'BUMDes & Unit Usaha Desa', category: 'Informasi' },
+  { id: 'news', label: 'Publikasi Berita Desa', category: 'Informasi' },
+  { id: 'umkm', label: 'Etalase Produk UMKM', category: 'Informasi' },
+  { id: 'tourism', label: 'Destinasi Wisata Desa', category: 'Informasi' },
+  { id: 'gallery', label: 'Galeri Foto Kegiatan', category: 'Informasi' },
+  { id: 'reports', label: 'Buku Administrasi Permendagri', category: 'Sistem' },
+  { id: 'settings', label: 'Pengaturan & Tema Portal', category: 'Sistem' },
+  { id: 'users', label: 'Manajemen Pengguna & Operator', category: 'Sistem' }
+];
+
+export const initialAdminUsers = [
+  {
+    id: "usr-1",
+    username: "admin",
+    name: "H. Budi Santoso, S.AP",
+    email: "admin@desasukamaju.id",
+    role: "SUPER_ADMIN",
+    position: "Kepala Desa / Super Administrator",
+    password: "admin",
+    phone: "0812-3456-7890",
+    status: "ACTIVE",
+    avatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=600&q=80",
+    lastLogin: "18 Agu 2026, 23:15 WIB",
+    permissions: ["all"]
+  },
+  {
+    id: "usr-2",
+    username: "pelayanan",
+    name: "Siti Nurhaliza, S.Sos",
+    email: "pelayanan@desasukamaju.id",
+    role: "OPERATOR_LAYANAN",
+    position: "Kasi Pelayanan Masyarakat",
+    password: "pelayanan123",
+    phone: "0813-8899-7711",
+    status: "ACTIVE",
+    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80",
+    lastLogin: "18 Agu 2026, 14:20 WIB",
+    permissions: ["dashboard", "services", "letter-templates", "citizens", "complaints", "bansos", "health"]
+  },
+  {
+    id: "usr-3",
+    username: "redaksi",
+    name: "Ahmad Fauzi",
+    email: "redaksi@desasukamaju.id",
+    role: "OPERATOR_MEDIA",
+    position: "Kaur Umum & Pengelola Media",
+    password: "redaksi123",
+    phone: "0856-1122-3344",
+    status: "ACTIVE",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80",
+    lastLogin: "17 Agu 2026, 10:05 WIB",
+    permissions: ["dashboard", "news", "gallery", "umkm", "tourism", "agriculture", "bumdes"]
+  },
+  {
+    id: "usr-4",
+    username: "keuangan",
+    name: "Ratna Kusuma, S.E",
+    email: "keuangan@desasukamaju.id",
+    role: "OPERATOR_KEUANGAN",
+    position: "Kaur Keuangan & Perencanaan",
+    password: "keuangan123",
+    phone: "0819-4455-6677",
+    status: "ACTIVE",
+    avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=150&q=80",
+    lastLogin: "16 Agu 2026, 16:45 WIB",
+    permissions: ["dashboard", "programs", "bansos", "bumdes", "reports"]
+  }
+];
+
+// ==========================================
+// 1. DATA BANSOS & BLT DANA DESA (KPM)
+// ==========================================
+export const initialBansosKPM = [
+  {
+    id: "kpm-1",
+    nik: "3201121504820001",
+    nokk: "3201120101200001",
+    name: "Asep Suryana",
+    dusun: "Dusun Pasirjati",
+    rt: "02",
+    rw: "01",
+    desil: "Desil 1 (Sangat Miskin)",
+    program: "BLT Dana Desa (BLT-DD)",
+    amount: 300000,
+    status: "TERVERIFIKASI",
+    period: "Tahap 3 (Juli - September 2026)",
+    bankAccount: "Tunai di Balai Desa",
+    notes: "Keluarga lansia tunggal tanpa penghasilan tetap",
+    phone: "081234567890"
+  },
+  {
+    id: "kpm-2",
+    nik: "3201122008750002",
+    nokk: "3201120101200002",
+    name: "Ujang Suherman",
+    dusun: "Dusun Sukarame",
+    rt: "04",
+    rw: "02",
+    desil: "Desil 1 (Sangat Miskin)",
+    program: "BLT Dana Desa (BLT-DD)",
+    amount: 300000,
+    status: "TERVERIFIKASI",
+    period: "Tahap 3 (Juli - September 2026)",
+    bankAccount: "Tunai di Balai Desa",
+    notes: "Kepala keluarga sakit menahun, tanggungan 3 anak",
+    phone: "081399881122"
+  },
+  {
+    id: "kpm-3",
+    nik: "3201120509800003",
+    nokk: "3201120101200003",
+    name: "Maman Firmansyah",
+    dusun: "Dusun Pasirjati",
+    rt: "01",
+    rw: "01",
+    desil: "Desil 2 (Tidak Mampu)",
+    program: "Program Keluarga Harapan (PKH)",
+    amount: 750000,
+    status: "TERVERIFIKASI",
+    period: "Tahap 3 T.A. 2026",
+    bankAccount: "Bank Himbara (BNI)",
+    notes: "Memiliki komponen anak sekolah SD & Balita",
+    phone: "085277889900"
+  },
+  {
+    id: "kpm-4",
+    nik: "3201121111900004",
+    nokk: "3201120101200004",
+    name: "Dedih Sunandar",
+    dusun: "Dusun Cikembar",
+    rt: "07",
+    rw: "03",
+    desil: "Desil 2 (Tidak Mampu)",
+    program: "Bantuan Pangan Non Tunai (BPNT / Sembako)",
+    amount: 200000,
+    status: "TERVERIFIKASI",
+    period: "Agustus 2026",
+    bankAccount: "E-Warong Desa",
+    notes: "Penyaluran komoditas beras & telur di e-Warong BUMDes",
+    phone: "087811223344"
+  },
+  {
+    id: "kpm-5",
+    nik: "3201122512880005",
+    nokk: "3201120101200005",
+    name: "Kosasih Pratama",
+    dusun: "Dusun Mekar",
+    rt: "09",
+    rw: "04",
+    desil: "Desil 3 (Kurang Mampu)",
+    program: "Beras Cadangan Pangan Pemerintah (CPP 10 Kg)",
+    amount: 0,
+    status: "TERVERIFIKASI",
+    period: "Agustus 2026",
+    bankAccount: "Beras Fisik 10 Kg",
+    notes: "Penyaluran beras Bulog di Balai Desa",
+    phone: "089655667788"
+  }
+];
+
+// ==========================================
+// 2. DATA e-POSYANDU & STUNTING
+// ==========================================
+export const initialPosyanduData = {
+  schedules: [
+    {
+      id: "sch-1",
+      posyanduName: "Posyandu Melati 1",
+      dusun: "Dusun Pasirjati (RW 01 & RW 02)",
+      date: "2026-08-25",
+      time: "08:30 - 11:30 WIB",
+      location: "Balai RW 01 Pasirjati",
+      agenda: "Penimbangan BB/TB Balita, Imunisasi Polio/DPT, & PMT Biskuit Gizi",
+      cadreLeader: "Ibu Nurul Aini",
+      phone: "0812-8877-6655"
+    },
+    {
+      id: "sch-2",
+      posyanduName: "Posyandu Mawar 2",
+      dusun: "Dusun Sukarame (RW 04 & RW 05)",
+      date: "2026-08-27",
+      time: "08:30 - 11:30 WIB",
+      location: "Posyandu Mawar Sukarame",
+      agenda: "Pemeriksaan Ibu Hamil, Timbang Balita, & Vitamin A Merah/Biru",
+      cadreLeader: "Ibu Siti Fatimah",
+      phone: "0813-2233-4455"
+    },
+    {
+      id: "sch-3",
+      posyanduName: "Posyandu Anggrek 3",
+      dusun: "Dusun Cikembar (RW 06 & RW 07)",
+      date: "2026-09-02",
+      time: "09:00 - 12:00 WIB",
+      location: "Aula Madrasah Dusun Cikembar",
+      agenda: "Pemeriksaan Kesehatan Lansia & Penimbangan Balita Rutin",
+      cadreLeader: "Ibu Dewi Kurnia",
+      phone: "0852-9988-1122"
+    }
+  ],
+  toddlers: [
+    {
+      id: "tod-1",
+      nik: "3201125501240001",
+      name: "Muhammad Rizky Pratama",
+      gender: "Laki-laki",
+      birthDate: "2024-01-15",
+      parentName: "Asep Suryana & Nurhasanah",
+      dusun: "Dusun Pasirjati",
+      rt: "02",
+      rw: "01",
+      weight: 12.4, // kg
+      height: 88.5, // cm
+      status: "GIZI_BAIK", // GIZI_BAIK, BERISIKO_STUNTING, STUNTING, GIZI_LEBIH
+      headCircumference: 47.0,
+      vitA: true,
+      immunization: "Lengkap",
+      lastCheck: "2026-08-10",
+      notes: "Pertumbuhan sangat baik, nafsu makan stabil"
+    },
+    {
+      id: "tod-2",
+      nik: "3201126005230002",
+      name: "Aisyah Putri Azzahra",
+      gender: "Perempuan",
+      birthDate: "2023-05-20",
+      parentName: "Ujang Suherman & Rina",
+      dusun: "Dusun Sukarame",
+      rt: "04",
+      rw: "02",
+      weight: 9.8,
+      height: 79.2,
+      status: "BERISIKO_STUNTING",
+      headCircumference: 44.5,
+      vitA: true,
+      immunization: "Lengkap",
+      lastCheck: "2026-08-12",
+      notes: "Tinggi badan di bawah kurva standar WHO, diberikan PMT telur & susu harian"
+    },
+    {
+      id: "tod-3",
+      nik: "3201124211240003",
+      name: "Kenzo Alfarizi",
+      gender: "Laki-laki",
+      birthDate: "2024-11-02",
+      parentName: "Maman Firmansyah & Eni",
+      dusun: "Dusun Pasirjati",
+      rt: "01",
+      rw: "01",
+      weight: 10.2,
+      height: 77.0,
+      status: "GIZI_BAIK",
+      headCircumference: 45.2,
+      vitA: true,
+      immunization: "Lengkap",
+      lastCheck: "2026-08-10",
+      notes: "Perkembangan motorik lancar"
+    }
+  ],
+  pregnantMothers: [
+    {
+      id: "preg-1",
+      nik: "3201126508980001",
+      name: "Ibu Lilis Suryani",
+      husbandName: "Hendra Gunawan",
+      dusun: "Dusun Sukarame",
+      gestationalAge: "28 Minggu (Trimester 3)",
+      hbLevel: "11.8 g/dL (Normal)",
+      riskStatus: "NORMAL",
+      phone: "0812-7788-9900",
+      notes: "Rutin minum tablet tambah darah (TTD)"
+    },
+    {
+      id: "preg-2",
+      nik: "3201124403010002",
+      name: "Ibu Siti Maimunah",
+      husbandName: "Dedi Wahyudi",
+      dusun: "Dusun Cikembar",
+      gestationalAge: "14 Minggu (Trimester 2)",
+      hbLevel: "9.5 g/dL (Anemia Ringan)",
+      riskStatus: "RESTI (Risiko Tinggi)",
+      phone: "0853-4455-6677",
+      notes: "Diberikan suplemen zat besi ekstra dan pendampingan bidan desa"
+    }
+  ]
+};
+
+// ==========================================
+// 3. DATA PERTANIAN & POKTAN
+// ==========================================
+export const initialAgricultureData = {
+  poktanList: [
+    {
+      id: "pok-1",
+      name: "Kelompok Tani 'Maju Bersama'",
+      leader: "H. Sukirman",
+      dusun: "Dusun Pasirjati",
+      membersCount: 48,
+      areaHectares: 32.5,
+      mainCrop: "Padi Sawah (Ciherang & Inpari 32)",
+      fertilizerQuota: {
+        urea: "16.2 Ton",
+        npk: "12.0 Ton",
+        organik: "8.5 Ton"
+      },
+      phone: "0812-3344-5566"
+    },
+    {
+      id: "pok-2",
+      name: "Kelompok Tani 'Tani Makmur'",
+      leader: "Bpk. Dadan Ramdani",
+      dusun: "Dusun Sukarame",
+      membersCount: 36,
+      areaHectares: 24.0,
+      mainCrop: "Hortikultura (Cabai Merah & Tomat)",
+      fertilizerQuota: {
+        urea: "8.5 Ton",
+        npk: "14.2 Ton",
+        organik: "10.0 Ton"
+      },
+      phone: "0813-7788-9900"
+    },
+    {
+      id: "pok-3",
+      name: "Kelompok Tani 'Sumber Rezeki'",
+      leader: "Bpk. Wahidin",
+      dusun: "Dusun Cikembar",
+      membersCount: 29,
+      areaHectares: 18.5,
+      mainCrop: "Palawija (Jagung Hibrida & Kedelai)",
+      fertilizerQuota: {
+        urea: "7.0 Ton",
+        npk: "9.0 Ton",
+        organik: "6.0 Ton"
+      },
+      phone: "0852-1144-7788"
+    }
+  ],
+  marketPrices: [
+    { id: "prc-1", commodity: "Gabah Kering Panen (GKP)", price: 7200, unit: "Kg", trend: "up", change: "+Rp 200", lastUpdate: "18 Agu 2026" },
+    { id: "prc-2", commodity: "Beras Medium IR64", price: 13500, unit: "Kg", trend: "stable", change: "Rp 0", lastUpdate: "18 Agu 2026" },
+    { id: "prc-3", commodity: "Cabai Merah Keriting", price: 42000, unit: "Kg", trend: "down", change: "-Rp 3.000", lastUpdate: "18 Agu 2026" },
+    { id: "prc-4", commodity: "Bawang Merah Lokal", price: 32000, unit: "Kg", trend: "stable", change: "Rp 0", lastUpdate: "18 Agu 2026" },
+    { id: "prc-5", commodity: "Jagung Pipil Kering", price: 5800, unit: "Kg", trend: "up", change: "+Rp 300", lastUpdate: "18 Agu 2026" },
+    { id: "prc-6", commodity: "Telur Ayam Ras", price: 28500, unit: "Kg", trend: "stable", change: "Rp 0", lastUpdate: "18 Agu 2026" }
+  ]
+};
+
+// ==========================================
+// 4. DATA BUMDES & UNIT USAHA DESA
+// ==========================================
+export const initialBumdesData = {
+  name: "BUMDes 'Sukamaju Sejahtera'",
+  director: "Drs. Hendra Setiawan, M.M",
+  establishedYear: 2021,
+  totalCapital: 350000000,
+  netProfitYTD: 68500000,
+  padesContribution: 45000000,
+  units: [
+    {
+      id: "bu-1",
+      name: "Unit Air Bersih Desa (PAMSIMAS Tirta Mandiri)",
+      category: "Jasa Air Bersih & Sanitasi",
+      customersCount: 420,
+      monthlyRevenue: 18500000,
+      monthlyExpenses: 8200000,
+      netProfit: 10300000,
+      status: "AKTIF_PRODUKTIF",
+      description: "Menyalurkan air bersih layak konsumsi dengan sistem meteran digital ke 420 rumah tangga di Dusun Pasirjati dan Sukarame."
+    },
+    {
+      id: "bu-2",
+      name: "Unit Pengelolaan Sampah & Bank Sampah 'Resik Berkah'",
+      category: "Lingkungan & Daur Ulang",
+      customersCount: 310,
+      monthlyRevenue: 9200000,
+      monthlyExpenses: 5400000,
+      netProfit: 3800000,
+      status: "AKTIF_PRODUKTIF",
+      description: "Layanan angkutan sampah terjadwal dan pengolahan pupuk kompos organik dari limbah rumah tangga."
+    },
+    {
+      id: "bu-3",
+      name: "Unit Kios Sarana Pertanian & Pupuk Desa",
+      category: "Perdagangan Saprotan",
+      customersCount: 115,
+      monthlyRevenue: 24000000,
+      monthlyExpenses: 19500000,
+      netProfit: 4500000,
+      status: "AKTIF_PRODUKTIF",
+      description: "Penyedia benih unggul, obat pertanian, dan penyaluran pupuk resmi kelompok tani."
+    },
+    {
+      id: "bu-4",
+      name: "Unit Pengelolaan Wisata Curug Luhur & Balai Pertemuan",
+      category: "Pariwisata & Jasa Sewa",
+      customersCount: 850,
+      monthlyRevenue: 15800000,
+      monthlyExpenses: 6900000,
+      netProfit: 8900000,
+      status: "AKTIF_PRODUKTIF",
+      description: "Tiket wisata alam air terjun, sewa gazebo, dan penyewaan gedung serbaguna desa untuk hajatan."
+    }
+  ]
+};
+
+// ==========================================
+// 5. DATA PETA INTERAKTIF DESA (WebGIS)
+// ==========================================
+export const initialVillageAmenities = [
+  { id: "gis-1", name: "Kantor Balai Desa Sukamaju Mandiri", category: "Pemerintahan", x: 50, y: 48, dusun: "Dusun Pasirjati", icon: "Building", description: "Pusat pelayanan administrasi & kantor kepala desa" },
+  { id: "gis-2", name: "Puskesmas Pembantu (Pustu / Poskesdes)", category: "Kesehatan", x: 47, y: 53, dusun: "Dusun Pasirjati", icon: "HeartPulse", description: "Pelayanan rawat jalan, imunisasi, dan persalinan 24 jam" },
+  { id: "gis-3", name: "SD Negeri 01 Sukamaju", category: "Pendidikan", x: 42, y: 40, dusun: "Dusun Pasirjati", icon: "GraduationCap", description: "Sekolah Dasar Negeri akreditasi A" },
+  { id: "gis-4", name: "SMP Negeri 2 Satu Atap", category: "Pendidikan", x: 72, y: 35, dusun: "Dusun Sukarame", icon: "GraduationCap", description: "Pendidikan menengah pertama desa" },
+  { id: "gis-5", name: "Masjid Jami' Al-Hidayah", category: "Ibadah", x: 53, y: 44, dusun: "Dusun Pasirjati", icon: "Moon", description: "Masjid agung pusat kegiatan keagamaan warga" },
+  { id: "gis-6", name: "Pasar Tradisional & Lapak BUMDes", category: "Ekonomi", x: 55, y: 58, dusun: "Dusun Pasirjati", icon: "ShoppingBag", description: "Pasar desa buka setiap Selasa & Jumat" },
+  { id: "gis-7", name: "Destinasi Wisata Curug Luhur", category: "Wisata", x: 82, y: 78, dusun: "Dusun Cikembar", icon: "Palmtree", description: "Air terjun alami dengan pemandian air dingin & camping ground" },
+  { id: "gis-8", name: "Gedung Olahraga & Lapangan Sepakbola", category: "Fasilitas Umum", x: 38, y: 62, dusun: "Dusun Pasirjati", icon: "Award", description: "Fasilitas olahraga dan pusat peringatan HUT RI" },
+  { id: "gis-9", name: "Pos Kamling & Gardu Ronda Dusun Mekar", category: "Keamanan", x: 22, y: 30, dusun: "Dusun Mekar", icon: "ShieldCheck", description: "Pos ronda siaga trantibum warga" },
+  { id: "gis-10", name: "Unit Pengolahan Sampah BUMDes", category: "Lingkungan", x: 78, y: 22, dusun: "Dusun Cikembar", icon: "RefreshCw", description: "Pusat daur ulang sampah & pupuk organik" }
+];
+
+// ==========================================
+// 6. DATA LOG PANGGILAN DARURAT (PANIC BUTTON)
+// ==========================================
+export const initialEmergencyLogs = [
+  {
+    id: "emg-1",
+    callerName: "Bpk. Wahyudi",
+    phone: "0812-9900-1122",
+    emergencyType: "MEDIS_AMBULANS",
+    location: "Dusun Pasirjati RW 02 RT 03",
+    description: "Warga lansia sesak nafas mendadak, membutuhkan ambulans desa ke RSUD.",
+    timestamp: "18 Agu 2026, 21:40 WIB",
+    status: "SELESAI_TERTANGANI",
+    handledBy: "Bidan Nurlaela & Driver Mobil Siaga"
+  },
+  {
+    id: "emg-2",
+    callerName: "Ibu Kartini",
+    phone: "0852-3344-5566",
+    emergencyType: "POHON_TUMBANG",
+    location: "Jalan Dusun Cikembar RW 07",
+    description: "Pohon kelapa roboh menutupi jalan desa akibat hujan angin.",
+    timestamp: "17 Agu 2026, 17:15 WIB",
+    status: "SELESAI_TERTANGANI",
+    handledBy: "Linmas Desa & Warga Gotong Royong"
+  }
+];
+
+// ==========================================
+// 7. DATA PERTANAHAN & BUKU LETTER C (OPENSID)
+// ==========================================
+export const initialLandData = {
+  letterCList: [
+    {
+      id: "c-001",
+      kohirNumber: "1042",
+      ownerName: "H. Abdul Wahab",
+      currentOwner: "H. Abdul Wahab",
+      persilNumber: "24",
+      block: "Blok Pasir 1",
+      areaM2: 2450,
+      landClass: "S.I (Sawah Kelas I)",
+      taxNumber: "32.04.150.002.024-0012.0",
+      status: "Hak Milik (Letter C Asli)",
+      mutations: [
+        { date: "12 Januari 1998", cause: "Waris dari alm. H. Abdullah", luasM2: 2450, noBAP: "BAP-01/1998" }
+      ]
+    },
+    {
+      id: "c-002",
+      kohirNumber: "1158",
+      ownerName: "Siti Masitoh",
+      currentOwner: "Dadan Ramdani (Beli)",
+      persilNumber: "36",
+      block: "Blok Babakan",
+      areaM2: 1200,
+      landClass: "D.II (Darat Kelas II / Pekarangan)",
+      taxNumber: "32.04.150.002.036-0045.0",
+      status: "Akta Jual Beli (AJB PPAT)",
+      mutations: [
+        { date: "15 Mei 2018", cause: "Jual Beli ke Dadan Ramdani", luasM2: 1200, noBAP: "AJB No. 44/2018" }
+      ]
+    },
+    {
+      id: "c-003",
+      kohirNumber: "0890",
+      ownerName: "Wawan Hermawan",
+      currentOwner: "Wawan Hermawan",
+      persilNumber: "18",
+      block: "Blok Sawah Lega",
+      areaM2: 3600,
+      landClass: "S.II (Sawah Kelas II)",
+      taxNumber: "32.04.150.002.018-0099.0",
+      status: "Sertifikat Hak Milik (SHM No. 412)",
+      mutations: [
+        { date: "20 Agustus 2005", cause: "Konversi Letter C ke SHM", luasM2: 3600, noBAP: "BPN-08/2005" }
+      ]
+    },
+    {
+      id: "c-004",
+      kohirNumber: "1420",
+      ownerName: "Ujang Koswara",
+      currentOwner: "Ujang Koswara",
+      persilNumber: "52",
+      block: "Blok Cikembar Hilir",
+      areaM2: 850,
+      landClass: "D.I (Darat Kelas I)",
+      taxNumber: "32.04.150.002.052-0018.0",
+      status: "Hak Milik Adat (Girik)",
+      mutations: []
+    }
+  ],
+  kasDesaList: [
+    {
+      id: "tkd-1",
+      name: "Tanah Bengkok Kepala Desa",
+      location: "Dusun Pasirjati Blok 01",
+      areaM2: 15000,
+      peruntukan: "Bengkok Kades / Pertanian Padi",
+      certificate: "Hak Pakai Pemdes No. 01/Sukamaju",
+      annualIncome: "Rp 18.000.000 (Sewa Musim)",
+      manager: "Pemerintah Desa"
+    },
+    {
+      id: "tkd-2",
+      name: "Tanah Lapangan Olahraga & Gedung Serbaguna",
+      location: "Dusun Pasirjati RW 02",
+      areaM2: 8000,
+      peruntukan: "Fasilitas Publik & Olahraga Desa",
+      certificate: "Sertifikat Hak Pakai No. 04",
+      annualIncome: "Fasilitas Gratis Masyarakat",
+      manager: "BUMDes Unit Pariwisata"
+    },
+    {
+      id: "tkd-3",
+      name: "Tanah Makam Umum Desa (TPU)",
+      location: "Dusun Cikembar RW 08",
+      areaM2: 6500,
+      peruntukan: "Tempat Pemakaman Umum",
+      certificate: "Tanah Kas Desa Register No. 12",
+      annualIncome: "Sosial Keagamaan",
+      manager: "Lembaga LPMD"
+    }
+  ]
+};
+
+// ==========================================
+// 8. DATA LEMBAGA KEMASYARAKATAN DESA (OPENSID LKD)
+// ==========================================
+export const initialLembagaData = [
+  {
+    id: "lkd-1",
+    name: "Badan Permusyawaratan Desa (BPD)",
+    code: "BPD",
+    leader: "Drs. M. Taufik Hidayat",
+    secretary: "Ahmad Suhendar, S.Pd",
+    membersCount: 9,
+    address: "Sekretariat BPD Kantor Balai Desa",
+    legalBasis: "SK Bupati No. 140/Kep.88-DPMD/2021",
+    description: "Lembaga legislatif dan penampung aspirasi masyarakat desa."
+  },
+  {
+    id: "lkd-2",
+    name: "Lembaga Pemberdayaan Masyarakat Desa (LPMD)",
+    code: "LPMD",
+    leader: "Ir. H. Gunawan",
+    secretary: "Yusuf Maulana",
+    membersCount: 15,
+    address: "Balai Pertemuan Warga Pasirjati",
+    legalBasis: "SK Kades No. 141/04/DS/2022",
+    description: "Mitra pemerintah desa dalam perencanaan dan pelaksanaan pembangunan fisik gotong royong."
+  },
+  {
+    id: "lkd-3",
+    name: "Pemberdayaan Kesejahteraan Keluarga (PKK)",
+    code: "TP-PKK",
+    leader: "Hj. Endang Rahmawati",
+    secretary: "Siti Maryam, S.Tr.Keb",
+    membersCount: 35,
+    address: "Gedung Posyandu Melati Indah",
+    legalBasis: "SK Kades No. 141/08/DS/2021",
+    description: "Gerakan pemberdayaan perempuan, kesehatan keluarga, dan penanggulangan stunting balita."
+  },
+  {
+    id: "lkd-4",
+    name: "Karang Taruna 'Kusuma Bangsa'",
+    code: "KARANG_TARUNA",
+    leader: "Rian Firmansyah, S.Kom",
+    secretary: "Dimas Anggara",
+    membersCount: 42,
+    address: "Sekretariat Pemuda Balai RW 02",
+    legalBasis: "SK Kades No. 141/12/DS/2023",
+    description: "Wadah kepemudaan, inovasi digital desa, olahraga, dan tanggap bencana sosial."
+  },
+  {
+    id: "lkd-5",
+    name: "Satuan Perlindungan Masyarakat (Satlinmas)",
+    code: "SATLINMAS",
+    leader: "Komandan Regu: Endang Suherman",
+    secretary: "Dede Suryadi",
+    membersCount: 24,
+    address: "Posko Linmas Kantor Desa",
+    legalBasis: "SK Kades No. 141/15/DS/2022",
+    description: "Pengamanan ketertiban masyarakat, pos ronda 24 jam, dan siaga evakuasi kebencanaan."
   }
 ];

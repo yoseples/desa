@@ -9,8 +9,13 @@ import {
   ShieldCheck, 
   KeyRound, 
   AlertCircle,
-  Sparkles
+  Sparkles,
+  Shield,
+  FileText,
+  Newspaper,
+  Layers
 } from 'lucide-react';
+import { StorageService } from '../services/storageService';
 
 export default function AdminLogin({ profile, onLoginSuccess, onBackToHome }) {
   const [username, setUsername] = useState('admin');
@@ -25,21 +30,20 @@ export default function AdminLogin({ profile, onLoginSuccess, onBackToHome }) {
     setIsLoading(true);
 
     setTimeout(() => {
-      // Valid credentials check (admin / admin123 or admin@desasukamaju.id)
-      const validUser = username.trim().toLowerCase();
-      if ((validUser === 'admin' || validUser === 'admin@desasukamaju.id') && password === 'admin123') {
+      const authResult = StorageService.authenticateUser(username, password);
+      if (authResult && authResult.success) {
         setIsLoading(false);
-        onLoginSuccess();
+        onLoginSuccess(authResult.user);
       } else {
         setIsLoading(false);
-        setErrorMsg('Username atau Password yang Anda masukkan salah. Silakan coba lagi.');
+        setErrorMsg(authResult?.message || 'Username atau Password yang Anda masukkan salah. Silakan coba lagi.');
       }
-    }, 500);
+    }, 400);
   };
 
-  const handleFillDemo = () => {
-    setUsername('admin');
-    setPassword('admin123');
+  const handleFillDemoRole = (demoUser, demoPass) => {
+    setUsername(demoUser);
+    setPassword(demoPass);
     setErrorMsg('');
   };
 
@@ -218,31 +222,105 @@ export default function AdminLogin({ profile, onLoginSuccess, onBackToHome }) {
           <div style={{
             background: '#f0fdf4',
             border: '1px dashed #86efac',
-            borderRadius: '12px',
-            padding: '0.85rem 1rem',
+            borderRadius: '14px',
+            padding: '1rem',
             fontSize: '0.825rem',
             color: '#166534'
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
               <strong>Kredensial Demo Pengujian:</strong>
+              <span style={{ fontSize: '0.725rem', color: '#15803d', fontWeight: 600 }}>Pilih peran untuk auto-fill:</span>
+            </div>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem', marginBottom: '0.65rem' }}>
               <button
-                onClick={handleFillDemo}
+                type="button"
+                onClick={() => handleFillDemoRole('admin', 'admin123')}
                 style={{
-                  background: '#dcfce7',
+                  background: username === 'admin' ? '#10b981' : '#dcfce7',
+                  color: username === 'admin' ? '#fff' : '#15803d',
                   border: '1px solid #86efac',
-                  color: '#15803d',
                   borderRadius: '6px',
-                  padding: '0.2rem 0.5rem',
+                  padding: '0.35rem 0.5rem',
                   fontSize: '0.75rem',
                   fontWeight: 700,
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.3rem'
                 }}
               >
-                Isi Otomatis
+                <Shield size={12} /> Super Admin
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleFillDemoRole('pelayanan', 'pelayanan123')}
+                style={{
+                  background: username === 'pelayanan' ? '#2563eb' : '#dbeafe',
+                  color: username === 'pelayanan' ? '#fff' : '#1d4ed8',
+                  border: '1px solid #93c5fd',
+                  borderRadius: '6px',
+                  padding: '0.35rem 0.5rem',
+                  fontSize: '0.75rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.3rem'
+                }}
+              >
+                <FileText size={12} /> Op. Layanan
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleFillDemoRole('redaksi', 'redaksi123')}
+                style={{
+                  background: username === 'redaksi' ? '#059669' : '#d1fae5',
+                  color: username === 'redaksi' ? '#fff' : '#047857',
+                  border: '1px solid #6ee7b7',
+                  borderRadius: '6px',
+                  padding: '0.35rem 0.5rem',
+                  fontSize: '0.75rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.3rem'
+                }}
+              >
+                <Newspaper size={12} /> Redaksi Media
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleFillDemoRole('keuangan', 'keuangan123')}
+                style={{
+                  background: username === 'keuangan' ? '#d97706' : '#fef3c7',
+                  color: username === 'keuangan' ? '#fff' : '#b45309',
+                  border: '1px solid #fde68a',
+                  borderRadius: '6px',
+                  padding: '0.35rem 0.5rem',
+                  fontSize: '0.75rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.3rem'
+                }}
+              >
+                <Layers size={12} /> Kaur Keuangan
               </button>
             </div>
-            <div>Username: <code>admin</code></div>
-            <div>Password: <code>admin123</code></div>
+
+            <div style={{ fontSize: '0.75rem', color: '#14532d', background: 'rgba(255,255,255,0.6)', padding: '0.35rem 0.5rem', borderRadius: '6px' }}>
+              Username: <code>{username}</code> | Password: <code>{password}</code>
+            </div>
           </div>
         </div>
 

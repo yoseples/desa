@@ -20,17 +20,40 @@ import {
   Globe,
   Search,
   FileCode,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Plus,
+  Trash2,
+  Edit,
+  Users,
+  Award,
+  FileText,
+  X,
+  ChevronRight,
+  UserCheck
 } from 'lucide-react';
 import { defaultThemeSettings } from '../services/initialData';
 import { applyThemeToDocument, applySeoAndFavicon } from '../services/themeHelper';
 
-export default function AdminSettings({ profile, onUpdateProfile }) {
-  const [activeTab, setActiveTab] = useState('general'); // 'general', 'seo', 'layout', 'styling', 'typography'
+export default function AdminSettings({ profile, onUpdateProfile, defaultTab = 'general' }) {
+  const [activeTab, setActiveTab] = useState(defaultTab);
+
+  useEffect(() => {
+    if (defaultTab) {
+      setActiveTab(defaultTab);
+    }
+  }, [defaultTab]);
   
   const [formData, setFormData] = useState(() => {
     return {
       ...profile,
+      headOfVillage: {
+        title: "Kepala Desa",
+        name: "H. Budi Santoso, S.AP",
+        period: "2021 - 2027",
+        photo: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=600&q=80",
+        welcomeSpeech: "Selamat datang di Portal Resmi Desa Pintar Sukamaju Mandiri.",
+        ...(profile?.headOfVillage || {})
+      },
       favicon: profile?.favicon || "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23059669' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect width='16' height='20' x='4' y='2' rx='2' ry='2'/><path d='M9 22v-4h6v4'/><path d='M8 6h.01'/><path d='M16 6h.01'/><path d='M8 10h.01'/><path d='M16 10h.01'/><path d='M8 14h.01'/><path d='M16 14h.01'/><path d='M8 18h.01'/><path d='M16 18h.01'/></svg>",
       seo: {
         metaTitle: profile?.seo?.metaTitle || `${profile?.name || 'Desa Sukamaju Mandiri'} - Portal Informasi & Layanan Digital Desa`,
@@ -49,6 +72,77 @@ export default function AdminSettings({ profile, onUpdateProfile }) {
       }
     };
   });
+
+  // Apparatus state for modal
+  const [apparatusModalOpen, setApparatusModalOpen] = useState(false);
+  const [editingApparatusId, setEditingApparatusId] = useState(null);
+  const [apparatusForm, setApparatusForm] = useState({
+    name: '',
+    position: '',
+    category: 'Pemerintah Desa',
+    nip: '',
+    phone: '',
+    photo: '',
+    area: ''
+  });
+
+  const handleOpenAddApparatus = () => {
+    setEditingApparatusId(null);
+    setApparatusForm({
+      name: '',
+      position: '',
+      category: 'Pemerintah Desa',
+      nip: '',
+      phone: '',
+      photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+      area: 'Sekretariat Desa'
+    });
+    setApparatusModalOpen(true);
+  };
+
+  const handleOpenEditApparatus = (item) => {
+    setEditingApparatusId(item.id);
+    setApparatusForm({
+      name: item.name || '',
+      position: item.position || '',
+      category: item.category || 'Pemerintah Desa',
+      nip: item.nip || '',
+      phone: item.phone || '',
+      photo: item.photo || '',
+      area: item.area || ''
+    });
+    setApparatusModalOpen(true);
+  };
+
+  const handleSaveApparatus = (e) => {
+    e.preventDefault();
+    if (!apparatusForm.name || !apparatusForm.position) {
+      alert('Nama dan Jabatan aparatur wajib diisi!');
+      return;
+    }
+
+    const currentList = formData.apparatus || [];
+    let updatedList;
+    if (editingApparatusId) {
+      updatedList = currentList.map(a => a.id === editingApparatusId ? { ...a, ...apparatusForm } : a);
+    } else {
+      const newApp = {
+        id: `app-${Date.now()}`,
+        ...apparatusForm
+      };
+      updatedList = [...currentList, newApp];
+    }
+
+    setFormData(prev => ({ ...prev, apparatus: updatedList }));
+    setApparatusModalOpen(false);
+  };
+
+  const handleDeleteApparatus = (id) => {
+    if (window.confirm('Hapus aparatur / perangkat desa ini dari daftar struktur?')) {
+      const updatedList = (formData.apparatus || []).filter(a => a.id !== id);
+      setFormData(prev => ({ ...prev, apparatus: updatedList }));
+    }
+  };
 
   // Live real-time preview of changes
   useEffect(() => {
@@ -95,6 +189,8 @@ export default function AdminSettings({ profile, onUpdateProfile }) {
           ...prev,
           seo: { ...prev.seo, ogImage: base64 }
         }));
+      } else if (fieldPath === 'apparatusPhoto') {
+        setApparatusForm(prev => ({ ...prev, photo: base64 }));
       }
     };
     reader.readAsDataURL(file);
@@ -369,17 +465,58 @@ export default function AdminSettings({ profile, onUpdateProfile }) {
               </div>
             </div>
 
-            {/* Sub-Section 3: Kepala Desa & Kontak */}
-            <div style={{ background: '#f8fafc', padding: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--light-border)' }}>
-              <h4 style={{ fontSize: '0.9rem', fontWeight: 800, color: '#059669', marginBottom: '1rem' }}>
-                3. Kepala Desa & Kontak Kantor
-              </h4>
+            {/* Sub-Section 3: Kepala Desa / Pimpinan di Tab Home */}
+            <div style={{ background: '#f8fafc', padding: '1.35rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--light-border)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: '#059669', margin: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <Users size={16} /> 3. Profil Pimpinan / Kepala Desa (Tampil di Tab Home)
+                </h4>
+                <span className="badge badge-success" style={{ fontSize: '0.7rem' }}>
+                  Hero Home Card Preview
+                </span>
+              </div>
+
+              {/* Photo Upload & Preview Bar */}
+              <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center', marginBottom: '1.25rem', background: '#ffffff', padding: '1rem', borderRadius: '10px', border: '1px solid var(--light-border)', flexWrap: 'wrap' }}>
+                <img
+                  src={formData.headOfVillage?.photo || 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=600&q=80'}
+                  alt={formData.headOfVillage?.name || "Kades"}
+                  style={{ width: '70px', height: '70px', borderRadius: '50%', objectFit: 'cover', border: '3px solid #10b981', background: '#e2e8f0', flexShrink: 0 }}
+                />
+                <div style={{ flex: 1, minWidth: '220px' }}>
+                  <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-main)', display: 'block' }}>
+                    Foto Resmi Kepala Desa / Pimpinan
+                  </span>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.5rem' }}>
+                    Format JPG/PNG/WebP, maksimal 3.5 MB. Ditampilkan pada kartu sambutan halaman utama (Home).
+                  </span>
+                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    <label className="btn btn-primary btn-sm" style={{ cursor: 'pointer', fontSize: '0.775rem' }}>
+                      <Upload size={13} /> Unggah Foto Kades
+                      <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handleImageFileChange(e, 'headPhoto')} />
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Atau tempel URL gambar foto..."
+                      className="form-control"
+                      style={{ fontSize: '0.775rem', height: '32px', flex: 1, minWidth: '180px' }}
+                      value={formData.headOfVillage?.photo || ''}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        headOfVillage: { ...formData.headOfVillage, photo: e.target.value }
+                      })}
+                    />
+                  </div>
+                </div>
+              </div>
 
               <div className="form-row">
                 <div className="form-group">
-                  <label className="form-label">Nama Kepala Desa</label>
+                  <label className="form-label">Nama Lengkap & Gelar Pimpinan *</label>
                   <input
                     type="text"
+                    required
+                    placeholder="Contoh: H. Budi Santoso, S.AP"
                     className="form-control"
                     value={formData.headOfVillage?.name || ''}
                     onChange={(e) => setFormData({
@@ -390,9 +527,25 @@ export default function AdminSettings({ profile, onUpdateProfile }) {
                 </div>
 
                 <div className="form-group">
+                  <label className="form-label">Sebutan / Jabatan Resmi *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Contoh: Kepala Desa / Pj. Kepala Desa / Lurah / Kuwu"
+                    className="form-control"
+                    value={formData.headOfVillage?.title || 'Kepala Desa'}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      headOfVillage: { ...formData.headOfVillage, title: e.target.value }
+                    })}
+                  />
+                </div>
+
+                <div className="form-group">
                   <label className="form-label">Periode Masa Jabatan</label>
                   <input
                     type="text"
+                    placeholder="Contoh: 2021 - 2027"
                     className="form-control"
                     value={formData.headOfVillage?.period || ''}
                     onChange={(e) => setFormData({
@@ -404,9 +557,10 @@ export default function AdminSettings({ profile, onUpdateProfile }) {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Kata Sambutan Kepala Desa</label>
+                <label className="form-label">Kata Sambutan Kepala Desa di Halaman Home</label>
                 <textarea
-                  rows={2}
+                  rows={3}
+                  placeholder="Tuliskan pesan sambutan selamat datang kepada warga dan pengunjung website..."
                   className="form-control"
                   value={formData.headOfVillage?.welcomeSpeech || ''}
                   onChange={(e) => setFormData({
@@ -417,10 +571,133 @@ export default function AdminSettings({ profile, onUpdateProfile }) {
               </div>
             </div>
 
-            {/* Sub-Section 4: Kontak & Lokasi Kantor Balai Desa */}
-            <div style={{ background: '#f8fafc', padding: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--light-border)' }}>
-              <h4 style={{ fontSize: '0.9rem', fontWeight: 800, color: '#059669', marginBottom: '1rem' }}>
-                4. Kontak Resmi & Lokasi Pelayanan Kantor Desa
+            {/* Sub-Section 4: Struktur Perangkat & Pamong Desa */}
+            <div style={{ background: '#f8fafc', padding: '1.35rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--light-border)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+                <div>
+                  <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: '#059669', margin: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <Users size={16} /> 4. Struktur Pamong & Perangkat Desa ({(formData.apparatus || []).length})
+                  </h4>
+                  <span style={{ fontSize: '0.775rem', color: 'var(--text-muted)' }}>
+                    Kelola nama, jabatan, foto, dan nomor kontak Sekretaris Desa, Kaur, Kasi, Kadus, RW, dan RT.
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm"
+                  onClick={handleOpenAddApparatus}
+                  style={{ fontSize: '0.775rem', padding: '0.35rem 0.8rem' }}
+                >
+                  <Plus size={13} /> Tambah Perangkat Desa
+                </button>
+              </div>
+
+              {/* Apparatus Table List */}
+              <div style={{ overflowX: 'auto', background: '#ffffff', borderRadius: '8px', border: '1px solid var(--light-border)' }}>
+                <table className="table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ background: '#f8fafc', borderBottom: '1px solid var(--light-border)' }}>
+                      <th style={{ padding: '0.65rem 0.85rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: 800 }}>PERANGKAT</th>
+                      <th style={{ padding: '0.65rem 0.85rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: 800 }}>JABATAN</th>
+                      <th style={{ padding: '0.65rem 0.85rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: 800 }}>KATEGORI</th>
+                      <th style={{ padding: '0.65rem 0.85rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: 800 }}>KONTAK / NIP</th>
+                      <th style={{ padding: '0.65rem 0.85rem', textAlign: 'center', fontSize: '0.75rem', fontWeight: 800, width: '120px' }}>AKSI</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(formData.apparatus || []).slice(0, 10).map((app) => (
+                      <tr key={app.id} style={{ borderBottom: '1px solid var(--light-border)' }}>
+                        <td style={{ padding: '0.65rem 0.85rem', verticalAlign: 'middle' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                            <img
+                              src={app.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'}
+                              alt={app.name}
+                              style={{ width: '34px', height: '34px', borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--light-border)', background: '#e2e8f0', flexShrink: 0 }}
+                            />
+                            <span style={{ fontSize: '0.825rem', fontWeight: 800, color: 'var(--text-main)' }}>
+                              {app.name}
+                            </span>
+                          </div>
+                        </td>
+                        <td style={{ padding: '0.65rem 0.85rem', verticalAlign: 'middle', fontSize: '0.8rem', fontWeight: 700, color: '#059669' }}>
+                          {app.position}
+                        </td>
+                        <td style={{ padding: '0.65rem 0.85rem', verticalAlign: 'middle' }}>
+                          <span className="badge badge-neutral" style={{ fontSize: '0.675rem' }}>
+                            {app.category}
+                          </span>
+                        </td>
+                        <td style={{ padding: '0.65rem 0.85rem', verticalAlign: 'middle', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                          {app.phone || app.nip || '-'}
+                        </td>
+                        <td style={{ padding: '0.65rem 0.85rem', verticalAlign: 'middle', textAlign: 'center' }}>
+                          <div style={{ display: 'inline-flex', gap: '0.35rem' }}>
+                            <button
+                              type="button"
+                              className="btn btn-secondary btn-sm"
+                              style={{ padding: '0.25rem 0.45rem', fontSize: '0.725rem' }}
+                              onClick={() => handleOpenEditApparatus(app)}
+                              title="Edit Perangkat Desa"
+                            >
+                              <Edit size={12} />
+                            </button>
+                            <button
+                              type="button"
+                              className="btn btn-sm"
+                              style={{ padding: '0.25rem 0.45rem', fontSize: '0.725rem', background: '#fef2f2', color: '#dc2626', border: '1px solid #fca5a5' }}
+                              onClick={() => handleDeleteApparatus(app.id)}
+                              title="Hapus Perangkat Desa"
+                            >
+                              <Trash2 size={12} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {(formData.apparatus || []).length > 10 && (
+                <div style={{ textAlign: 'center', fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
+                  Menampilkan 10 dari {(formData.apparatus || []).length} Perangkat & Pamong Desa (Seluruhnya tersimpan di database).
+                </div>
+              )}
+            </div>
+
+            {/* Sub-Section 5: Visi, Misi & Sejarah Desa */}
+            <div style={{ background: '#f8fafc', padding: '1.35rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--light-border)' }}>
+              <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: '#059669', marginBottom: '1rem' }}>
+                5. Visi, Misi & Sejarah Desa
+              </h4>
+
+              <div className="form-group">
+                <label className="form-label">Visi Pembangunan Desa</label>
+                <textarea
+                  rows={2}
+                  className="form-control"
+                  value={formData.vision || ''}
+                  onChange={(e) => setFormData({ ...formData, vision: e.target.value })}
+                  placeholder="Rumusan visi pembangunan desa..."
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Sejarah Singkat Desa</label>
+                <textarea
+                  rows={3}
+                  className="form-control"
+                  value={formData.history || ''}
+                  onChange={(e) => setFormData({ ...formData, history: e.target.value })}
+                  placeholder="Tuliskan asal-usul, sejarah, dan peristiwa penting berdirinya desa..."
+                />
+              </div>
+            </div>
+
+            {/* Sub-Section 6: Kontak & Lokasi Kantor Balai Desa */}
+            <div style={{ background: '#f8fafc', padding: '1.35rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--light-border)' }}>
+              <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: '#059669', marginBottom: '1rem' }}>
+                6. Kontak Resmi & Lokasi Pelayanan Kantor Desa
               </h4>
 
               <div className="form-group">
@@ -1308,6 +1585,162 @@ export default function AdminSettings({ profile, onUpdateProfile }) {
         </div>
 
       </form>
+
+      {/* ====================================================================
+          MODAL: TAMBAH / EDIT PERANGKAT DESA
+          ==================================================================== */}
+      {apparatusModalOpen && (
+        <div className="modal-backdrop open" onClick={() => setApparatusModalOpen(false)}>
+          <div
+            className="modal-content"
+            style={{ maxWidth: '580px', maxHeight: '90vh', overflowY: 'auto' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-header">
+              <h3 className="modal-title" style={{ fontSize: '1.1rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <UserCheck size={18} color="#059669" />
+                {editingApparatusId ? 'Edit Perangkat & Pamong Desa' : 'Tambah Perangkat Desa Baru'}
+              </h3>
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                onClick={() => setApparatusModalOpen(false)}
+                style={{ padding: '0.25rem 0.5rem' }}
+              >
+                <X size={14} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveApparatus} style={{ padding: '1.25rem' }}>
+              
+              {/* Photo Upload & Preview */}
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '1.25rem', background: 'var(--light-surface)', padding: '0.85rem', borderRadius: '8px', border: '1px solid var(--light-border)' }}>
+                <img
+                  src={apparatusForm.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'}
+                  alt="Foto Perangkat"
+                  style={{ width: '60px', height: '60px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #059669', background: '#e2e8f0', flexShrink: 0 }}
+                />
+                <div style={{ flex: 1 }}>
+                  <label className="form-label" style={{ marginBottom: '0.25rem' }}>Foto Perangkat Desa</label>
+                  <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                    <label className="btn btn-secondary btn-sm" style={{ cursor: 'pointer', fontSize: '0.75rem' }}>
+                      <Upload size={12} /> Unggah Foto
+                      <input
+                        type="file"
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        onChange={(e) => handleImageFileChange(e, 'apparatusPhoto')}
+                      />
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Atau URL foto..."
+                      className="form-control"
+                      style={{ fontSize: '0.75rem', height: '30px', flex: 1, minWidth: '140px' }}
+                      value={apparatusForm.photo}
+                      onChange={(e) => setApparatusForm({ ...apparatusForm, photo: e.target.value })}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Nama Lengkap & Gelar *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Contoh: Rahmat Hidayat, S.IP"
+                    className="form-control"
+                    value={apparatusForm.name}
+                    onChange={(e) => setApparatusForm({ ...apparatusForm, name: e.target.value })}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Jabatan Pamong Desa *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Contoh: Sekretaris Desa (Sekdes)"
+                    className="form-control"
+                    value={apparatusForm.position}
+                    onChange={(e) => setApparatusForm({ ...apparatusForm, position: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Kategori Wilayah / Lembaga</label>
+                  <select
+                    className="form-control"
+                    value={apparatusForm.category}
+                    onChange={(e) => setApparatusForm({ ...apparatusForm, category: e.target.value })}
+                  >
+                    <option value="Pemerintah Desa">Pemerintah Desa (Balai Desa)</option>
+                    <option value="Kepala Dusun (Kadus)">Kepala Dusun (Kadus)</option>
+                    <option value="Rukun Warga (RW)">Rukun Warga (RW)</option>
+                    <option value="Rukun Tetangga (RT)">Rukun Tetangga (RT)</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Nomor NIP / Nomor SK Pengangkatan</label>
+                  <input
+                    type="text"
+                    placeholder="Contoh: 19830820 200902 1 002"
+                    className="form-control"
+                    value={apparatusForm.nip}
+                    onChange={(e) => setApparatusForm({ ...apparatusForm, nip: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Nomor WhatsApp / HP</label>
+                  <input
+                    type="text"
+                    placeholder="Contoh: 081234567890"
+                    className="form-control"
+                    value={apparatusForm.phone}
+                    onChange={(e) => setApparatusForm({ ...apparatusForm, phone: e.target.value })}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Wilayah Tugas / Desk</label>
+                  <input
+                    type="text"
+                    placeholder="Contoh: Sekretariat Desa / Dusun Pasirjati"
+                    className="form-control"
+                    value={apparatusForm.area}
+                    onChange={(e) => setApparatusForm({ ...apparatusForm, area: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '1.25rem', paddingTop: '1rem', borderTop: '1px solid var(--light-border)' }}>
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => setApparatusModalOpen(false)}
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary btn-sm"
+                  style={{ fontWeight: 700 }}
+                >
+                  <Save size={13} /> {editingApparatusId ? 'Simpan Perubahan' : 'Tambahkan Perangkat'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
     </div>
   );
