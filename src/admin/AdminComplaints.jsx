@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MessageSquare, CheckCircle, Clock, AlertCircle, Send, X, Phone, User } from 'lucide-react';
+import { MessageSquare, CheckCircle, Clock, AlertCircle, Send, X, Phone, User, MessageCircle } from 'lucide-react';
 
 export default function AdminComplaints({ complaintsList, onUpdateComplaint }) {
   const [selectedComplaint, setSelectedComplaint] = useState(null);
@@ -19,6 +19,27 @@ export default function AdminComplaints({ complaintsList, onUpdateComplaint }) {
     if (!responseModal) return;
     onUpdateComplaint(responseModal.id, formResponse.status, formResponse.adminResponse);
     setResponseModal(null);
+  };
+
+  const handleSendWhatsAppNotification = (c) => {
+    if (!c || !c.phone || c.phone === "-") {
+      if (window.showDesaToast) {
+        window.showDesaToast("Nomor WhatsApp pelapor tidak tersedia.", "warning");
+      } else {
+        alert("Nomor WhatsApp pelapor tidak tersedia.");
+      }
+      return;
+    }
+    const cleanPhone = c.phone.replace(/[^0-9]/g, "");
+    const phoneFormatted = cleanPhone.startsWith("0") ? "62" + cleanPhone.slice(1) : cleanPhone;
+    
+    let statusText = "Telah diterima";
+    if (c.status === "DITINDAKLANJUTI") statusText = "Sedang ditindaklanjuti oleh Pemerintah Desa";
+    else if (c.status === "SELESAI") statusText = "Telah selesai ditangani";
+
+    const msg = "Halo Sdr/i " + (c.reporterName || "Warga") + ", tanggapan resmi dari Pemerintah Desa mengenai laporan pengaduan Anda:\n\n*Judul Aduan:* " + (c.subject || c.category) + "\n*Status:* " + c.status + " (" + statusText + ")\n*Tanggapan Pemdes:* " + (c.adminResponse || "Laporan Anda telah kami catat dan dalam proses penanganan.") + "\n\nTerima kasih telah berkontribusi membangun desa kita tercinta.";
+    
+    window.open("https://wa.me/" + phoneFormatted + "?text=" + encodeURIComponent(msg), "_blank");
   };
 
   const getStatusBadge = (status) => {
@@ -75,12 +96,23 @@ export default function AdminComplaints({ complaintsList, onUpdateComplaint }) {
                     </td>
                     <td>{getStatusBadge(c.status)}</td>
                     <td style={{ textAlign: 'right' }}>
-                      <button
-                        className="btn btn-sm btn-primary"
-                        onClick={() => handleOpenResponse(c)}
-                      >
-                        Tanggapi / Update
-                      </button>
+                      <div style={{ display: 'inline-flex', gap: '0.35rem' }}>
+                        <button
+                          type="button"
+                          className="btn btn-sm"
+                          style={{ background: '#f0fdf4', color: '#16a34a', border: '1px solid #86efac', padding: '0.25rem 0.45rem' }}
+                          onClick={() => handleSendWhatsAppNotification(c)}
+                          title="Kirim Tanggapan / Notifikasi ke WhatsApp Pelapor"
+                        >
+                          <MessageCircle size={14} />
+                        </button>
+                        <button
+                          className="btn btn-sm btn-primary"
+                          onClick={() => handleOpenResponse(c)}
+                        >
+                          Tanggapi / Update
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -145,6 +177,14 @@ export default function AdminComplaints({ complaintsList, onUpdateComplaint }) {
               </div>
 
               <div className="modal-footer">
+                <button 
+                  type="button" 
+                  className="btn btn-sm" 
+                  style={{ background: '#f0fdf4', color: '#16a34a', border: '1px solid #86efac', marginRight: 'auto' }}
+                  onClick={() => handleSendWhatsAppNotification({ ...responseModal, status: formResponse.status, adminResponse: formResponse.adminResponse })}
+                >
+                  <MessageCircle size={14} /> Notifikasi WA Pelapor
+                </button>
                 <button type="button" className="btn btn-secondary" onClick={() => setResponseModal(null)}>
                   Batal
                 </button>

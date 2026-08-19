@@ -884,6 +884,19 @@ export const officialLetterTemplates = [
     ],
     openingText: "Kepala Desa Sukamaju Mandiri dengan ini MENUGASKAN kepada:",
     bodyParagraph: "Untuk melaksanakan tugas kedinasan sebagaimana tercantum di atas dengan penuh tanggung jawab dan melaporkan hasil pelaksanaannya kepada Kepala Desa.",
-    closingText: "Surat perintah tugas ini diberikan agar dilaksanakan dengan sebaik-baiknya."
+    closingText: "Surat perintah tugas ini diberikan agar dilaksanakan dengan sebaik-baiknya."  },
+  {
+    id: "SURAT_CUSTOM",
+    code: "500/SK-KUS",
+    name: "Surat Keterangan Kustom (Format Bebas & Fleksibel)",
+    category: "Surat Kustom / Bebas",
+    description: "Format surat resmi fleksibel ber-Kop Desa yang dapat diedit bebas mulai dari judul surat, nomor klasifikasi, paragraf pembuka, poin-poin keterangan, hingga penutupnya.",
+    fields: [
+      { key: "customTitle", label: "Judul / Nama Surat Resmi", placeholder: "SURAT KETERANGAN KHUSUS" },
+      { key: "customPurpose", label: "Tujuan / Keperluan Surat", placeholder: "Persyaratan permohonan khusus..." }
+    ],
+    openingText: "Yang bertanda tangan di bawah ini Kepala Desa Sukamaju Mandiri, Kecamatan Harapan Makmur, Kabupaten Nusantara dengan ini menerangkan bahwa:",
+    bodyParagraph: "Adalah benar yang bersangkutan merupakan warga penduduk desa kami dan surat keterangan ini diterbitkan guna keperluan sebagaimana tersebut di atas.",
+    closingText: "Demikian surat keterangan ini kami buat dengan sebenarnya agar dapat dipergunakan sebagaimana mestinya oleh pihak yang berkepentingan."
   }
 ];

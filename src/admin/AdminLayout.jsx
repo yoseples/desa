@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import { USER_ROLES } from '../services/initialData';
 import { initColorMode, applyColorMode } from '../services/themeHelper';
+import AdminNotificationDropdown from './AdminNotificationDropdown';
 
 export default function AdminLayout({ 
   activeTab, 
@@ -43,6 +44,8 @@ export default function AdminLayout({
   complaintCount, 
   familyCount,
   programCount,
+  requestsList = [],
+  complaintsList = [],
   children 
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -92,7 +95,7 @@ export default function AdminLayout({
       title: 'Layanan Administrasi',
       items: [
         { id: 'services', label: 'Permohonan Surat', icon: FileText, badge: pendingCount, badgeColor: '#2563eb' },
-        { id: 'letter-templates', label: '51 Template Surat', icon: Printer },
+        { id: 'letter-templates', label: 'Template & Cetak Surat', icon: Printer },
         { id: 'complaints', label: 'Pengaduan Warga', icon: MessageSquare, badge: complaintCount, badgeColor: '#dc2626' },
       ]
     },
@@ -281,6 +284,13 @@ export default function AdminLayout({
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
+            {/* Notification Bell Dropdown */}
+            <AdminNotificationDropdown
+              requestsList={requestsList}
+              complaintsList={complaintsList}
+              onNavigateTab={setActiveTab}
+            />
+
             {/* Quick Dark / Light Mode Switcher */}
             <button 
               className="btn btn-sm btn-secondary"

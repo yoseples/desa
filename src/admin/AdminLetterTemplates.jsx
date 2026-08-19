@@ -46,6 +46,21 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
   const [catalogSearch, setCatalogSearch] = useState('');
   const [catalogCategory, setCatalogCategory] = useState('ALL');
 
+  // Generator Quick Search & Category Filter
+  const [templateSearch, setTemplateSearch] = useState('');
+  const [templateCategoryFilter, setTemplateCategoryFilter] = useState('ALL');
+
+  // Custom Editable Letter State
+  const [customLetterForm, setCustomLetterForm] = useState({
+    title: 'SURAT KETERANGAN KHUSUS',
+    code: '500/SK-KUS',
+    openingText: 'Yang bertanda tangan di bawah ini Kepala Desa Sukamaju Mandiri, Kecamatan Harapan Makmur, Kabupaten Nusantara dengan ini menerangkan bahwa:',
+    bodyText: `Adalah benar yang bersangkutan merupakan warga penduduk Desa Sukamaju Mandiri dan surat keterangan ini dibuat untuk keperluan:
+1. Persyaratan administrasi khusus sesuai permohonan yang bersangkutan.
+2. Berlaku sejak tanggal diterbitkan sampai dengan keperluan di atas selesai.`,
+    closingText: 'Demikian surat keterangan ini kami buat dengan sebenarnya agar dapat dipergunakan sebagaimana mestinya oleh pihak yang berkepentingan.'
+  });
+
   // Generator State
   const [selectedTemplateId, setSelectedTemplateId] = useState('SK_JUAL_BELI');
   const [letterNumber, setLetterNumber] = useState(`593/018/DS-SKM/VIII/${new Date().getFullYear()}`);
@@ -106,6 +121,20 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
   // Modal View Scan File
   const [viewScanModal, setViewScanModal] = useState(null);
 
+  const generatorCategories = ['ALL', ...Array.from(new Set(officialLetterTemplates.map(t => t.category)))];
+  
+  const filteredGeneratorTemplates = officialLetterTemplates.filter(t => {
+    const matchCat = templateCategoryFilter === 'ALL' || t.category === templateCategoryFilter;
+    const q = templateSearch.toLowerCase().trim();
+    const matchQ = !q || 
+      t.name.toLowerCase().includes(q) || 
+      t.code.toLowerCase().includes(q) || 
+      t.description.toLowerCase().includes(q) ||
+      t.category.toLowerCase().includes(q) ||
+      (t.fields && t.fields.some(f => f.label.toLowerCase().includes(q)));
+    return matchCat && matchQ;
+  });
+
   const currentTemplate = officialLetterTemplates.find(t => t.id === selectedTemplateId) || officialLetterTemplates[0];
 
   const handleLookupCitizen = (nik) => {
@@ -153,13 +182,21 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
       recipient = `${dynamicFieldValues.sellerName || 'Penjual'} & ${dynamicFieldValues.buyerName || 'Pembeli'}`;
     }
 
+    const finalLetterName = selectedTemplateId === 'SURAT_CUSTOM' 
+      ? (customLetterForm.title || 'Surat Keterangan Khusus') 
+      : currentTemplate.name;
+
+    const finalPurpose = selectedTemplateId === 'SURAT_CUSTOM'
+      ? (customLetterForm.bodyText ? customLetterForm.bodyText.substring(0, 100) : 'Pelayanan Surat Kustom')
+      : (dynamicFieldValues.itemType || dynamicFieldValues.purpose || dynamicFieldValues.meetingSubject || 'Pelayanan Administrasi');
+
     StorageService.addOutgoingLetter({
       letterNumber,
       letterType: selectedTemplateId,
-      letterName: currentTemplate.name,
+      letterName: finalLetterName,
       recipientName: recipient,
       recipientNik: citizenNik || dynamicFieldValues.sellerNik || '-',
-      purpose: dynamicFieldValues.itemType || dynamicFieldValues.purpose || dynamicFieldValues.meetingSubject || 'Pelayanan Administrasi',
+      purpose: finalPurpose,
       signer: letterhead.signatoryName
     });
 
@@ -303,28 +340,118 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
               <FileText size={20} color="#059669" /> Formulir Generator Dokumen Desa
             </h3>
 
-            {/* Template Selector */}
-            <div className="form-group">
-              <label className="form-label">Pilih Jenis Template Surat Resmi *</label>
+            {/* Quick Search & Template Selector */}
+            <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '12px', border: '1px solid var(--light-border)', marginBottom: '1.25rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.65rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                <label className="form-label" style={{ margin: 0, fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <Search size={15} color="var(--primary)" /> Cari & Pilih Template Surat Resmi *
+                </label>
+                <button
+                  type="button"
+                  className="btn btn-sm"
+                  style={{
+                    background: selectedTemplateId === 'SURAT_CUSTOM' ? '#059669' : '#ecfdf5',
+                    color: selectedTemplateId === 'SURAT_CUSTOM' ? '#ffffff' : '#059669',
+                    border: '1px solid #a7f3d0',
+                    fontWeight: 700,
+                    fontSize: '0.725rem',
+                    padding: '0.25rem 0.55rem',
+                    borderRadius: '6px'
+                  }}
+                  onClick={() => {
+                    setSelectedTemplateId('SURAT_CUSTOM');
+                    setLetterNumber(`500/0${Math.floor(10 + Math.random() * 89)}/DS-SKM/VIII/${new Date().getFullYear()}`);
+                  }}
+                  title="Buat format surat baru dengan judul dan isi bebas sesuai kebutuhan"
+                >
+                  <Plus size={13} /> + Buat Format Surat Kustom
+                </button>
+              </div>
+
+              {/* Search Input */}
+              <div style={{ position: 'relative', marginBottom: '0.65rem' }}>
+                <Search size={15} style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                <input
+                  type="text"
+                  placeholder="Ketik kata kunci surat (contoh: kematian, sku, tanah, waris, nikah, beasiswa, izin, dll)..."
+                  className="form-control"
+                  value={templateSearch}
+                  onChange={(e) => setTemplateSearch(e.target.value)}
+                  style={{ paddingLeft: '2.4rem', paddingRight: templateSearch ? '2rem' : '0.85rem', height: '38px', fontSize: '0.825rem' }}
+                />
+                {templateSearch && (
+                  <button
+                    type="button"
+                    onClick={() => setTemplateSearch('')}
+                    style={{
+                      position: 'absolute',
+                      right: '0.6rem',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'transparent',
+                      border: 'none',
+                      color: 'var(--text-muted)',
+                      cursor: 'pointer',
+                      padding: '2px',
+                      display: 'flex',
+                      alignItems: 'center'
+                    }}
+                    title="Hapus pencarian"
+                  >
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
+
+              {/* Quick Category Filter Pills */}
+              <div style={{ display: 'flex', gap: '0.35rem', overflowX: 'auto', paddingBottom: '0.35rem', marginBottom: '0.65rem' }}>
+                {generatorCategories.map(cat => (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => setTemplateCategoryFilter(cat)}
+                    style={{
+                      border: 'none',
+                      background: templateCategoryFilter === cat ? 'var(--primary)' : '#e2e8f0',
+                      color: templateCategoryFilter === cat ? '#ffffff' : '#334155',
+                      fontSize: '0.7rem',
+                      fontWeight: 700,
+                      padding: '0.2rem 0.55rem',
+                      borderRadius: '9999px',
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                      transition: 'all 0.15s ease'
+                    }}
+                  >
+                    {cat === 'ALL' ? 'Semua' : cat}
+                  </button>
+                ))}
+              </div>
+
+              {/* Dropdown Select (Filtered) */}
               <select
                 className="form-control"
                 value={selectedTemplateId}
                 onChange={(e) => {
-                  setSelectedTemplateId(e.target.value);
-                  const selected = officialLetterTemplates.find(t => t.id === e.target.value);
+                  const tId = e.target.value;
+                  setSelectedTemplateId(tId);
+                  const selected = officialLetterTemplates.find(t => t.id === tId);
                   setLetterNumber(`${selected?.code || '500'}/0${Math.floor(10 + Math.random() * 89)}/DS-SKM/VIII/${new Date().getFullYear()}`);
                 }}
-                style={{ fontWeight: 700, color: '#064e3b' }}
+                style={{ fontWeight: 700, color: '#064e3b', height: '40px' }}
               >
-                {officialLetterTemplates.map((t) => (
+                {filteredGeneratorTemplates.map((t) => (
                   <option key={t.id} value={t.id}>
                     {t.name} ({t.category})
                   </option>
                 ))}
               </select>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                {currentTemplate.description}
-              </span>
+              
+              <div style={{ marginTop: '0.4rem', fontSize: '0.75rem', color: 'var(--text-muted)', lineHeight: 1.35 }}>
+                {selectedTemplateId === 'SURAT_CUSTOM' 
+                  ? 'Format surat fleksibel yang dapat disesuaikan judul, nomor, isi keterangan, dan penutupnya secara bebas.'
+                  : currentTemplate.description}
+              </div>
             </div>
 
             {/* Register Number */}
@@ -415,10 +542,66 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
               </>
             )}
 
+            {/* Custom Letter Form Fields */}
+            {selectedTemplateId === 'SURAT_CUSTOM' && (
+              <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', padding: '1.15rem', borderRadius: '12px', marginBottom: '1.25rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.85rem', color: '#166534', fontWeight: 800, fontSize: '0.875rem' }}>
+                  <Edit size={16} /> Formulir Penyesuaian Surat Kustom
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" style={{ fontWeight: 700 }}>Judul / Nama Surat Resmi *</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Contoh: SURAT KETERANGAN PENGANTAR KHUSUS"
+                    value={customLetterForm.title}
+                    onChange={(e) => setCustomLetterForm({ ...customLetterForm, title: e.target.value.toUpperCase() })}
+                    style={{ fontWeight: 800, letterSpacing: '0.02em' }}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" style={{ fontWeight: 700 }}>Kalimat / Paragraf Pembuka</label>
+                  <textarea
+                    rows={2}
+                    className="form-control"
+                    value={customLetterForm.openingText}
+                    onChange={(e) => setCustomLetterForm({ ...customLetterForm, openingText: e.target.value })}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" style={{ fontWeight: 700 }}>Isi Surat / Poin-Poin Keterangan (Bebas Edit) *</label>
+                  <textarea
+                    rows={4}
+                    className="form-control"
+                    placeholder="Tuliskan isi keterangan, rincian permohonan, atau poin-poin surat..."
+                    value={customLetterForm.bodyText}
+                    onChange={(e) => setCustomLetterForm({ ...customLetterForm, bodyText: e.target.value })}
+                    style={{ fontSize: '0.85rem', lineHeight: 1.5 }}
+                  />
+                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                    Tip: Tekan Enter untuk membuat baris baru atau penomoran 1, 2, 3.
+                  </span>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" style={{ fontWeight: 700 }}>Kalimat / Paragraf Penutup</label>
+                  <textarea
+                    rows={2}
+                    className="form-control"
+                    value={customLetterForm.closingText}
+                    onChange={(e) => setCustomLetterForm({ ...customLetterForm, closingText: e.target.value })}
+                  />
+                </div>
+              </div>
+            )}
+
             {/* Dynamic Specific Fields */}
             <div style={{ borderTop: '1px solid var(--light-border)', paddingTop: '1rem', marginTop: '0.5rem' }}>
               <h4 style={{ fontSize: '0.9rem', color: '#059669', marginBottom: '0.75rem' }}>
-                Rincian Data Dokumen ({currentTemplate.id}):
+                Rincian Data Dokumen ({selectedTemplateId === 'SURAT_CUSTOM' ? 'Surat Kustom' : currentTemplate.id}):
               </h4>
               {currentTemplate.fields.map((field) => (
                 <div className="form-group" key={field.key}>
@@ -660,8 +843,70 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
                     </div>
                   </div>
                 </div>
+              ) : selectedTemplateId === 'SURAT_CUSTOM' ? (
+                /* 3. FORMAT SURAT KETERANGAN KUSTOM / BEBAS */
+                <div>
+                  <div style={{ textAlign: 'center', marginBottom: '1.25rem' }}>
+                    <h3 style={{ fontSize: '12.5pt', fontWeight: 'bold', textTransform: 'uppercase', textDecoration: 'underline', margin: 0 }}>
+                      {customLetterForm.title || 'SURAT KETERANGAN KHUSUS'}
+                    </h3>
+                    <p style={{ fontSize: '10pt', margin: '3px 0 0 0' }}>
+                      Nomor: {letterNumber}
+                    </p>
+                  </div>
+
+                  <div style={{ textAlign: 'justify', fontSize: '10.5pt', marginBottom: '1rem' }}>
+                    <p style={{ textIndent: '28px', margin: '0 0 0.75rem 0' }}>
+                      {customLetterForm.openingText}
+                    </p>
+
+                    <table style={{ width: '100%', marginBottom: '0.75rem', borderCollapse: 'collapse', fontSize: '10.5pt' }}>
+                      <tbody>
+                        <tr><td style={{ width: '180px', padding: '2px 0' }}>Nama Lengkap</td><td style={{ width: '12px' }}>:</td><td style={{ fontWeight: 'bold' }}>{citizenName || '...........................................'}</td></tr>
+                        <tr><td style={{ padding: '2px 0' }}>NIK</td><td>:</td><td>{citizenNik || '...........................................'}</td></tr>
+                        <tr><td style={{ padding: '2px 0' }}>Pekerjaan</td><td>:</td><td>{citizenJob || '...........................................'}</td></tr>
+                        <tr><td style={{ padding: '2px 0' }}>Alamat Domisili</td><td>:</td><td>{citizenAddress || '...........................................'} ({citizenRtRw})</td></tr>
+                        <tr><td style={{ padding: '2px 0' }}>Desa / Kecamatan</td><td>:</td><td>{letterhead.villageName?.replace('KANTOR KEPALA DESA ', '') || 'Sukamaju Mandiri'} / {letterhead.districtName?.replace('KECAMATAN ', '') || 'Harapan Makmur'}</td></tr>
+                      </tbody>
+                    </table>
+
+                    {/* Custom Body Paragraphs / Points */}
+                    <div style={{ margin: '0.75rem 0', whiteSpace: 'pre-line', textIndent: '28px', lineHeight: 1.5 }}>
+                      {customLetterForm.bodyText}
+                    </div>
+
+                    <p style={{ textIndent: '28px', marginTop: '0.75rem' }}>
+                      {customLetterForm.closingText}
+                    </p>
+                  </div>
+
+                  {/* TANDA TANGAN & TTE QR */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginTop: '2rem', fontSize: '10pt' }}>
+                    {letterhead.showQrVerification && (
+                      <div style={{ width: '180px', textAlign: 'center', padding: '0.5rem', border: '1px dashed #64748b', borderRadius: '4px' }}>
+                        <div style={{ fontSize: '7.5pt', color: '#64748b', marginBottom: '2px' }}>VERIFIKASI DIGITAL DESA</div>
+                        <div style={{ background: '#f8fafc', padding: '4px', border: '1px solid #059669', color: '#059669', fontWeight: 'bold', fontSize: '8pt', borderRadius: '3px' }}>
+                          ✓ TTE TERVERIFIKASI
+                        </div>
+                        <div style={{ fontSize: '7pt', color: '#64748b', marginTop: '3px' }}>
+                          Dokumen Resmi Elektronik
+                        </div>
+                      </div>
+                    )}
+
+                    <div style={{ textAlign: 'center', width: '220px' }}>
+                      <p style={{ margin: 0 }}>Sukamaju, {currentDate}</p>
+                      <p style={{ margin: '2px 0 0 0', fontWeight: 'bold' }}>{letterhead.signatoryRole}</p>
+                      <div style={{ height: '55px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <span style={{ fontSize: '8.5pt', color: '#059669', fontStyle: 'italic', fontWeight: 'bold' }}>[ TTE Terverifikasi ]</span>
+                      </div>
+                      <p style={{ margin: 0, fontWeight: 'bold', textDecoration: 'underline' }}>{letterhead.signatoryName}</p>
+                      <p style={{ margin: 0, fontSize: '8.5pt' }}>NIP. {letterhead.signatoryNip}</p>
+                    </div>
+                  </div>
+                </div>
               ) : (
-                /* 3. FORMAT SURAT KETERANGAN UMUM (SKU, SKTM, SKD, DLL) */
+                /* 4. FORMAT SURAT KETERANGAN UMUM (SKU, SKTM, SKD, DLL) */
                 <div>
                   <div style={{ textAlign: 'center', marginBottom: '1.25rem' }}>
                     <h3 style={{ fontSize: '12.5pt', fontWeight: 'bold', textTransform: 'uppercase', textDecoration: 'underline', margin: 0 }}>
@@ -1120,7 +1365,7 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
                   />
                 </div>
                 <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>
-                  Menampilkan <strong>{filteredTemplates.length}</strong> dari {officialLetterTemplates.length} Template Surat Resmi
+                  Menampilkan <strong>{filteredTemplates.length}</strong> Template Surat Resmi
                 </div>
               </div>
 
@@ -1144,7 +1389,7 @@ export default function AdminLetterTemplates({ profile, onUpdateProfile }) {
                       transition: 'all 0.15s ease'
                     }}
                   >
-                    {cat === 'ALL' ? `Semua Kategori (${officialLetterTemplates.length})` : cat}
+                    {cat === 'ALL' ? 'Semua Kategori' : cat}
                   </button>
                 ))}
               </div>

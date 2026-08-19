@@ -11,7 +11,8 @@ import {
   User, 
   Phone, 
   MapPin, 
-  X 
+  X, 
+  MessageCircle 
 } from 'lucide-react';
 
 export default function AdminServices({ 
@@ -40,6 +41,29 @@ export default function AdminServices({
       status: req.status || 'MENUNGGU',
       adminNotes: req.adminNotes || ''
     });
+  };
+
+  const handleSendWhatsAppNotification = (req) => {
+    if (!req || !req.phone || req.phone === "-") {
+      if (window.showDesaToast) {
+        window.showDesaToast("Nomor WhatsApp pemohon tidak tersedia.", "warning");
+      } else {
+        alert("Nomor WhatsApp pemohon tidak tersedia.");
+      }
+      return;
+    }
+    const cleanPhone = req.phone.replace(/[^0-9]/g, "");
+    const phoneFormatted = cleanPhone.startsWith("0") ? "62" + cleanPhone.slice(1) : cleanPhone;
+    
+    let statusText = "sedang dalam antrean verifikasi";
+    if (req.status === "DIPROSES") statusText = "sedang diverifikasi dan diproses oleh petugas";
+    else if (req.status === "DISETUJUI") statusText = "telah disetujui Kepala Desa";
+    else if (req.status === "SELESAI") statusText = "telah SELESAI dan dokumen resmi dapat diambil / dicetak";
+    else if (req.status === "DITOLAK") statusText = "belum dapat disetujui karena berkas belum lengkap";
+
+    const msg = "Halo Sdr/i " + (req.citizenName || "Warga") + ", pemberitahuan resmi dari Pemerintah Desa:\n\nPermohonan *" + (req.letterName || req.letterType) + "* dengan Kode Resi *" + req.trackingCode + "* saat ini berstatus: *" + req.status + "* (" + statusText + ").\n\nCatatan Petugas: " + (req.adminNotes || "-") + "\n\nTerima kasih atas partisipasi Anda dalam menggunakan Layanan Administrasi Desa Digital.";
+    
+    window.open("https://wa.me/" + phoneFormatted + "?text=" + encodeURIComponent(msg), "_blank");
   };
 
   const handleSaveStatus = (e) => {
@@ -152,6 +176,14 @@ export default function AdminServices({
                           <Eye size={14} /> Detail
                         </button>
                         <button
+                          className="btn btn-sm"
+                          style={{ background: "#f0fdf4", color: "#16a34a", border: "1px solid #86efac", padding: "0.25rem 0.45rem" }}
+                          onClick={() => handleSendWhatsAppNotification(req)}
+                          title="Kirim Notifikasi Status via WhatsApp"
+                        >
+                          <MessageCircle size={14} />
+                        </button>
+                        <button
                           className="btn btn-sm btn-primary"
                           onClick={() => handleOpenEdit(req)}
                           title="Ubah Status & Catatan"
@@ -251,6 +283,14 @@ export default function AdminServices({
               )}
             </div>
             <div className="modal-footer">
+              <button 
+                type="button" 
+                className="btn btn-sm" 
+                style={{ background: "#f0fdf4", color: "#16a34a", border: "1px solid #86efac", marginRight: "auto" }}
+                onClick={() => handleSendWhatsAppNotification(selectedReq)}
+              >
+                <MessageCircle size={14} /> Kirim Notifikasi WA
+              </button>
               <button className="btn btn-secondary" onClick={() => setSelectedReq(null)}>Tutup</button>
               <button
                 className="btn btn-primary"

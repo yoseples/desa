@@ -175,13 +175,33 @@ export default function App() {
   // Toast notifications
   const [toasts, setToasts] = useState([]);
 
-  const addToast = (message, type = 'success') => {
-    const id = Date.now();
-    setToasts((prev) => [...prev, { id, message, type }]);
+  const addToast = (messageOrObj, type = 'success', duration = 4500) => {
+    const id = Date.now() + '-' + Math.random().toString(36).substring(2, 7);
+    let item = { id, type, duration };
+    if (typeof messageOrObj === 'object' && messageOrObj !== null) {
+      item = { ...item, ...messageOrObj };
+    } else {
+      item.message = String(messageOrObj || '');
+    }
+    setToasts((prev) => [...prev, item]);
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 4000);
+    }, item.duration || duration);
   };
+
+  useEffect(() => {
+    const handleGlobalToast = (e) => {
+      if (e && e.detail) {
+        addToast(e.detail.message || e.detail, e.detail.type || 'info', e.detail.duration);
+      }
+    };
+    window.addEventListener('desa:toast', handleGlobalToast);
+    window.showDesaToast = addToast;
+    return () => {
+      window.removeEventListener('desa:toast', handleGlobalToast);
+      delete window.showDesaToast;
+    };
+  }, []);
 
   const dismissToast = (id) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
@@ -495,6 +515,8 @@ export default function App() {
             complaintCount={pendingComplaintsCount}
             familyCount={(familiesList || []).length}
             programCount={(workProgramsList || []).length}
+            requestsList={requestsList}
+            complaintsList={complaintsList}
           >
             {adminTab === 'dashboard' && (
               <AdminDashboard

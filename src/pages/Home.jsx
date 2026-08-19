@@ -179,7 +179,7 @@ export default function Home({
             margin: '0 auto'
           }}>
             
-            {/* 1. 51 Template Surat */}
+            {/* 1. Template Surat Resmi */}
             <div 
               onClick={() => onOpenServiceModal('SKU')}
               style={{ background: 'rgba(255, 255, 255, 0.12)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.22)', borderRadius: '10px', padding: '0.65rem 0.4rem', cursor: 'pointer', transition: 'all 0.2s ease', textAlign: 'center' }}
