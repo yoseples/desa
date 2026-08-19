@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Search, Calendar, User, Eye, ArrowRight, Tag } from 'lucide-react';
 
+export const slug = '/berita';
 export default function News({ newsList, onSelectNews }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Semua');

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Image as ImageIcon, Calendar, X, ZoomIn } from 'lucide-react';
 
+export const slug = '/galeri';
 export default function Gallery({ galleryList }) {
   const [selectedCategory, setSelectedCategory] = useState('Semua');
   const [activePhoto, setActivePhoto] = useState(null);

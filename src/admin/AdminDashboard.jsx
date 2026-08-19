@@ -24,6 +24,7 @@ import {
   Coins
 } from 'lucide-react';
 
+export const slug = '/dashboard';
 export default function AdminDashboard({
   profile,
   newsList = [],

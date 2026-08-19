@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+
+export const slug = '/profil';
 import { 
   Building2, 
   Target, 

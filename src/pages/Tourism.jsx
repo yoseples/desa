@@ -1,6 +1,7 @@
 import React from 'react';
 import { Palmtree, MapPin, Clock, Ticket, Star, CheckCircle, Navigation } from 'lucide-react';
 
+export const slug = '/wisata';
 export default function Tourism({ tourismList }) {
   const formatRupiah = (num) => {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);

@@ -82,7 +82,7 @@ export default function AdminLayout({
       ]
     },
     {
-      title: 'Kependudukan OpenSID',
+      title: 'Administrasi Kependudukan',
       items: [
         { id: 'citizens', label: 'Data Penduduk & KK', icon: Users, badge: familyCount, badgeColor: '#0d9488' },
         { id: 'statistics', label: 'Statistik & Piramida', icon: Sun, badgeColor: '#2563eb' },

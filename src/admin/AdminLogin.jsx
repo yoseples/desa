@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { StorageService } from '../services/storageService';
 
+export const slug = '/login';
 export default function AdminLogin({ profile, onLoginSuccess, onBackToHome }) {
   const [username, setUsername] = useState('admin');
   const [password, setPassword] = useState('admin123');

@@ -1625,6 +1625,30 @@ h1, h2, h3, h4, .section-title, .hero-title, .modal-title, .card-title {
   gap: 1.5rem;
 }
 
+/* Filter Tabs for category pills */
+.filter-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+.filter-tab {
+  background: var(--bg-main);
+  color: var(--text-main);
+  border: 1px solid var(--light-border);
+  border-radius: var(--radius-full);
+  padding: 0.35rem 0.75rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.filter-tab.active,
+.filter-tab:hover {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
 .card {
   background: #ffffff;
   border-radius: var(--radius-xl);

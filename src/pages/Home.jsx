@@ -134,10 +134,10 @@ export default function Home({
             <img 
               src={profile?.logo || 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?auto=format&fit=crop&w=200&q=80'} 
               alt="Logo Desa"
-              style={{ width: '48px', height: '48px', objectFit: 'contain', marginBottom: '0.5rem', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.5))' }}
+              style={{ width: '240px', height: '240px', maxWidth: '90vw', maxHeight: '240px', objectFit: 'contain', marginBottom: '1rem', filter: 'drop-shadow(0 6px 16px rgba(0,0,0,0.6))' }}
             />
             <span style={{ fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#6ee7b7', background: 'rgba(16, 185, 129, 0.2)', padding: '0.2rem 0.65rem', borderRadius: '9999px', border: '1px solid rgba(52, 211, 153, 0.35)', marginBottom: '0.35rem' }}>
-              Sistem Informasi Desa Pintar (OpenSID)
+              Sistem Informasi Desa Pintar
             </span>
             <h1 style={{ fontSize: 'clamp(1.25rem, 2.8vw, 1.85rem)', fontWeight: 900, color: '#ffffff', margin: 0, textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
               {profile?.name || 'Desa Sukamaju Mandiri'}

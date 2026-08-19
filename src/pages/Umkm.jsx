@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Search, ShoppingBag, Star, MessageCircle, SlidersHorizontal, ArrowUpDown } from 'lucide-react';
 
+export const slug = '/umkm';
 export default function Umkm({ umkmList, onSelectUmkm }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Semua');

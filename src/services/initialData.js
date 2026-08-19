@@ -820,7 +820,7 @@ export const initialAdminUsers = [
     email: "admin@desasukamaju.id",
     role: "SUPER_ADMIN",
     position: "Kepala Desa / Super Administrator",
-    password: "admin",
+    password: "admin123",
     phone: "0812-3456-7890",
     status: "ACTIVE",
     avatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=600&q=80",

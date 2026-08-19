@@ -74,7 +74,7 @@ export default function CitizenSelfServiceModal({ isOpen, onClose, onOpenService
         <div className="modal-header" style={{ background: 'linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%)', color: '#ffffff', borderBottom: 'none' }}>
           <div>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.2rem 0.6rem', background: 'rgba(59, 130, 246, 0.2)', border: '1px solid #3b82f6', borderRadius: '9999px', fontSize: '0.7rem', fontWeight: 700, color: '#93c5fd', marginBottom: '0.35rem' }}>
-              <UserCheck size={12} /> Layanan Mandiri Warga OpenSID
+              <UserCheck size={12} /> Layanan Mandiri Warga
             </div>
             <h3 className="modal-title" style={{ fontSize: '1.25rem', fontWeight: 800, color: '#ffffff' }}>
               Anjungan Pelayanan Mandiri Online

@@ -213,7 +213,7 @@ export default function AdminLand({ profile }) {
           <div className="table-toolbar" style={{ flexWrap: 'wrap', gap: '0.75rem' }}>
             <div>
               <h3 className="table-toolbar-title" style={{ fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                <FileText size={18} color="#059669" /> Buku Letter C / Daftar Kohir Pertanahan Desa (OpenSID)
+                <FileText size={18} color="#059669" /> Buku Letter C / Daftar Kohir Pertanahan Desa (Buku Tanah Desa)
               </h3>
               <span style={{ fontSize: '0.775rem', color: 'var(--text-muted)' }}>
                 Kutipan buku C pertanahan, riwayat mutasi peralihan hak (waris, hibah, jual beli).

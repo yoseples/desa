@@ -10,6 +10,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 
+export const slug = '/kontak';
 export default function Contact({ profile, onSubmitComplaint }) {
   const [contactForm, setContactForm] = useState({
     name: '',

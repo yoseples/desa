@@ -14,6 +14,7 @@ import {
 import { letterTypes } from '../services/initialData';
 import confetti from 'canvas-confetti';
 
+export const slug = '/layanan';
 export default function Services({ onOpenServiceModal, onOpenTracking, onSubmitComplaint }) {
   const [complaintForm, setComplaintForm] = useState({
     reporterName: '',

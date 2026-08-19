@@ -86,7 +86,7 @@ export default function AdminStatistics({ profile }) {
       }}>
         <div>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', padding: '0.2rem 0.6rem', background: 'var(--primary-light)', border: '1px solid var(--primary-border)', borderRadius: '9999px', fontSize: '0.7rem', fontWeight: 700, color: 'var(--primary-dark)', marginBottom: '0.35rem' }}>
-            <BarChart2 size={12} /> Modul Statistik OpenSID
+            <BarChart2 size={12} /> Modul Statistik Terpadu
           </div>
           <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
             Statistik Demografi & Piramida Kependudukan

@@ -169,7 +169,7 @@ export default function AdminPopulation({ profile }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       
-      {/* 1. OpenSID Top Stat Infoboxes */}
+      {/* 1. Kependudukan Top Stat Infoboxes */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
         <div style={{ background: 'var(--card-bg)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', padding: '1.25rem', borderLeft: '4px solid #2563eb' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -224,7 +224,7 @@ export default function AdminPopulation({ profile }) {
         </div>
       </div>
 
-      {/* 2. Sub Menu Tabs OpenSID */}
+      {/* 2. Sub Menu Tabs Kependudukan */}
       <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
         <button
           type="button"
@@ -266,7 +266,7 @@ export default function AdminPopulation({ profile }) {
           <div className="table-toolbar" style={{ flexWrap: 'wrap', gap: '0.75rem' }}>
             <div>
               <h3 className="table-toolbar-title" style={{ fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                <Users size={18} color="#2563eb" /> Buku Administrasi Kependudukan (OpenSID Data)
+                <Users size={18} color="#2563eb" /> Buku Administrasi Kependudukan (Data Kependudukan)
               </h3>
               <span style={{ fontSize: '0.775rem', color: 'var(--text-muted)' }}>
                 Kelola data NIK, SHDK, pendidikan, pekerjaan, dan rekam KTP-el warga desa.
@@ -640,7 +640,7 @@ export default function AdminPopulation({ profile }) {
           <div className="modal-content" style={{ maxWidth: '540px' }} onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3 className="modal-title" style={{ fontSize: '1.1rem', fontWeight: 800 }}>
-                Biodata Lengkap Penduduk (OpenSID)
+                Biodata Lengkap Penduduk 
               </h3>
               <button type="button" className="btn btn-secondary btn-sm" onClick={() => setDetailCitizen(null)}>
                 <X size={14} />
@@ -703,7 +703,7 @@ export default function AdminPopulation({ profile }) {
           <div className="modal-content" style={{ maxWidth: '620px', maxHeight: '90vh', overflowY: 'auto' }} onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3 className="modal-title" style={{ fontSize: '1.1rem', fontWeight: 800 }}>
-                {editingCitizenId ? 'Edit Biodata Penduduk' : 'Input Penduduk Baru (OpenSID)'}
+                {editingCitizenId ? 'Edit Biodata Penduduk' : 'Input Penduduk Baru '}
               </h3>
               <button type="button" className="btn btn-secondary btn-sm" onClick={() => setCitizenModalOpen(false)}>
                 <X size={14} />
